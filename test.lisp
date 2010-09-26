@@ -7,9 +7,6 @@
 
 (defsuite* :musicxml)
 
-(deftest dummy
-  (is (= 1 1)))
-
 (defun files-eql-p (a b)
   (let ((process (sb-ext:run-program
 		  "/usr/bin/diff"
@@ -34,7 +31,7 @@
     (with-open-file (out "/tmp/foo.xml"
 			 :direction :output
 			 :if-exists :supersede)
-      (s-xml:print-xml (s-xml:parse-xml-file xml) :stream out))
+      (s-xml:print-xml (parse-xml-file-via-cxml xml) :stream out))
     (canonicalize "/tmp/foo.xml" "/tmp/fooc.xml")
     (canonicalize xml "/tmp/origc.xml")
     (is (files-eql-p "/tmp/origc.xml" "/tmp/fooc.xml")
