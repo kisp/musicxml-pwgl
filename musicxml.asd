@@ -8,6 +8,6 @@
   :licence "GPLv3"
   :depends-on (s-xml cxml myam)
   :serial t
-  :components ((:file "pprint-xml")
-	       (:file "test")
-	       (:file "musicxml")))
+  :components ((:file "pprint-xml")	       
+	       (:file "musicxml")
+	       (:file "test")))

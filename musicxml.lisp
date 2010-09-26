@@ -66,13 +66,15 @@
 (defmethod translate-from-lxml (dom (type (eql ':|pitch|)))
   (assoc-bind (step alter octave) (cdr dom)
     (make-pitch :step (intern step)
-		:alter (parse-integer alter)
+		:alter (if (null alter) 0 (parse-integer alter))
 		:octave (parse-integer octave))))
 
 (defmethod translate-to-lxml ((pitch pitch))
   `(:|pitch|
      (:|step| ,(string (pitch-step pitch)))
-     (:|alter| ,(princ-to-string (pitch-alter pitch)))
+     ,@(unless
+	(eql 0 (pitch-alter pitch))
+	`((:|alter| ,(princ-to-string (pitch-alter pitch)))))
      (:|octave| ,(princ-to-string (pitch-octave pitch)))))
 
 (defmethod make-constructor-form ((pitch pitch))
