@@ -2,7 +2,7 @@
 
 (asdf:defsystem musicxml
   :version "0"
-  :description "musicxml export for PWGL"
+  :description "musicxml export for pwgl"
   :maintainer "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :author "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :licence "GPLv3"

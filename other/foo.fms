@@ -1,0 +1,10 @@
+output (xml)
+
+filename = "/tmp/foo.xml"
+
+time 0 dur 1 pitch 61 ;
+time 1.2 dur 1 pitch 62 ;
+
+
+
+

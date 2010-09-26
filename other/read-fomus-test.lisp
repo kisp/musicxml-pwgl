@@ -1,54 +1,38 @@
 
+
 (let ((*print-pprint-dispatch* (copy-pprint-dispatch nil)))
   (set-pprint-dispatch '(cons (member :|pitch|) t) 
 		       (lambda (stream obj) 				  
 			 (format stream "~A~A" (second (assoc :|step| (cdr obj)))
 				 (second (assoc :|octave| (cdr obj))))))
   (set-pprint-dispatch '(cons (member :|note|) t) 
-		       (lambda (stream obj) 				  
+		       (lambda (stream obj &aux chordp) 				  
+			 (pop obj)
+			 (when (eql (first obj) :|chord|)
+			   (setq chordp t)
+			   (pop obj))
 			 (toad-case1 obj
-			   ((list :|note| 
-				  (and pitch (cons :|pitch| t))
-				  (list :|duration| duration)
-				  (list :|type| type)
-				  (list :|accidental| accidental)
-				  (list :|staff| staff)) 
+			   ((list  
+			     (and pitch (cons :|pitch| t))
+			     (list :|duration| duration)
+			     (list :|type| type)
+			     (list :|accidental| accidental)
+			     (list :|staff| staff)) 
 			    (format stream "<~W ~A ~A s~A>" 
 				    pitch
 				    duration
 				    (subseq type 0 1)
-				    staff))
-			   ((list :|note| :|chord| 
-				  (and pitch (cons :|pitch| t))
-				  (list :|duration| duration)
-				  (list :|type| type)
-				  (list :|accidental| accidental)
-				  (list :|staff| staff)) 
-			    (format stream "_~W ~A ~A s~A_" 
-				    pitch
-				    duration
-				    (subseq type 0 1)
-				    staff))
-			   ((list :|note| 
-				  (and pitch (or :|rest| (cons :|pitch| t)))
-				  (list :|duration| duration)
-				  (list :|type| type)					   
-				  (list :|staff| staff)) 
+				    staff))			   
+			   ((list  
+			     (and pitch (or :|rest| (cons :|pitch| t)))
+			     (list :|duration| duration)
+			     (list :|type| type)					   
+			     (list :|staff| staff)) 
 			    (format stream "<~W ~A ~A s~A>" 
 				    pitch
 				    duration
 				    (subseq type 0 1)
-				    staff))
-			   ((list :|note| :|chord|
-				  (and pitch (cons :|pitch| t))
-				  (list :|duration| duration)
-				  (list :|type| type)					   
-				  (list :|staff| staff)) 
-			    (format stream "_~W ~A ~A s~A_" 
-				    pitch
-				    duration
-				    (subseq type 0 1)
-				    staff))
+				    staff))			   
 			   (t (with-standard-io-syntax (error "~A" (prin1-to-string obj))))) 
 			 ))
   (set-pprint-dispatch '(member :|rest|)
