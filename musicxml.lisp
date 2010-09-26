@@ -12,7 +12,19 @@
 (in-package #:musicxml)
 
 (defun from-lxml (dom)
-  (translate-from-lxml dom (car dom)))
+  (cond ((consp dom)
+	 (translate-from-lxml dom (car dom)))
+	((stringp dom) dom)
+	((keywordp dom)
+	 (translate-from-lxml dom dom))
+	(t
+	 (error "dunno with ~S?" dom))))
+
+(defmethod translate-from-lxml (dom type)
+  (if (consp dom)
+      (cons (car dom)
+	    (mapcar 'from-lxml (cdr dom)))
+      dom))
 
 (defun to-lxml (obj)
   (translate-to-lxml obj))
