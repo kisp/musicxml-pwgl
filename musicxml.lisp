@@ -29,6 +29,12 @@
 (defun to-lxml (obj)
   (translate-to-lxml obj))
 
+(defmethod translate-to-lxml (obj)
+  (if (consp obj)
+      (cons (car obj)
+	    (mapcar 'translate-to-lxml (cdr obj)))
+      obj))
+
 (defgeneric make-constructor-form (obj))
 
 (defun generic-pretty-printer (stream obj)
@@ -53,6 +59,7 @@
   (write-string "#." stream)
   (prin1 (make-constructor-form musicxml-object) stream))
 
+;;; pitch
 (defstruct (pitch (:include musicxml-object))
   step alter octave)
 

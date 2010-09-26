@@ -73,5 +73,11 @@
 	(s-xml:parse-xml-file xml)
 	(diff "/tmp/origc.xml" "/tmp/fooc.xml"))))
 
+(deftest lxml
+  (dolist (xml (directory "fomus-xmls/*.xml"))
+    (let ((lxml (s-xml:parse-xml-file xml)))
+      (is (equal lxml
+		 (musicxml:to-lxml (musicxml:from-lxml lxml)))))))
+
 (defun run-tests ()
   (run! :musicxml))
