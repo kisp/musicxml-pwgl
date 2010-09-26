@@ -88,7 +88,7 @@
 
 (set-pprint-dispatch 'pitch 'generic-pretty-printer 0 *pprint-xml-table*)
 
-;;; rest
+;;; rest*
 (defstruct (rest* (:include musicxml-object)))
 
 (defmethod translate-from-lxml (dom (type (eql ':|rest|)))
