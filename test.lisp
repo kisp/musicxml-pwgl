@@ -1,7 +1,9 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (defpackage #:test
-  (:use #:cl #:myam))
+  (:use #:cl #:myam)
+  (:export
+   #:run-tests))
 
 (in-package #:test)
 
@@ -70,3 +72,6 @@
 	(file-namestring xml)
 	(s-xml:parse-xml-file xml)
 	(diff "/tmp/origc.xml" "/tmp/fooc.xml"))))
+
+(defun run-tests ()
+  (run! :musicxml))

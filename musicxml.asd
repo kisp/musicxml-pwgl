@@ -9,4 +9,5 @@
   :depends-on (s-xml cxml myam)
   :serial t
   :components ((:file "pprint-xml")
-	       (:file "test")))
+	       (:file "test")
+	       (:file "musicxml")))
