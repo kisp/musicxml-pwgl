@@ -46,14 +46,19 @@
   (xmls2lxml (cxml:parse-file path (cxml-xmls:make-xmls-builder))))
 
 (defun xmls2lxml (node)
-  (if (consp node)
-      `((,(intern (cxml-xmls:node-name node) "KEYWORD")
-	  ,@(mapcan (lambda (pair)
-		      (list (intern (first pair) "KEYWORD")
-			    (second pair)))
-		    (reverse (cxml-xmls:node-attrs node))))
-	,@(mapcar #'xmls2lxml (cxml-xmls:node-children node)))
-      node))
+  (cond ((and (consp node)
+	      (null (cxml-xmls:node-attrs node))
+	      (null (cxml-xmls:node-children node)))
+	 (intern (cxml-xmls:node-name node) "KEYWORD"))
+	((consp node)
+	 `((,(intern (cxml-xmls:node-name node) "KEYWORD")
+	     ,@(mapcan (lambda (pair)
+			 (list (intern (first pair) "KEYWORD")
+			       (second pair)))
+		       (reverse (cxml-xmls:node-attrs node))))
+	   ,@(mapcar #'xmls2lxml (cxml-xmls:node-children node))))
+	(t
+	 node)))
 
 (deftest ppxml-read-write
   (dolist (xml (directory "any-xmls/*.xml"))
