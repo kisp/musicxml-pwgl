@@ -51,8 +51,10 @@
 (set-pprint-dispatch
  'symbol
  (lambda (stream obj)
-   (let ((*print-pretty* nil))
-     (format stream "<~A/>" obj)))
+   (write-string "<" stream)
+   (write-string (string obj) stream)
+   (pprint-newline :linear stream)
+   (write-string "/>" stream))
  0 *pprint-xml-table*)
 
 (set-pprint-dispatch
