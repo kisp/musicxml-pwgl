@@ -7,7 +7,8 @@
    #:from-lxml
    #:to-lxml
    #:make-constructor-form
-   #:pitch))
+   #:pitch
+   #:rest*))
 
 (in-package #:musicxml)
 
@@ -86,3 +87,19 @@
   (make-pitch :step step :alter alter :octave octave))
 
 (set-pprint-dispatch 'pitch 'generic-pretty-printer 0 *pprint-xml-table*)
+
+;;; rest
+(defstruct (rest* (:include musicxml-object)))
+
+(defmethod translate-from-lxml (dom (type (eql ':|rest|)))
+  (make-rest*))
+
+(defmethod translate-to-lxml ((rest* rest*))
+  :|rest|)
+
+(defmethod make-constructor-form ((rest* rest*))
+  '(rest*))
+
+(defun rest* () (make-rest*))
+
+(set-pprint-dispatch 'rest* 'generic-pretty-printer 0 *pprint-xml-table*)

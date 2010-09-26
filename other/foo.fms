@@ -2,4 +2,4 @@ output (xml)
 
 filename = "/tmp/foo.xml"
 
-time 0 dur 1 pitch 60 ;
+time 0 dur 5 pitch 60 ;
