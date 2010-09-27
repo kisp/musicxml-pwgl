@@ -171,9 +171,9 @@
 	 ',(note-type note)
 	 ',(note-accidental note)
 	 :chordp ,(note-chordp note)
+	 :tie ',(note-tie note)
 	 :staff ,(note-staff note)
-	 :notations ,(note-notations note)
-	 :tie ',(note-tie note)))
+	 :notations ,(note-notations note)))
 
 (defun note (pitch-or-rest duration type accidental &key chordp staff notations tie)
   (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp :staff staff
