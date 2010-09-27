@@ -163,24 +163,49 @@
   (accidental nil :type accidental)
   (type nil :type note-type)
   notations tie
-  (time-modification nil :type (or null time-modification)))
+  (time-modification nil :type (or null time-modification))
+  beam-begin beam-continue beam-end)
+
+(defun beam-element-p (dom)
+  (and (consp dom)
+       (consp (first dom))
+       (eql :|beam| (caar dom))))
+
+(defun decode-beams (list-of-beams)
+  "Returns list of beams for start, continue and end."
+  (flet ((beam-number (beam)
+	   (parse-integer (third (car beam))))
+	 (beam-type (beam)
+	   (intern* (string-upcase (second beam)))))
+    (let (start continue end)
+      (dolist (beam list-of-beams)
+	(ecase (beam-type beam)
+	  (begin (push (beam-number beam) start))
+	  (continue (push (beam-number beam) continue))
+	  (end (push (beam-number beam) end))))
+      (values (nreverse start) (nreverse continue) (nreverse end)))))
 
 (defmethod translate-from-lxml (dom (type (eql ':|note|)))
   (assoc-bind* (duration chord rest pitch staff
 			 accidental type notations
 			 tie time-modification)
       dom
-    (make-note :pitch-or-rest (if rest (rest*) (from-lxml pitch))
-	       :duration (parse-integer (second duration))
-	       :chordp chord
-	       :staff (and staff (parse-integer (second staff)))
-	       :accidental (and accidental (intern* (string-upcase
-						     (second accidental))))
-	       :type (and type (intern* (string-upcase (second type))))
-	       :notations (rest notations)
-	       :tie (and tie (intern* (string-upcase (third (first tie)))))
-	       :time-modification (and time-modification
-				       (from-lxml time-modification)))))
+    (multiple-value-bind (beam-begin beam-continue beam-end)
+	(decode-beams (remove-if-not 'beam-element-p dom))
+      (make-note :pitch-or-rest (if rest (rest*) (from-lxml pitch))
+		 :duration (parse-integer (second duration))
+		 :chordp chord
+		 :staff (and staff (parse-integer (second staff)))
+		 :accidental (and accidental (intern* (string-upcase
+						       (second accidental))))
+		 :type (and type (intern* (string-upcase (second type))))
+		 :notations (rest notations)
+		 :tie (and tie (intern* (string-upcase (third (first tie)))))
+		 :time-modification (and time-modification
+					 (from-lxml time-modification))
+		 :beam-begin beam-begin
+		 :beam-continue beam-continue
+		 :beam-end beam-end))))
 
 (defmethod translate-to-lxml ((note note))
   `(:|note|
@@ -199,6 +224,15 @@
 		 ,(string-downcase (symbol-name (note-accidental note))))))
      ,@(when (note-staff note)
 	     `((:|staff| ,(princ-to-string (note-staff note)))))
+     ,@(mapcar (lambda (n) `((:|beam| :|number| ,(princ-to-string n))
+			     "begin"))
+	       (note-beam-begin note))
+     ,@(mapcar (lambda (n) `((:|beam| :|number| ,(princ-to-string n))
+			     "continue"))
+	       (note-beam-continue note))
+     ,@(mapcar (lambda (n) `((:|beam| :|number| ,(princ-to-string n))
+			     "end"))
+	       (note-beam-end note))
      ,@(when (note-notations note)
 	     `((:|notations| ,@(note-notations note))))))
 
@@ -211,15 +245,22 @@
 	 :tie ',(note-tie note)
 	 :staff ,(note-staff note)
 	 :notations ,(note-notations note)
-	 :time-modification ,(note-time-modification note)))
+	 :time-modification ,(note-time-modification note)
+	 :beam-begin ,(note-beam-begin note)
+	 :beam-continue ,(note-beam-continue note)
+	 :beam-end ,(note-beam-end note)))
 
 (defun note (pitch-or-rest duration type accidental
 	     &key chordp staff notations tie
-	     time-modification)
+	     time-modification
+	     beam-begin beam-continue beam-end)
   (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp
 	     :staff staff :accidental accidental :type type
 	     :notations notations :tie tie
-	     :time-modification time-modification))
+	     :time-modification time-modification
+	     :beam-begin beam-begin
+	     :beam-continue beam-continue
+	     :beam-end beam-end))
 
 (set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
 
