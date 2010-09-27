@@ -141,24 +141,32 @@
 (deftype accidental ()
   '(member nil flat sharp quarter-sharp three-quarters-sharp))
 
+(deftype note-type ()
+  '(member nil 16th eighth quarter half whole))
+
 (defstruct (note (:include musicxml-object))
   pitch-or-rest duration chordp staff
   (accidental nil :type accidental)
-  type
-  notations tie)
+  (type nil :type note-type)
+  notations tie
+  (time-modification nil :type (or null time-modification)))
 
 (defmethod translate-from-lxml (dom (type (eql ':|note|)))
   (assoc-bind* (duration chord rest pitch staff
-			 accidental type notations tie)
+			 accidental type notations
+			 tie time-modification)
       dom
     (make-note :pitch-or-rest (if rest (rest*) (from-lxml pitch))
 	       :duration (parse-integer (second duration))
 	       :chordp chord
 	       :staff (and staff (parse-integer (second staff)))
-	       :accidental (and accidental (intern* (string-upcase (second accidental))))
+	       :accidental (and accidental (intern* (string-upcase
+						     (second accidental))))
 	       :type (and type (intern* (string-upcase (second type))))
-	       :notations (second notations)
-	       :tie (and tie (intern* (string-upcase (third (first tie))))))))
+	       :notations (rest notations)
+	       :tie (and tie (intern* (string-upcase (third (first tie)))))
+	       :time-modification (and time-modification
+				       (from-lxml time-modification)))))
 
 (defmethod translate-to-lxml ((note note))
   `(:|note|
@@ -166,15 +174,19 @@
      ,(translate-to-lxml (note-pitch-or-rest note))
      (:|duration| ,(princ-to-string (note-duration note)))
      ,@(when (note-tie note)
-	     `(((:|tie| :|type| ,(string-downcase (symbol-name (note-tie note)))))))
+	     `(((:|tie| :|type|
+		  ,(string-downcase (symbol-name (note-tie note)))))))
      ,@(when (note-type note)
 	     `((:|type| ,(string-downcase (symbol-name (note-type note))))))
+     ,@(when (note-time-modification note)
+	     (list (translate-to-lxml (note-time-modification note))))
      ,@(when (note-accidental note)
-	     `((:|accidental| ,(string-downcase (symbol-name (note-accidental note))))))
+	     `((:|accidental|
+		 ,(string-downcase (symbol-name (note-accidental note))))))
      ,@(when (note-staff note)
 	     `((:|staff| ,(princ-to-string (note-staff note)))))
      ,@(when (note-notations note)
-	     `((:|notations| ,(note-notations note))))))
+	     `((:|notations| ,@(note-notations note))))))
 
 (defmethod make-constructor-form ((note note))
   `(note ,(note-pitch-or-rest note)
@@ -184,10 +196,51 @@
 	 :chordp ,(note-chordp note)
 	 :tie ',(note-tie note)
 	 :staff ,(note-staff note)
-	 :notations ,(note-notations note)))
+	 :notations ,(note-notations note)
+	 :time-modification ,(note-time-modification note)))
 
-(defun note (pitch-or-rest duration type accidental &key chordp staff notations tie)
-  (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp :staff staff
-	     :accidental accidental :type type :notations notations :tie tie))
+(defun note (pitch-or-rest duration type accidental
+	     &key chordp staff notations tie
+	     time-modification)
+  (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp
+	     :staff staff :accidental accidental :type type
+	     :notations notations :tie tie
+	     :time-modification time-modification))
 
 (set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
+
+;;; time-modification
+(defstruct (time-modification (:include musicxml-object))
+  actual-notes normal-notes
+  (normal-type nil :type note-type))
+
+(defmethod translate-from-lxml (dom (type (eql ':|time-modification|)))
+  (assoc-bind (actual-notes normal-notes normal-type) (cdr dom)
+    (make-time-modification
+     :actual-notes (parse-integer actual-notes)
+     :normal-notes (parse-integer normal-notes)
+     :normal-type (intern* (string-upcase normal-type)))))
+
+(defmethod translate-to-lxml ((time-modification time-modification))
+  `(:|time-modification|
+     (:|actual-notes|
+       ,(princ-to-string (time-modification-actual-notes time-modification)))
+     (:|normal-notes|
+       ,(princ-to-string (time-modification-normal-notes time-modification)))
+     (:|normal-type|
+       ,(string-downcase (symbol-name (time-modification-normal-type
+				       time-modification))))))
+
+(defmethod make-constructor-form ((time-modification time-modification))
+  `(time-modification
+    ,(time-modification-actual-notes time-modification)
+    ,(time-modification-normal-notes time-modification)
+    ',(time-modification-normal-type time-modification)))
+
+(defun time-modification (actual-notes normal-notes normal-type)
+  (make-time-modification :actual-notes actual-notes
+			  :normal-notes normal-notes
+			  :normal-type normal-type))
+
+(set-pprint-dispatch 'time-modification 'generic-pretty-printer
+		     0 *pprint-xml-table*)

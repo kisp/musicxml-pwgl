@@ -113,5 +113,12 @@
     (is (equal lxml (musicxml:to-lxml
 		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
 
+(deftest time-modification
+  (dolist (lxml '((:|time-modification| (:|actual-notes| "5") (:|normal-notes| "4")
+		   (:|normal-type| "quarter"))))
+    (is (equal lxml (musicxml:to-lxml (musicxml:from-lxml lxml))))
+    (is (equal lxml (musicxml:to-lxml
+		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
+
 (defun run-tests ()
   (run! :musicxml))
