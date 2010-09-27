@@ -3,7 +3,11 @@ output (xml)
 filename = "/tmp/foo.xml"
 quartertones = yes
 
-time 0 dur 1 pitch 60 ;
-time 0 dur 1 pitch 60.5 ;
-time 0 dur 1 pitch 67 ;
-time 0 dur 1 pitch 66.5 ;
+time 0 dur 1 pitch 61 ;
+time 1 dur 1 pitch 61 ;
+time 2 dur 1 pitch 61 ;
+time 3 dur 1 pitch 61 ;
+time 4 dur 1 pitch 61 ;
+time 5 dur 1 pitch 61 ;
+time 6 dur 1 pitch 61 ;
+time 7 dur 1 pitch 61 ;
