@@ -81,6 +81,9 @@
 	      bindings)
 	 ,@body))))
 
+(defun intern* (name)
+  (intern name (find-package "MXML")))
+
 (defstruct musicxml-object)
 
 (defmethod print-object ((musicxml-object musicxml-object) stream)
@@ -88,12 +91,15 @@
   (prin1 (make-constructor-form musicxml-object) stream))
 
 ;;; pitch
+(deftype pitch-step ()
+  '(member c d e f g a b))
+
 (defstruct (pitch (:include musicxml-object))
-  step alter octave)
+  (step nil :type pitch-step) alter octave)
 
 (defmethod translate-from-lxml (dom (type (eql ':|pitch|)))
   (assoc-bind (step alter octave) (cdr dom)
-    (make-pitch :step (intern step)
+    (make-pitch :step (intern* step)
 		:alter (if (null alter) 0 (parse-integer alter))
 		:octave (parse-integer octave))))
 
@@ -144,10 +150,10 @@
 	       :duration (parse-integer (second duration))
 	       :chordp chord
 	       :staff (and staff (parse-integer (second staff)))
-	       :accidental (and accidental (intern (string-upcase (second accidental))))
-	       :type (and type (intern (string-upcase (second type))))
+	       :accidental (and accidental (intern* (string-upcase (second accidental))))
+	       :type (and type (intern* (string-upcase (second type))))
 	       :notations (second notations)
-	       :tie (and tie (intern (string-upcase (third (first tie))))))))
+	       :tie (and tie (intern* (string-upcase (third (first tie))))))))
 
 (defmethod translate-to-lxml ((note note))
   `(:|note|
