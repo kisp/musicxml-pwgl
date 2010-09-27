@@ -9,7 +9,9 @@
    #:make-constructor-form
    #:pitch
    #:rest*
-   #:print-musicxml))
+   #:print-musicxml
+   #:note
+   #:time-modification))
 
 (in-package #:musicxml)
 
