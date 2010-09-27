@@ -79,5 +79,39 @@
       (is (equal lxml
 		 (musicxml:to-lxml (musicxml:from-lxml lxml)))))))
 
+(deftest note
+  (dolist (lxml '((:|note| :|rest| (:|duration| "2"))
+		  (:|note| :|rest| (:|duration| "1"))
+		  (:|note| :|chord| :|rest| (:|duration| "1"))
+		  (:|note|
+		   (:|pitch| (:|step| "C") (:|octave| "4"))
+		   (:|duration| "1"))
+		  (:|note|
+		   :|chord|
+		   (:|pitch| (:|step| "C") (:|octave| "4"))
+		   (:|duration| "1"))
+		  (:|note|
+		   (:|pitch| (:|step| "C") (:|octave| "4"))
+		   (:|duration| "1")
+		   (:|staff| "1"))
+		  (:|note|
+		   (:|pitch| (:|step| "C") (:|octave| "4"))
+		   (:|duration| "1")
+		   (:|accidental| "flat"))
+		  (:|note|
+		   (:|pitch| (:|step| "C") (:|octave| "4"))
+		   (:|duration| "1")
+		   (:|type| "quarter")
+		   (:|accidental| "flat"))
+		  (:|note|
+		   (:|pitch| (:|step| "C") (:|octave| "4"))
+		   (:|duration| "1")
+		   ((:|tie| :|type| "start"))
+		   (:|type| "quarter")
+		   (:|accidental| "flat"))))
+    (is (equal lxml (musicxml:to-lxml (musicxml:from-lxml lxml))))
+    (is (equal lxml (musicxml:to-lxml
+		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
+
 (defun run-tests ()
   (run! :musicxml))

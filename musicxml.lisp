@@ -54,6 +54,33 @@
 	      bindings)
 	 ,@body))))
 
+(defun assoc* (item list)
+  (if (null list)
+      nil
+      (let ((candidate (first list)))
+	(if (cond ((and (consp candidate)
+			(consp (first candidate)))
+		   (eql item (caar candidate)))
+		  ((consp candidate)
+		   (eql item (first candidate)))
+		  (t
+		   (eql item candidate)))
+	    candidate
+	    (assoc* item (rest list))))))
+
+(defmacro assoc-bind* (bindings exp &body body)
+  (let ((=exp= (gensym "=EXP=")))
+    `(let ((,=exp= ,exp))
+       (let ,(mapcar
+	      (lambda (binding)
+		`(,binding
+		  (assoc*
+		   ,(intern (string-downcase (string binding))
+			    "KEYWORD")
+		   ,=exp=)))
+	      bindings)
+	 ,@body))))
+
 (defstruct musicxml-object)
 
 (defmethod print-object ((musicxml-object musicxml-object) stream)
@@ -103,3 +130,53 @@
 (defun rest* () (make-rest*))
 
 (set-pprint-dispatch 'rest* 'generic-pretty-printer 0 *pprint-xml-table*)
+
+;;; note
+(defstruct (note (:include musicxml-object))
+  pitch-or-rest duration chordp staff accidental type
+  notations tie)
+
+(defmethod translate-from-lxml (dom (type (eql ':|note|)))
+  (assoc-bind* (duration chord rest pitch staff
+			 accidental type notations tie)
+      dom
+    (make-note :pitch-or-rest (if rest (rest*) (from-lxml pitch))
+	       :duration (parse-integer (second duration))
+	       :chordp chord
+	       :staff (and staff (parse-integer (second staff)))
+	       :accidental (and accidental (intern (string-upcase (second accidental))))
+	       :type (and type (intern (string-upcase (second type))))
+	       :notations (second notations)
+	       :tie (and tie (intern (string-upcase (third (first tie))))))))
+
+(defmethod translate-to-lxml ((note note))
+  `(:|note|
+     ,@(when (note-chordp note) '(:|chord|))
+     ,(translate-to-lxml (note-pitch-or-rest note))
+     (:|duration| ,(princ-to-string (note-duration note)))
+     ,@(when (note-tie note)
+	     `(((:|tie| :|type| ,(string-downcase (symbol-name (note-tie note)))))))
+     ,@(when (note-type note)
+	     `((:|type| ,(string-downcase (symbol-name (note-type note))))))
+     ,@(when (note-accidental note)
+	     `((:|accidental| ,(string-downcase (symbol-name (note-accidental note))))))
+     ,@(when (note-staff note)
+	     `((:|staff| ,(princ-to-string (note-staff note)))))
+     ,@(when (note-notations note)
+	     `((:|notations| ,(note-notations note))))))
+
+(defmethod make-constructor-form ((note note))
+  `(note ,(note-pitch-or-rest note)
+	 ,(note-duration note)
+	 ',(note-type note)
+	 ',(note-accidental note)
+	 :chordp ,(note-chordp note)
+	 :staff ,(note-staff note)
+	 :notations ,(note-notations note)
+	 :tie ',(note-tie note)))
+
+(defun note (pitch-or-rest duration type accidental &key chordp staff notations tie)
+  (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp :staff staff
+	     :accidental accidental :type type :notations notations :tie tie))
+
+(set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
