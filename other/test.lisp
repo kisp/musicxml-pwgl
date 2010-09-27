@@ -45,6 +45,39 @@
 	      :time-modification (time-modification 5 4 'mxml::16th))
        ,(note (pitch 'd -1 4) 1 nil nil
 	      :beam-end '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th)))
+
+      ((:|measure| :|number| "2")
+       (:|attributes| (:|divisions| "4"))
+       ,(note (pitch 'd -1 4) 1 nil 'flat
+	      :beam-begin '(1 2))
+       ,(note (pitch 'd 0 4) 1 nil 'mxml::natural
+	      :beam-continue '(1 2))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-end '(1 2))
+
+       ,(note (pitch 'd -1 4) 1 nil 'flat
+	      :beam-begin '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 5) 1 nil 'flat
+	      :chordp t
+	      :beam-begin '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1)
+	      :beam-end '(2)
+	      :beam-begin '(2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-end '(1 2)
 	      :time-modification (time-modification 5 4 'mxml::16th))
 
        (:|barline| (:|bar-style| "light-heavy")))))
