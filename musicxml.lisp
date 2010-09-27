@@ -100,7 +100,7 @@
 (defmethod translate-from-lxml (dom (type (eql ':|pitch|)))
   (assoc-bind (step alter octave) (cdr dom)
     (make-pitch :step (intern* step)
-		:alter (if (null alter) 0 (parse-integer alter))
+		:alter (if (null alter) 0 (read-from-string alter))
 		:octave (parse-integer octave))))
 
 (defmethod translate-to-lxml ((pitch pitch))
@@ -138,8 +138,13 @@
 (set-pprint-dispatch 'rest* 'generic-pretty-printer 0 *pprint-xml-table*)
 
 ;;; note
+(deftype accidental ()
+  '(member nil flat sharp quarter-sharp three-quarters-sharp))
+
 (defstruct (note (:include musicxml-object))
-  pitch-or-rest duration chordp staff accidental type
+  pitch-or-rest duration chordp staff
+  (accidental nil :type accidental)
+  type
   notations tie)
 
 (defmethod translate-from-lxml (dom (type (eql ':|note|)))
