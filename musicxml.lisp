@@ -8,9 +8,18 @@
    #:to-lxml
    #:make-constructor-form
    #:pitch
-   #:rest*))
+   #:rest*
+   #:print-musicxml))
 
 (in-package #:musicxml)
+
+(defun print-musicxml (dom &key (stream t))
+  (write-line
+   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" stream)
+  (write-line "<!DOCTYPE score-partwise PUBLIC" stream)
+  (write-line "	\"-//Recordare//DTD MusicXML 2.0 Partwise//EN\"" stream)
+  (write-line "	\"http://www.musicxml.org/dtds/partwise.dtd\">" stream)
+  (ppxml:pprint-xml dom :stream stream))
 
 (defun from-lxml (dom)
   (cond ((consp dom)
