@@ -11,7 +11,10 @@
    #:rest*
    #:print-musicxml
    #:note
-   #:time-modification))
+   #:time-modification
+   #:c #:d #:e #:f #:g #:a #:b
+   #:flat #:sharp #:quarter-sharp #:three-quarters-sharp
+   #:16th #:eighth #:quarter #:half #:whole))
 
 (in-package #:musicxml)
 
