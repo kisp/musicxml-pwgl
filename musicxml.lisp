@@ -153,7 +153,9 @@
 
 ;;; note
 (deftype accidental ()
-  '(member nil flat sharp quarter-sharp three-quarters-sharp))
+  '(member nil sharp natural flat double-sharp sharp-sharp flat-flat
+    natural-sharp natural-flat quarter-flat quarter-sharp three-quarters-flat
+    three-quarters-sharp))
 
 (deftype note-type ()
   '(member nil 16th eighth quarter half whole))
@@ -217,11 +219,11 @@
 		  ,(string-downcase (symbol-name (note-tie note)))))))
      ,@(when (note-type note)
 	     `((:|type| ,(string-downcase (symbol-name (note-type note))))))
-     ,@(when (note-time-modification note)
-	     (list (translate-to-lxml (note-time-modification note))))
      ,@(when (note-accidental note)
 	     `((:|accidental|
 		 ,(string-downcase (symbol-name (note-accidental note))))))
+     ,@(when (note-time-modification note)
+	     (list (translate-to-lxml (note-time-modification note))))
      ,@(when (note-staff note)
 	     `((:|staff| ,(princ-to-string (note-staff note)))))
      ,@(mapcar (lambda (n) `((:|beam| :|number| ,(princ-to-string n))

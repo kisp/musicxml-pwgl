@@ -17,15 +17,35 @@
       ((:|measure| :|number| "1")
        (:|attributes| (:|divisions| "4")
 	 (:|key| (:|fifths| "0"))
-	 (:|time| (:|beats| "1") (:|beat-type| "4"))
+	 (:|time| (:|beats| "2") (:|beat-type| "4"))
 	 (:|staves| "2")
 	 ((:|clef| :|number| "1") (:|sign| "G"))
 	 ((:|clef| :|number| "2") (:|sign| "F")))
-       
-       ,(note (pitch 'd -1 4) 1 nil 'flat)
-       ,(note (pitch 'd 0 4) 1 nil nil)
-       ,(note (pitch 'd -1 4) 1 nil nil)
-       ,(note (pitch 'd -1 4) 1 nil nil)
-       
+
+       ,(note (pitch 'd -1 4) 1 nil 'flat
+	      :beam-begin '(1 2))
+       ,(note (pitch 'd 0 4) 1 nil 'mxml::natural
+	      :beam-continue '(1 2))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-end '(1 2))
+
+       ,(note (pitch 'd -1 5) 1 nil 'flat
+	      :beam-begin '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-continue '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 1 nil nil
+	      :beam-end '(1 2)
+	      :time-modification (time-modification 5 4 'mxml::16th))
+
        (:|barline| (:|bar-style| "light-heavy")))))
    :stream out))
