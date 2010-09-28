@@ -350,17 +350,17 @@
 (defmethod translate-to-lxml ((tuplet tuplet))
   `((:|tuplet|
       :|type|
-      ,(string-downcase (princ-to-string (tuplet-type tuplet)))
+      ,(string-downcase (symbol-name (tuplet-type tuplet)))
       :|number| ,(princ-to-string (tuplet-id tuplet)))
     (:|tuplet-actual|
       (:|tuplet-number|
 	,(princ-to-string (tuplet-actual-number tuplet)))
       (:|tuplet-type|
-	,(string-downcase (princ-to-string (tuplet-actual-type tuplet)))))
+	,(string-downcase (symbol-name (tuplet-actual-type tuplet)))))
     (:|tuplet-normal|
       (:|tuplet-number| ,(princ-to-string (tuplet-normal-number tuplet)))
       (:|tuplet-type|
-	,(string-downcase (princ-to-string (tuplet-normal-type tuplet)))))))
+	,(string-downcase (symbol-name (tuplet-normal-type tuplet)))))))
 
 (defmethod make-constructor-form ((tuplet tuplet))
   `(tuplet ',(tuplet-type tuplet)

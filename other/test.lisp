@@ -33,7 +33,8 @@
 
        ,(note (pitch 'd -1 5) 1 nil 'flat
 	      :beam-begin '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
+	      :time-modification (time-modification 5 4 'mxml::16th)
+	      :notations (list (tuplet 'mxml::start 1 5 '16TH 4 '16TH)))
        ,(note (pitch 'd -1 4) 1 nil nil
 	      :beam-continue '(1 2)
 	      :time-modification (time-modification 5 4 'mxml::16th))
@@ -45,7 +46,8 @@
 	      :time-modification (time-modification 5 4 'mxml::16th))
        ,(note (pitch 'd -1 4) 1 nil nil
 	      :beam-end '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th)))
+	      :time-modification (time-modification 5 4 'mxml::16th)
+	      :notations (list (tuplet 'mxml::stop 1 5 '16TH 4 '16TH))))
 
       ((:|measure| :|number| "2")
        (:|attributes| (:|divisions| "4"))
