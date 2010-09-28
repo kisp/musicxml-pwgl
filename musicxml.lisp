@@ -4,17 +4,31 @@
   (:nicknames #:mxml)
   (:use #:cl #:pprint-xml)
   (:export
+   #:16th
+   #:a
+   #:b
+   #:c
+   #:d
+   #:e
+   #:eighth
+   #:f
+   #:flat
    #:from-lxml
-   #:to-lxml
+   #:g
+   #:half
    #:make-constructor-form
-   #:pitch
-   #:rest*
-   #:print-musicxml
    #:note
+   #:pitch
+   #:print-musicxml
+   #:quarter
+   #:quarter-sharp
+   #:rest*
+   #:sharp
+   #:three-quarters-sharp
    #:time-modification
-   #:c #:d #:e #:f #:g #:a #:b
-   #:flat #:sharp #:quarter-sharp #:three-quarters-sharp
-   #:16th #:eighth #:quarter #:half #:whole))
+   #:to-lxml
+   #:whole
+   ))
 
 (in-package #:musicxml)
 
@@ -27,7 +41,10 @@
   (ppxml:pprint-xml dom :stream stream))
 
 (defun from-lxml (dom)
-  (cond ((consp dom)
+  (cond ((and (consp dom)
+	      (consp (car dom)))
+	 (translate-from-lxml dom (caar dom)))
+	((consp dom)
 	 (translate-from-lxml dom (car dom)))
 	((stringp dom) dom)
 	((keywordp dom)
@@ -201,7 +218,7 @@
 		 :accidental (and accidental (intern* (string-upcase
 						       (second accidental))))
 		 :type (and type (intern* (string-upcase (second type))))
-		 :notations (rest notations)
+		 :notations (mapcar #'from-lxml (rest notations))
 		 :tie (and tie (intern* (string-upcase (third (first tie)))))
 		 :time-modification (and time-modification
 					 (from-lxml time-modification))
@@ -236,7 +253,7 @@
 			     "end"))
 	       (note-beam-end note))
      ,@(when (note-notations note)
-	     `((:|notations| ,@(note-notations note))))))
+	     `((:|notations| ,@(mapcar #'to-lxml (note-notations note)))))))
 
 (defmethod make-constructor-form ((note note))
   `(note ,(note-pitch-or-rest note)
@@ -301,3 +318,59 @@
 
 (set-pprint-dispatch 'time-modification 'generic-pretty-printer
 		     0 *pprint-xml-table*)
+
+;;; tuplet
+(defstruct (tuplet (:include musicxml-object))
+  type id actual-number actual-type normal-number normal-type)
+
+(defmethod translate-from-lxml (dom (type (eql ':|tuplet|)))
+  (assoc-bind* (tuplet-actual tuplet-normal) (cdr dom)
+    (make-tuplet :type (intern* (string-upcase (third (car dom))))
+		 :id (parse-integer (fifth (car dom)))
+		 :actual-number (parse-integer
+				 (second (assoc :|tuplet-number|
+						(cdr tuplet-actual))))
+		 :actual-type (intern*
+			       (string-upcase
+				(second (assoc :|tuplet-type|
+					       (cdr tuplet-actual)))))
+		 :normal-number (parse-integer
+				 (second (assoc :|tuplet-number|
+						(cdr tuplet-normal))))
+		 :normal-type (intern*
+			       (string-upcase
+				(second (assoc :|tuplet-type|
+					       (cdr tuplet-normal))))))))
+
+(defmethod translate-to-lxml ((tuplet tuplet))
+  `((:|tuplet|
+      :|type|
+      ,(string-downcase (princ-to-string (tuplet-type tuplet)))
+      :|number| ,(princ-to-string (tuplet-id tuplet)))
+    (:|tuplet-actual|
+      (:|tuplet-number|
+	,(princ-to-string (tuplet-actual-number tuplet)))
+      (:|tuplet-type|
+	,(string-downcase (princ-to-string (tuplet-actual-type tuplet)))))
+    (:|tuplet-normal|
+      (:|tuplet-number| ,(princ-to-string (tuplet-normal-number tuplet)))
+      (:|tuplet-type|
+	,(string-downcase (princ-to-string (tuplet-normal-type tuplet)))))))
+
+(defmethod make-constructor-form ((tuplet tuplet))
+  `(tuplet ',(tuplet-type tuplet)
+	   ,(tuplet-id tuplet)
+	   ,(tuplet-actual-number tuplet)
+	   ',(tuplet-actual-type tuplet)
+	   ,(tuplet-normal-number tuplet)
+	   ',(tuplet-normal-type tuplet)))
+
+(defun tuplet (type id actual-number actual-type normal-number normal-type)
+  (make-tuplet :type type
+	       :id id
+	       :actual-number actual-number
+	       :actual-type actual-type
+	       :normal-number normal-number
+	       :normal-type normal-type))
+
+(set-pprint-dispatch 'tuplet 'generic-pretty-printer 0 *pprint-xml-table*)

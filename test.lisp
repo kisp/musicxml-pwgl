@@ -120,5 +120,22 @@
     (is (equal lxml (musicxml:to-lxml
 		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
 
+(deftest tuplet
+  (dolist (lxml '(((:|tuplet| :|type| "start" :|number| "1")
+		   (:|tuplet-actual| (:|tuplet-number| "5") (:|tuplet-type| "16th"))
+		   (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))		  
+		  ((:|tuplet| :|type| "stop" :|number| "1")
+		   (:|tuplet-actual| (:|tuplet-number| "5") (:|tuplet-type| "16th"))
+		   (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))
+		  ((:|tuplet| :|type| "stop" :|number| "1")
+		   (:|tuplet-actual| (:|tuplet-number| "7") (:|tuplet-type| "16th"))
+		   (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))
+		  ((:|tuplet| :|type| "start" :|number| "3")
+		   (:|tuplet-actual| (:|tuplet-number| "3") (:|tuplet-type| "quarter"))
+		   (:|tuplet-normal| (:|tuplet-number| "2") (:|tuplet-type| "quarter")))))
+    (is (equal lxml (musicxml:to-lxml (musicxml:from-lxml lxml))))
+    (is (equal lxml (musicxml:to-lxml
+		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
+
 (defun run-tests ()
   (run! :musicxml))
