@@ -4,4 +4,5 @@
 * Tasks
 ** DONE intern* string-upcase					   :refactor:
    CLOSED: [2010-09-28 Di 14:12]
-** TODO test file should use mxml
+** DONE test file should use mxml
+   CLOSED: [2010-09-28 Di 18:11]

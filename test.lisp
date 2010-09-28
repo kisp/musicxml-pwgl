@@ -1,7 +1,7 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (defpackage #:test
-  (:use #:cl #:myam)
+  (:use #:cl #:myam #:mxml)
   (:export
    #:run-tests))
 
@@ -77,7 +77,7 @@
   (dolist (xml (directory "fomus-xmls/*.xml"))
     (let ((lxml (s-xml:parse-xml-file xml)))
       (is (equal lxml
-		 (musicxml:to-lxml (musicxml:from-lxml lxml)))))))
+		 (to-lxml (from-lxml lxml)))))))
 
 (deftest note
   (dolist (lxml '((:|note| :|rest| (:|duration| "2"))
@@ -109,21 +109,21 @@
 		   ((:|tie| :|type| "start"))
 		   (:|type| "quarter")
 		   (:|accidental| "flat"))))
-    (is (equal lxml (musicxml:to-lxml (musicxml:from-lxml lxml))))
-    (is (equal lxml (musicxml:to-lxml
-		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
+    (is (equal lxml (to-lxml (from-lxml lxml))))
+    (is (equal lxml (to-lxml
+		     (eval (make-constructor-form (from-lxml lxml))))))))
 
 (deftest time-modification
   (dolist (lxml '((:|time-modification| (:|actual-notes| "5") (:|normal-notes| "4")
 		   (:|normal-type| "quarter"))))
-    (is (equal lxml (musicxml:to-lxml (musicxml:from-lxml lxml))))
-    (is (equal lxml (musicxml:to-lxml
-		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
+    (is (equal lxml (to-lxml (from-lxml lxml))))
+    (is (equal lxml (to-lxml
+		     (eval (make-constructor-form (from-lxml lxml))))))))
 
 (deftest tuplet
   (dolist (lxml '(((:|tuplet| :|type| "start" :|number| "1")
 		   (:|tuplet-actual| (:|tuplet-number| "5") (:|tuplet-type| "16th"))
-		   (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))		  
+		   (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))
 		  ((:|tuplet| :|type| "stop" :|number| "1")
 		   (:|tuplet-actual| (:|tuplet-number| "5") (:|tuplet-type| "16th"))
 		   (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))
@@ -133,9 +133,9 @@
 		  ((:|tuplet| :|type| "start" :|number| "3")
 		   (:|tuplet-actual| (:|tuplet-number| "3") (:|tuplet-type| "quarter"))
 		   (:|tuplet-normal| (:|tuplet-number| "2") (:|tuplet-type| "quarter")))))
-    (is (equal lxml (musicxml:to-lxml (musicxml:from-lxml lxml))))
-    (is (equal lxml (musicxml:to-lxml
-		     (eval (musicxml:make-constructor-form (musicxml:from-lxml lxml))))))))
+    (is (equal lxml (to-lxml (from-lxml lxml))))
+    (is (equal lxml (to-lxml
+		     (eval (make-constructor-form (from-lxml lxml))))))))
 
 (defun run-tests ()
   (run! :musicxml))

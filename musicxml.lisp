@@ -4,10 +4,14 @@
   (:nicknames #:mxml)
   (:use #:cl #:pprint-xml)
   (:export
+   #:128th
    #:16th
+   #:256th
    #:32nd
+   #:64th
    #:a
    #:b
+   #:breve
    #:c
    #:d
    #:double-sharp
@@ -19,6 +23,7 @@
    #:from-lxml
    #:g
    #:half
+   #:long
    #:make-constructor-form
    #:natural
    #:natural-flat
@@ -32,12 +37,15 @@
    #:rest*
    #:sharp
    #:sharp-sharp
+   #:start
+   #:stop
    #:three-quarters-flat
    #:three-quarters-sharp
    #:time-modification
    #:to-lxml
    #:tuplet
-   #:whole))
+   #:whole
+   ))
 
 (in-package #:musicxml)
 
@@ -184,7 +192,8 @@
     three-quarters-sharp))
 
 (deftype note-type ()
-  '(member nil 32nd 16th eighth quarter half whole))
+  '(member nil 256th 128th 64th 32nd 16th
+    eighth quarter half whole breve long))
 
 (defstruct (note (:include musicxml-object))
   pitch-or-rest duration chordp staff
