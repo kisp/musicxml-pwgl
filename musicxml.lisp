@@ -9,26 +9,34 @@
    #:b
    #:c
    #:d
+   #:double-sharp
    #:e
    #:eighth
    #:f
    #:flat
+   #:flat-flat
    #:from-lxml
    #:g
    #:half
    #:make-constructor-form
+   #:natural
+   #:natural-flat
+   #:natural-sharp
    #:note
    #:pitch
    #:print-musicxml
    #:quarter
+   #:quarter-flat
    #:quarter-sharp
    #:rest*
    #:sharp
+   #:sharp-sharp
+   #:three-quarters-flat
    #:three-quarters-sharp
    #:time-modification
    #:to-lxml
-   #:whole
-   ))
+   #:tuplet
+   #:whole))
 
 (in-package #:musicxml)
 
