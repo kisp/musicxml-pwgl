@@ -15,72 +15,43 @@
        ((:|score-part| :|id| "P1") :|part-name| :|part-abbreviation|))
      ((:|part| :|id| "P1")
       ((:|measure| :|number| "1")
-       (:|attributes| (:|divisions| "4")
+       (:|attributes| (:|divisions| "180")
 	 (:|key| (:|fifths| "0"))
 	 (:|time| (:|beats| "2") (:|beat-type| "4"))
-	 (:|staves| "2")
+	 
 	 ((:|clef| :|number| "1") (:|sign| "G"))
 	 ((:|clef| :|number| "2") (:|sign| "F")))
-
-       ,(note (pitch 'd -1 4) 1 nil 'flat
-	      :beam-begin '(1 2))
-       ,(note (pitch 'd 0 4) 1 nil 'mxml::natural
-	      :beam-continue '(1 2))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-end '(1 2))
-
-       ,(note (pitch 'd -1 5) 1 nil 'flat
-	      :beam-begin '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th)
-	      :notations (list (tuplet 'mxml::start 1 5 '16TH 4 '16TH)))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-end '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th)
-	      :notations (list (tuplet 'mxml::stop 1 5 '16TH 4 '16TH))))
-
-      ((:|measure| :|number| "2")
-       (:|attributes| (:|divisions| "4"))
-       ,(note (pitch 'd -1 4) 1 nil 'flat
-	      :beam-begin '(1 2))
-       ,(note (pitch 'd 0 4) 1 nil 'mxml::natural
-	      :beam-continue '(1 2))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-end '(1 2))
-
-       ,(note (pitch 'd -1 4) 1 nil 'flat
-	      :beam-begin '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 5) 1 nil 'flat
-	      :chordp t
-	      :beam-begin '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
+       
+       ,(note (pitch 'd -1 4) 60 'eighth 'flat
+	      :beam-begin '(1)
+	      :time-modification (time-modification 3 2 'mxml::eighth)
+	      :notations (list (tuplet 'mxml::start 1 3 'eighth 2 'eighth)))
+       ,(note (pitch 'd -1 4) 60 'eighth 'flat
 	      :beam-continue '(1)
-	      :beam-end '(2)
-	      :beam-begin '(2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-continue '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
-       ,(note (pitch 'd -1 4) 1 nil nil
-	      :beam-end '(1 2)
-	      :time-modification (time-modification 5 4 'mxml::16th))
+	      :time-modification (time-modification 3 2 'mxml::eighth))
+       ,(note (pitch 'd -1 4) 60 'eighth 'flat
+	      :beam-end '(1)
+	      :time-modification (time-modification 3 2 'mxml::eighth)
+	      :notations (list (tuplet 'mxml::stop 1 3 'eighth 2 'eighth)))
 
-       (:|barline| (:|bar-style| "light-heavy")))))
+       ,(note (pitch 'd -1 5) 36 '16th 'flat
+       	      :beam-begin '(1 2)
+       	      :time-modification (time-modification 5 4 'mxml::16th)
+       	      :notations (list (tuplet 'mxml::start 1 5 '16TH 4 '16TH)))
+       ,(note (pitch 'd -1 4) 36 '16th 'flat
+       	      :beam-continue '(1 2)
+       	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 36 '16th nil
+       	      :beam-continue '(1 2)
+       	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 36 '16th nil
+       	      :beam-continue '(1 2)
+       	      :time-modification (time-modification 5 4 'mxml::16th))
+       ,(note (pitch 'd -1 4) 36 '16th nil
+       	      :beam-end '(1 2)
+       	      :time-modification (time-modification 5 4 'mxml::16th)
+       	      :notations (list (tuplet 'mxml::stop 1 5 '16TH 4 '16TH)))
+       )
+
+      ))
    :stream out))

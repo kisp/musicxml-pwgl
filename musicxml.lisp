@@ -5,6 +5,7 @@
   (:use #:cl #:pprint-xml)
   (:export
    #:16th
+   #:32nd
    #:a
    #:b
    #:c
@@ -183,7 +184,7 @@
     three-quarters-sharp))
 
 (deftype note-type ()
-  '(member nil 16th eighth quarter half whole))
+  '(member nil 32nd 16th eighth quarter half whole))
 
 (defstruct (note (:include musicxml-object))
   pitch-or-rest duration chordp staff
@@ -327,8 +328,12 @@
 		     0 *pprint-xml-table*)
 
 ;;; tuplet
+(deftype start-stop ()
+  '(member start stop))
+
 (defstruct (tuplet (:include musicxml-object))
-  type id actual-number actual-type normal-number normal-type)
+  (type nil :type start-stop)
+  id actual-number actual-type normal-number normal-type)
 
 (defmethod translate-from-lxml (dom (type (eql ':|tuplet|)))
   (assoc-bind* (tuplet-actual tuplet-normal) (cdr dom)

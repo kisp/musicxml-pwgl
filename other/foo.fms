@@ -8,7 +8,6 @@ time 0.25 dur 0.25 pitch 60 ;
 time 0.5 dur 0.25 pitch 60 ;
 time 0.75 dur 0.25 pitch 60 ;
 
-
 time 1 dur 0.2 pitch 60 ;
 time 1.2 dur 0.2 pitch 60 ;
 time 1.4 dur 0.2 pitch 60 ;
