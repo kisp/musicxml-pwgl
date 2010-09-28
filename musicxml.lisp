@@ -113,7 +113,7 @@
 	 ,@body))))
 
 (defun intern* (name)
-  (intern name (find-package "MXML")))
+  (intern (string-upcase name) (find-package "MXML")))
 
 (defstruct musicxml-object)
 
@@ -195,7 +195,7 @@
   (flet ((beam-number (beam)
 	   (parse-integer (third (car beam))))
 	 (beam-type (beam)
-	   (intern* (string-upcase (second beam)))))
+	   (intern* (second beam))))
     (let (start continue end)
       (dolist (beam list-of-beams)
 	(ecase (beam-type beam)
@@ -215,11 +215,10 @@
 		 :duration (parse-integer (second duration))
 		 :chordp chord
 		 :staff (and staff (parse-integer (second staff)))
-		 :accidental (and accidental (intern* (string-upcase
-						       (second accidental))))
-		 :type (and type (intern* (string-upcase (second type))))
+		 :accidental (and accidental (intern* (second accidental)))
+		 :type (and type (intern* (second type)))
 		 :notations (mapcar #'from-lxml (rest notations))
-		 :tie (and tie (intern* (string-upcase (third (first tie)))))
+		 :tie (and tie (intern* (third (first tie))))
 		 :time-modification (and time-modification
 					 (from-lxml time-modification))
 		 :beam-begin beam-begin
@@ -293,7 +292,7 @@
     (make-time-modification
      :actual-notes (parse-integer actual-notes)
      :normal-notes (parse-integer normal-notes)
-     :normal-type (intern* (string-upcase normal-type)))))
+     :normal-type (intern* normal-type))))
 
 (defmethod translate-to-lxml ((time-modification time-modification))
   `(:|time-modification|
@@ -325,22 +324,20 @@
 
 (defmethod translate-from-lxml (dom (type (eql ':|tuplet|)))
   (assoc-bind* (tuplet-actual tuplet-normal) (cdr dom)
-    (make-tuplet :type (intern* (string-upcase (third (car dom))))
+    (make-tuplet :type (intern* (third (car dom)))
 		 :id (parse-integer (fifth (car dom)))
 		 :actual-number (parse-integer
 				 (second (assoc :|tuplet-number|
 						(cdr tuplet-actual))))
 		 :actual-type (intern*
-			       (string-upcase
-				(second (assoc :|tuplet-type|
-					       (cdr tuplet-actual)))))
+			       (second (assoc :|tuplet-type|
+					      (cdr tuplet-actual))))
 		 :normal-number (parse-integer
 				 (second (assoc :|tuplet-number|
 						(cdr tuplet-normal))))
 		 :normal-type (intern*
-			       (string-upcase
-				(second (assoc :|tuplet-type|
-					       (cdr tuplet-normal))))))))
+			       (second (assoc :|tuplet-type|
+					      (cdr tuplet-normal)))))))
 
 (defmethod translate-to-lxml ((tuplet tuplet))
   `((:|tuplet|
