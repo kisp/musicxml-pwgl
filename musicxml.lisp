@@ -28,6 +28,7 @@
    #:natural
    #:natural-flat
    #:natural-sharp
+   #:no
    #:note
    #:pitch
    #:print-musicxml
@@ -45,7 +46,7 @@
    #:to-lxml
    #:tuplet
    #:whole
-   ))
+   #:yes))
 
 (in-package #:musicxml)
 
@@ -318,9 +319,10 @@
        ,(princ-to-string (time-modification-actual-notes time-modification)))
      (:|normal-notes|
        ,(princ-to-string (time-modification-normal-notes time-modification)))
-     (:|normal-type|
-       ,(string-downcase (symbol-name (time-modification-normal-type
-				       time-modification))))))
+     ,@(when (time-modification-normal-type time-modification)
+	     `((:|normal-type|
+		 ,(string-downcase (symbol-name (time-modification-normal-type
+						 time-modification))))))))
 
 (defmethod make-constructor-form ((time-modification time-modification))
   `(time-modification
@@ -340,9 +342,13 @@
 (deftype start-stop ()
   '(member start stop))
 
+(deftype yes-no? ()
+  '(member nil yes no))
+
 (defstruct (tuplet (:include musicxml-object))
   (type nil :type start-stop)
-  id actual-number actual-type normal-number normal-type)
+  id actual-number actual-type normal-number normal-type
+  (bracket nil :type yes-no?))
 
 (defmethod translate-from-lxml (dom (type (eql ':|tuplet|)))
   (assoc-bind* (tuplet-actual tuplet-normal) (cdr dom)
@@ -359,13 +365,16 @@
 						(cdr tuplet-normal))))
 		 :normal-type (intern*
 			       (second (assoc :|tuplet-type|
-					      (cdr tuplet-normal)))))))
+					      (cdr tuplet-normal))))
+		 :bracket nil)))
 
 (defmethod translate-to-lxml ((tuplet tuplet))
   `((:|tuplet|
       :|type|
       ,(string-downcase (symbol-name (tuplet-type tuplet)))
-      :|number| ,(princ-to-string (tuplet-id tuplet)))
+      :|number| ,(princ-to-string (tuplet-id tuplet))
+      ,@(when (tuplet-bracket tuplet)
+	      `(:|bracket| ,(string-downcase (symbol-name (tuplet-bracket tuplet))))))
     (:|tuplet-actual|
       (:|tuplet-number|
 	,(princ-to-string (tuplet-actual-number tuplet)))
@@ -382,14 +391,17 @@
 	   ,(tuplet-actual-number tuplet)
 	   ',(tuplet-actual-type tuplet)
 	   ,(tuplet-normal-number tuplet)
-	   ',(tuplet-normal-type tuplet)))
+	   ',(tuplet-normal-type tuplet)
+	   :bracket ',(tuplet-bracket tuplet)))
 
-(defun tuplet (type id actual-number actual-type normal-number normal-type)
+(defun tuplet (type id actual-number actual-type normal-number normal-type
+	       &key bracket)
   (make-tuplet :type type
 	       :id id
 	       :actual-number actual-number
 	       :actual-type actual-type
 	       :normal-number normal-number
-	       :normal-type normal-type))
+	       :normal-type normal-type
+	       :bracket bracket))
 
 (set-pprint-dispatch 'tuplet 'generic-pretty-printer 0 *pprint-xml-table*)
