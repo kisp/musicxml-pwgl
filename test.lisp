@@ -21,7 +21,7 @@
      "/usr/bin/diff"
      (list "-u" (namestring a) (namestring b)) :output out)))
 
-(defun canonicalize (path new-path)
+(defun canonicalise (path new-path)
   (sb-ext:run-program
    "/bin/bash"
    (list "-c"
@@ -34,8 +34,8 @@
 			 :direction :output
 			 :if-exists :supersede)
       (s-xml:print-xml (parse-xml-file-via-cxml xml) :stream out))
-    (canonicalize "/tmp/foo.xml" "/tmp/fooc.xml")
-    (canonicalize xml "/tmp/origc.xml")
+    (canonicalise "/tmp/foo.xml" "/tmp/fooc.xml")
+    (canonicalise xml "/tmp/origc.xml")
     (is (files-eql-p "/tmp/origc.xml" "/tmp/fooc.xml")
 	"~A failed~%~A"
 	(file-namestring xml)
@@ -65,8 +65,8 @@
 			 :direction :output
 			 :if-exists :supersede)
       (ppxml:pprint-xml (parse-xml-file-via-cxml xml) :stream out))
-    (canonicalize "/tmp/foo.xml" "/tmp/fooc.xml")
-    (canonicalize xml "/tmp/origc.xml")
+    (canonicalise "/tmp/foo.xml" "/tmp/fooc.xml")
+    (canonicalise xml "/tmp/origc.xml")
     (is (files-eql-p "/tmp/origc.xml" "/tmp/fooc.xml")
 	"~A failed~%~S~%~A"
 	(file-namestring xml)
