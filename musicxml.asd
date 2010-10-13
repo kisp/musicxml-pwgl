@@ -6,8 +6,10 @@
   :maintainer "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :author "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :licence "GPLv3"
-  :depends-on (s-xml cxml myam)
+  :depends-on (s-xml cxml myam sqlite-orm)
   :serial t
-  :components ((:file "pprint-xml")	       
+  :components ((:file "pprint-xml")
 	       (:file "musicxml")
+	       (:file "enp2musicxml")
+	       (:file "test-db")
 	       (:file "test")))

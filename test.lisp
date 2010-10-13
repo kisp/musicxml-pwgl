@@ -1,7 +1,7 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (defpackage #:test
-  (:use #:cl #:myam #:mxml)
+  (:use #:cl #:myam #:mxml #:test-db)
   (:export
    #:run-tests))
 
@@ -27,6 +27,46 @@
    (list "-c"
 	 (format nil "Canonicalise <~A >~A"
 		 (namestring path) (namestring new-path)))))
+
+(defun string-remove-first-n-lines (n string)
+  (if (zerop n)
+      string
+      (let ((pos (position #\newline string)))
+	(assert pos)
+	(string-remove-first-n-lines
+	 (1- n)
+	 (subseq string (1+ pos))))))
+
+;;; cxml ext
+(in-package #:cxml)
+
+(defclass whitespace-trimmer (sax-proxy)
+  ())
+
+(defun make-whitespace-trimmer (chained-handler)
+  (make-instance 'whitespace-trimmer
+		 :chained-handler chained-handler))
+
+(defmethod sax:characters ((handler whitespace-trimmer) data)
+  (call-next-method handler (string-trim '(#\space #\newline #\tab #\page) data)))
+
+;; (dom:map-document
+;;  (cxml:make-string-sink)
+;;  (cxml:parse "<foo>
+;;                    a b c d
+;;                 </foo>" (make-whitespace-trimmer (cxml-dom:make-dom-builder))))
+
+(defun trim-xml-file (src-path out-path)
+  (with-open-file (out out-path
+		       :direction :output
+		       :if-exists :supersede)
+    (dom:map-document
+     (cxml:make-character-stream-sink out)
+     (cxml:parse-file src-path
+		      (cxml::make-whitespace-trimmer (rune-dom:make-dom-builder))))))
+
+;;; tests
+(in-package #:test)
 
 (deftest s-xml-read-write
   (dolist (xml (directory "any-xmls/*.xml"))
@@ -136,6 +176,30 @@
     (is (equal lxml (to-lxml (from-lxml lxml))))
     (is (equal lxml (to-lxml
 		     (eval (make-constructor-form (from-lxml lxml))))))))
+
+(deftest test-db
+  (assert (list-test-cases))
+  (dolist (test-case (list-test-cases))
+    (ecase (status test-case)
+      (:skip #+nil(skip "~A -- ~A" (name test-case) (description test-case)))
+      (:run
+       (with-open-file (out "/tmp/res.xml"
+			    :direction :output
+			    :if-exists :supersede)
+	 (write-line "<?xml version='1.0' encoding='UTF-8' ?>" out)
+	 (print-musicxml (e2m:enp2musicxml (enp test-case)) :stream out :no-header t))
+       (canonicalise "/tmp/res.xml" "/tmp/resc.xml")
+       (alexandria:write-string-into-file
+	(with-output-to-string (out)
+	  (write-string (string-remove-first-n-lines 3 (musicxml test-case))
+			out))
+	"/tmp/exp-o.xml" :if-exists :supersede)
+       (cxml::trim-xml-file "/tmp/exp-o.xml" "/tmp/exp.xml")
+       (canonicalise "/tmp/exp.xml" "/tmp/expc.xml")
+       (is (files-eql-p "/tmp/resc.xml" "/tmp/expc.xml")
+	   "~A failed~%~A"
+	   (name test-case)
+	   (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
 
 (defun run-tests ()
   (run! :musicxml))
