@@ -46,7 +46,8 @@
    #:to-lxml
    #:tuplet
    #:whole
-   #:yes))
+   #:yes
+   #:attributes))
 
 (in-package #:musicxml)
 
@@ -406,3 +407,68 @@
 	       :bracket bracket))
 
 (set-pprint-dispatch 'tuplet 'generic-pretty-printer 0 *pprint-xml-table*)
+
+;;; attributes
+(deftype clef-sign ()
+  '(member g))
+
+(defstruct (attributes (:include musicxml-object))
+  divisions time clef staves key)
+
+(defmethod translate-from-lxml (dom (type (eql ':|attributes|)))
+  (assoc-bind* (divisions time clef staves key) (cdr dom)
+    (make-attributes :divisions (and divisions (parse-integer (second divisions)))
+		     :staves (and staves (parse-integer (second staves)))
+		     :key (and key
+			       (assoc-bind (fifths) (cdr key)
+				 (parse-integer fifths)))
+		     :time (and time
+				(assoc-bind (beats beat-type) (cdr time)
+				  (list (parse-integer beats)
+					(parse-integer beat-type))))
+		     :clef (and clef
+				(assoc-bind (sign line) (cdr clef)
+				  (list (intern* sign)
+					(and line (parse-integer line))))))))
+
+(defmethod translate-to-lxml ((attributes attributes))
+  (let ((dom `(:|attributes|
+		,@(when (attributes-divisions attributes)
+			`((:|divisions| ,(princ-to-string (attributes-divisions attributes)))))
+		,@(when (attributes-key attributes)
+			`((:|key| (:|fifths| ,(princ-to-string (attributes-key attributes))))))
+		,@(when (attributes-time attributes)
+			`((:|time|
+			    (:|beats| ,(princ-to-string (first (attributes-time attributes))))
+			    (:|beat-type| ,(princ-to-string (second (attributes-time attributes)))))))
+		,@(when (attributes-staves attributes)
+			`((:|staves| ,(princ-to-string (attributes-staves attributes)))))
+		,@(cond
+		   ;; KLUDGE
+		   ((and (attributes-staves attributes)
+			 (= 2 (attributes-staves attributes)))
+		    '(((:|clef| :|number| "1") (:|sign| "G"))
+		      ((:|clef| :|number| "2") (:|sign| "F"))))
+		   ((attributes-clef attributes)
+		    `((:|clef|
+			(:|sign| ,(symbol-name (first (attributes-clef attributes))))
+			,@(when
+			   (second (attributes-clef attributes))
+			   `((:|line| ,(princ-to-string (second (attributes-clef attributes)))))))))
+		   (t nil)))))
+    (if (cdr dom)
+	dom
+	nil)))
+
+(defmethod make-constructor-form ((attributes attributes))
+  `(attributes :divisions ,(attributes-divisions attributes)
+	       :key ,(attributes-key attributes)
+	       :staves ,(attributes-staves attributes)
+	       :time ',(attributes-time attributes)
+	       :clef ',(attributes-clef attributes)))
+
+(defun attributes (&rest args &key divisions time clef staves key)
+  (declare (ignore divisions time clef staves key))
+  (apply #'make-attributes args))
+
+(set-pprint-dispatch 'attributes 'generic-pretty-printer 0 *pprint-xml-table*)

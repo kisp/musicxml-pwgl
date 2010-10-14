@@ -160,6 +160,20 @@
     (is (equal lxml (to-lxml
 		     (eval (make-constructor-form (from-lxml lxml))))))))
 
+(deftest attributes
+  (is (null (to-lxml (attributes))))
+  (dolist (lxml '((:|attributes|
+		   (:|divisions| "1")
+		   (:|time|
+		    (:|beats| "5")
+		    (:|beat-type| "4"))
+		   (:|clef| (:|sign| "G") (:|line| "2")))
+		  (:|attributes|
+		   (:|divisions| "1"))))
+    (is (equal lxml (to-lxml (from-lxml lxml))))
+    (is (equal lxml (to-lxml
+		     (eval (make-constructor-form (from-lxml lxml))))))))
+
 (deftest tuplet
   (dolist (lxml '(((:|tuplet| :|type| "start" :|number| "1")
 		   (:|tuplet-actual| (:|tuplet-number| "5") (:|tuplet-type| "16th"))
