@@ -76,6 +76,9 @@
 (defun set-to-run (test-case)
   (setf (status test-case) :run))
 
+(defun set-to-skip (test-case)
+  (setf (status test-case) :skip))
+
 (defun nth-enp (n)
   (enp (nth n (list-by-class 'test-case))))
 
