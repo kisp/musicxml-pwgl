@@ -56,8 +56,10 @@
     (write-line
      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" stream)
     (write-line "<!DOCTYPE score-partwise PUBLIC" stream)
-    (write-line "	\"-//Recordare//DTD MusicXML 2.0 Partwise//EN\"" stream)
-    (write-line "	\"http://www.musicxml.org/dtds/partwise.dtd\">" stream))
+    (write-line "	\"-//Recordare//DTD MusicXML 2.0 Partwise//EN\""
+		stream)
+    (write-line "	\"http://www.musicxml.org/dtds/partwise.dtd\">"
+		stream))
   (ppxml:pprint-xml dom :stream stream))
 
 (defun from-lxml (dom)
@@ -376,7 +378,8 @@
       ,(string-downcase (symbol-name (tuplet-type tuplet)))
       :|number| ,(princ-to-string (tuplet-id tuplet))
       ,@(when (tuplet-bracket tuplet)
-	      `(:|bracket| ,(string-downcase (symbol-name (tuplet-bracket tuplet))))))
+	      `(:|bracket|
+		 ,(string-downcase (symbol-name (tuplet-bracket tuplet))))))
     (:|tuplet-actual|
       (:|tuplet-number|
 	,(princ-to-string (tuplet-actual-number tuplet)))
@@ -417,7 +420,8 @@
 
 (defmethod translate-from-lxml (dom (type (eql ':|attributes|)))
   (assoc-bind* (divisions time clef staves key) (cdr dom)
-    (make-attributes :divisions (and divisions (parse-integer (second divisions)))
+    (make-attributes :divisions (and divisions
+				     (parse-integer (second divisions)))
 		     :staves (and staves (parse-integer (second staves)))
 		     :key (and key
 			       (assoc-bind (fifths) (cdr key)
@@ -434,15 +438,25 @@
 (defmethod translate-to-lxml ((attributes attributes))
   (let ((dom `(:|attributes|
 		,@(when (attributes-divisions attributes)
-			`((:|divisions| ,(princ-to-string (attributes-divisions attributes)))))
+			`((:|divisions|
+			    ,(princ-to-string
+			      (attributes-divisions attributes)))))
 		,@(when (attributes-key attributes)
-			`((:|key| (:|fifths| ,(princ-to-string (attributes-key attributes))))))
+			`((:|key| (:|fifths|
+				    ,(princ-to-string
+				      (attributes-key attributes))))))
 		,@(when (attributes-time attributes)
 			`((:|time|
-			    (:|beats| ,(princ-to-string (first (attributes-time attributes))))
-			    (:|beat-type| ,(princ-to-string (second (attributes-time attributes)))))))
+			    (:|beats|
+			      ,(princ-to-string
+				(first (attributes-time attributes))))
+			    (:|beat-type|
+			      ,(princ-to-string
+				(second (attributes-time attributes)))))))
 		,@(when (attributes-staves attributes)
-			`((:|staves| ,(princ-to-string (attributes-staves attributes)))))
+			`((:|staves|
+			    ,(princ-to-string
+			      (attributes-staves attributes)))))
 		,@(cond
 		   ;; KLUDGE
 		   ((and (attributes-staves attributes)
@@ -451,10 +465,13 @@
 		      ((:|clef| :|number| "2") (:|sign| "F"))))
 		   ((attributes-clef attributes)
 		    `((:|clef|
-			(:|sign| ,(symbol-name (first (attributes-clef attributes))))
+			(:|sign|
+			  ,(symbol-name (first (attributes-clef attributes))))
 			,@(when
 			   (second (attributes-clef attributes))
-			   `((:|line| ,(princ-to-string (second (attributes-clef attributes)))))))))
+			   `((:|line|
+			       ,(princ-to-string
+				 (second (attributes-clef attributes)))))))))
 		   (t nil)))))
     (if (cdr dom)
 	dom

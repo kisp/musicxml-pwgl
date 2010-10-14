@@ -8,16 +8,6 @@
 
 (in-package #:e2m)
 
-;; (defun mapcar-index (fn list)
-;;   "Like MAPCAR, but call FN additionally with an index (counting from
-;; 1) as first argument."
-;;   (labels ((rec (fn list index)
-;; 	     (if (null list)
-;; 		 nil
-;; 		 (cons (funcall fn index (car list))
-;; 		       (rec fn (cdr list) (1+ index))))))
-;;     (rec fn list 1)))
-
 (defstruct mapcar-state
   index lastp previous)
 
