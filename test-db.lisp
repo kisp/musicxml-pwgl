@@ -37,8 +37,8 @@
 
 (unless (store-open-p)
   (let ((path (merge-pathnames
-	       "unis/musicxml-final/tests.db"
-	       (user-homedir-pathname))))
+	       "tests.db"
+	       (asdf:component-pathname (asdf:find-system :musicxml)))))
     (assert (probe-file path))
     (open-store path)))
 
