@@ -60,6 +60,12 @@
  0 *pprint-xml-table*)
 
 (set-pprint-dispatch
+ 'null
+ (lambda (stream obj)
+   (declare (ignore stream obj)))
+ 1 *pprint-xml-table*)
+
+(set-pprint-dispatch
  'string
  (lambda (stream obj)
    (write-string obj stream))

@@ -201,5 +201,12 @@
 	   (name test-case)
 	   (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
 
+(deftest pprint-xml-nil
+  (is
+   (string= "
+<huhu>123<zzz></zzz></huhu>"
+	    (with-output-to-string (out)
+	      (ppxml:pprint-xml '(:|huhu| "123" (:|zzz| nil)) :stream out)))))
+
 (defun run-tests ()
   (run! :musicxml))
