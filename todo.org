@@ -3,3 +3,5 @@
    CLOSED: [2010-09-28 Di 14:12]
 ** DONE test file should use mxml
    CLOSED: [2010-09-28 Di 18:11]
+** TODO mapcar-state allocate only once				   :refactor:
+   [[file:enp2musicxml.lisp::(defun%20mapcar-state%20(fn%20list)][file:enp2musicxml.lisp::(defun mapcar-state (fn list)]]

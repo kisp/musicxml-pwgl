@@ -36,7 +36,11 @@
 	    (store-object-id obj) (name obj) (status obj))))
 
 (unless (store-open-p)
-  (open-store "tests.db"))
+  (let ((path (merge-pathnames
+	       "unis/musicxml-final/tests.db"
+	       (user-homedir-pathname))))
+    (assert (probe-file path))
+    (open-store path)))
 
 (defun list-test-cases ()
   (list-by-class 'test-case))
@@ -68,6 +72,9 @@
    "/tmp/s.png" :if-exists :supersede)
   (sb-ext:run-program "/usr/bin/gnome-open" (list "/tmp/s.png"))
   nil)
+
+(defun set-to-run (test-case)
+  (setf (status test-case) :run))
 
 (defun nth-enp (n)
   (enp (nth n (list-by-class 'test-case))))
