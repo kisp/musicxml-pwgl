@@ -222,5 +222,14 @@
 	    (with-output-to-string (out)
 	      (ppxml:pprint-xml '(:|huhu| "123" (:|zzz| nil)) :stream out)))))
 
+(deftest split-list-plist
+  (for-all ((list (gen-list))
+	    (plist (gen-list)))
+    (multiple-value-bind (new-list new-plist)
+	(enp2musicxml::split-list-plist
+	 (enp2musicxml::append-list-plist list plist))
+      (is (equal list new-list))
+      (is (equal plist new-plist)))))
+
 (defun run-tests ()
   (run! :musicxml))

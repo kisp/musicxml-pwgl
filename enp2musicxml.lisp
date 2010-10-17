@@ -8,25 +8,7 @@
 
 (in-package #:e2m)
 
-(defstruct mapcar-state
-  index lastp previous)
-
-(defun mapcar-state-firstp (state)
-  (= 1 (mapcar-state-index state)))
-
-(defun mapcar-state (fn list)
-  (labels ((rec (fn list index previous)
-	     (if (null list)
-		 nil
-		 (let ((value
-			(funcall fn
-				 (make-mapcar-state :index index
-						    :lastp (null (cdr list))
-						    :previous previous)
-				 (car list))))
-		   (cons value (rec fn (cdr list) (1+ index) (car list)))))))
-    (rec fn list 1 nil)))
-
+;;; enp2musicxml
 (defun convert-measure (state measure)
   (labels ((previous ()
 	     (mapcar-state-previous state))
@@ -59,6 +41,7 @@
        (:|part-name| "Violin")))
     ,@(mapcar #'convert-part (enp-parts enp))))
 
+;;; enp access
 (defun enp-parts (enp) enp)
 
 (defun part-measures (part) (first part))
@@ -71,5 +54,46 @@
   (declare (ignore measure))
   1)
 
+;;; mapcar-state
+(defstruct mapcar-state
+  index lastp previous)
+
+(defun mapcar-state-firstp (state)
+  (= 1 (mapcar-state-index state)))
+
+(defun mapcar-state (fn list)
+  (labels ((rec (fn list index previous)
+	     (if (null list)
+		 nil
+		 (let ((value
+			(funcall fn
+				 (make-mapcar-state :index index
+						    :lastp (null (cdr list))
+						    :previous previous)
+				 (car list))))
+		   (cons value (rec fn (cdr list) (1+ index) (car list)))))))
+    (rec fn list 1 nil)))
+
+;;; utils
 (defgeneric ts (obj))
 (defmethod ts ((obj integer)) (princ-to-string obj))
+
+(defun plistp (list)
+  (labels ((rec (list state)
+	     (if (and (null list)
+		      (eql state :key))
+		 t
+		 (ecase state
+		   (:key (when (keywordp (car list))
+			   (rec (cdr list) :value)))
+		   (:value (when (car list)
+			     (rec (cdr list) :key)))))))
+    (rec list :key)))
+
+(defun append-list-plist (list plist)
+  (declare (type list list)
+	   (type (satisfies plistp) plist))
+  (append list plist))
+
+(defun split-list-plist (list)
+  list)
