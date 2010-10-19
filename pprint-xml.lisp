@@ -82,3 +82,7 @@
 	   (member char '(#\space #\page #\newline #\return #\tab))))
     (subst-if "" (lambda (obj) (and (stringp obj) (every #'whitespace-p obj)))
 	      dom)))
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
