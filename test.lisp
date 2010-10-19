@@ -10,7 +10,14 @@
                 #:divp
                 #:div-dur
                 #:div-items
-                #:chord-dur))
+                #:chord-dur
+                #:nodep
+                #:leafp
+                #:items
+                #:pload
+                #:make-leaf
+                #:make-node
+                #:fringe))
 
 (in-package #:test)
 
@@ -267,6 +274,40 @@
 (deftest chord-dur
   (is (= 1 (chord-dur '(1 :START-TIME 4.0 :NOTES (60)))))
   (signals error (chord-dur '(10 ((1 :START-TIME 4.0 :NOTES (60)))))))
+
+(defun gen-object ()
+  (gen-one-element :f 1 "f" '(1 2 3) '(:a 1 :b 2)
+                   '(1 :START-TIME 4.0 :NOTES (60))
+                   '(10 ((1 :START-TIME 4.0 :NOTES (60))))
+                   '((a . 1) (b . 2))))
+
+(deftest nodep-leafp
+  (flet ((xor (a b)
+           (and (or a b)
+                (not (and a b)))))
+    (for-all ((obj (gen-object)))
+      (is (xor (nodep obj) (leafp obj))))))
+
+(deftest leafp-items
+  (for-all ((obj (gen-object) (leafp obj)))
+    (is (null (items obj)))))
+
+(deftest make-leaf-make-node
+  (for-all ((obj (gen-object)))
+    (is (leafp (make-leaf obj)))
+    (is (nodep (make-node obj nil)))))
+
+(deftest pload
+  (for-all ((obj (gen-object)))
+    (is (equal obj (pload (make-node obj nil))))
+    (is (equal obj (pload (make-leaf obj))))))
+
+(deftest fringe
+  (is (equal '(2 3)
+             (fringe (make-node 1 (list (make-leaf 2) (make-leaf 3))))))
+  (for-all ((obj (gen-object)))
+    (is (equal (list obj)
+               (fringe (make-node 1 (list (make-leaf obj))))))))
 
 (defun run-tests ()
   (run! :musicxml))

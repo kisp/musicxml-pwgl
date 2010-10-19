@@ -17,15 +17,22 @@
                        (not (equal (funcall reader (previous))
                                    (funcall reader measure))))
                (funcall reader measure))))
-    `((:|measure| :|number| ,(ts (mapcar-state-index state)))
-      ,(attributes :divisions (when-changed #'measure-divisions)
-                   :time (when-changed #'measure-time-signature)
-                   :clef (when (mapcar-state-firstp state)
-                           (list 'g 2)))
-      ,@(loop repeat (first (measure-time-signature measure))
-             collect (note (pitch 'c 0 4) 1 'quarter nil))
-      ,@(when (mapcar-state-lastp state)
-              '((:|barline| (:|bar-style| "light-heavy")))))))
+    (let* ((division (measure-quarter-division measure))
+           (unit-dur (/ 1/4 division)))
+      `((:|measure| :|number| ,(ts (mapcar-state-index state)))
+        ,(attributes :divisions (when-changed #'measure-quarter-division)
+                     :time (when-changed #'measure-time-signature)
+                     :clef (when (mapcar-state-firstp state)
+                             (list 'g 2)))
+        ,@(loop for abs-dur in (measure-abs-durs measure)
+             collect (note (pitch 'c 0 4)
+                           (/ abs-dur unit-dur)
+                           (ecase abs-dur
+                             (1/4 'quarter)
+                             (1/2 'half))
+                           nil))
+        ,@(when (mapcar-state-lastp state)
+                '((:|barline| (:|bar-style| "light-heavy"))))))))
 
 (defun convert-part (part)
   `((:|part| :|id| "P1")
@@ -52,11 +59,27 @@
     (declare (ignore list))
     (getf plist :time-signature)))
 
-(defun measure-divisions (measure)
-  (declare (ignore measure))
-  1)
+(defun minimal-quarter-division (abs-dur)
+  "Minimal division of a quarter note that is needed to represent
+ABS-DUR. If ABS-DUR is greater than a quarter note a suitable division
+is returned so that a sequence of quarter notes equivally divided
+establish a grid that allows to represent ABS-DUR, which starts on a
+grid point. This is always the case, because we never leave the grid."
+  (let ((x (/ 1/4 abs-dur)))
+    (* x (denominator x))))
 
-(defun chordp (enp) (atom (second enp)))
+(defun measure-quarter-division (measure)
+  "Minimal division of a quarter note that is needed to represent all
+\(absolute) durations within MEASURE."
+  (declare (ignore measure))
+  (reduce #'lcm
+          (measure-abs-durs measure)
+          :key #'minimal-quarter-division))
+
+(defun chordp (enp)
+  (or (atom enp)               ;only needed for tree abstraction below
+      (and (second enp)
+           (atom (second enp)))))
 (defun divp (enp) (not (chordp enp)))
 
 (defun div-dur (enp)
@@ -69,6 +92,35 @@
 (defun chord-dur (enp)
   (declare ((satisfies chordp) enp))
   (first enp))
+
+(defun measure-abs-durs (measure)
+  (labels ((rec (unit tree)
+             (if (chordp tree)
+                 (list (* unit (chord-dur tree)))
+                 (let ((unit (/ (* unit (abs (div-dur tree)))
+                                (reduce #'+ (div-items tree) :key #'first))))
+                   (mapcan (lambda (tree) (rec unit tree))
+                           (div-items tree))))))
+    (multiple-value-bind (beats plist)
+        (split-list-plist measure)
+      (rec 1 (list (apply #'/ (getf plist :time-signature))
+                   beats)))))
+
+;;;# tree abstraction
+(defun make-leaf (obj) (list obj :leaf))
+(defun make-node (obj nodes) (list obj nodes))
+(defun nodep (tree) (divp tree))
+(defun leafp (tree) (chordp tree))
+(defun items (tree) (unless (leafp tree) (div-items tree)))
+(defun pload (tree)
+  (if (leafp tree)
+      (car tree)
+      (div-dur tree)))
+
+(defun fringe (tree)
+  (if (leafp tree)
+      (list (pload tree))
+      (mapcan #'fringe (items tree))))
 
 ;;;# mapcar-state
 (defstruct mapcar-state
