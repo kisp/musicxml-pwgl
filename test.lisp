@@ -222,9 +222,23 @@
 	    (with-output-to-string (out)
 	      (ppxml:pprint-xml '(:|huhu| "123" (:|zzz| nil)) :stream out)))))
 
+
+(defun gen-keyword ()
+  (lambda ()
+    (intern (string-upcase (funcall (gen-string :elements (gen-character :alphanumericp t :code-limit 120))))
+	    "KEYWORD")))
+
+(defun gen-plist (&key (length (gen-integer :min 0 :max 10))
+		  (elements (gen-integer :min -10 :max 10)))
+  (lambda ()
+    (loop with keyword = (gen-keyword)
+       repeat (funcall length)
+       collect (funcall keyword)
+       collect (funcall elements))))
+
 (deftest split-list-plist
   (for-all ((list (gen-list))
-	    (plist (gen-list)))
+	    (plist (gen-plist)))
     (multiple-value-bind (new-list new-plist)
 	(enp2musicxml::split-list-plist
 	 (enp2musicxml::append-list-plist list plist))

@@ -23,7 +23,7 @@
 		   :clef (when (mapcar-state-firstp state)
 			   (list 'g 2)))
       ,@(loop repeat (first (measure-time-signature measure))
-	     collect (note (pitch 'c 0 4) 1 'quarter nil))
+	   collect (note (pitch 'c 0 4) 1 'quarter nil))
       ,@(when (mapcar-state-lastp state)
 	      '((:|barline| (:|bar-style| "light-heavy")))))))
 
@@ -47,8 +47,10 @@
 (defun part-measures (part) (first part))
 
 (defun measure-time-signature (measure)
-  (nth (1+ (position :time-signature measure))
-       measure))
+  (multiple-value-bind (list plist)
+      (split-list-plist measure)
+    (declare (ignore list))
+    (getf plist :time-signature)))
 
 (defun measure-divisions (measure)
   (declare (ignore measure))
@@ -96,4 +98,7 @@
   (append list plist))
 
 (defun split-list-plist (list)
-  list)
+  (let ((position (or (position-if #'keywordp list)
+		      (length list))))
+    (values (subseq list 0 position)
+	    (subseq list position))))
