@@ -9,15 +9,24 @@
 (in-package #:e2m)
 
 ;;;# enp2musicxml
+(defun convert-note2pitch (note)
+  (pitch 'c 0 4))
+
+(defun convert-note2note (abs-dur unit-dur)
+  (lambda (state note)
+    (note (convert-note2pitch note)
+	  (/ abs-dur unit-dur)
+	  (abs-dur-name abs-dur)
+	  nil)))
+
 (defun convert-chord (unit-dur)
   (lambda (abs-dur chord)
-    (list
-     (note (if (plusp (chord-dur chord))
-	       (pitch 'c 0 4)
-	       (rest*))
-	   (/ abs-dur unit-dur)
-	   (abs-dur-name abs-dur)
-	   nil))))
+    (multiple-value-bind (dur notes)
+	(destructure-chord chord)
+      (if (minusp dur)
+	  (list (note (rest*) (/ abs-dur unit-dur) (abs-dur-name abs-dur) nil))
+	  (mapcar-state (convert-note2note abs-dur unit-dur)
+			notes)))))
 
 (defun convert-measure (state measure)
   (labels ((previous ()
@@ -103,6 +112,10 @@ grid point. This is always the case, because we never leave the grid."
 (defun chord-dur (enp)
   (declare ((satisfies chordp) enp))
   (first enp))
+
+(defun destructure-chord (enp)
+  (values (car enp)
+	  (getf (cdr enp) :notes)))
 
 (defun measure-abs-durs (measure)
   (labels ((rec (unit tree)
