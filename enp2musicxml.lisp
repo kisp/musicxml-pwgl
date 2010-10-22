@@ -25,8 +25,8 @@
 		     :clef (when (mapcar-state-firstp state)
 			     (list 'g 2)))
 	,@(loop for abs-dur in (measure-abs-durs measure)
-	     for dur in (measure-chord-durs measure)
-	     collect (note (if (plusp dur)
+	     for chord in (measure-chords measure)
+	     collect (note (if (plusp (chord-dur chord))
 			       (pitch 'c 0 4)
 			       (rest*))
 			   (/ abs-dur unit-dur)
@@ -112,11 +112,11 @@ grid point. This is always the case, because we never leave the grid."
       (rec 1 (list (apply #'/ (getf plist :time-signature))
 		   beats)))))
 
-(defun measure-chord-durs (measure)
+(defun measure-chords (measure)
   (multiple-value-bind (beats plist)
       (split-list-plist measure)
     (declare (ignore plist))
-    (fringe (make-node nil beats))))
+    (fringe* (make-node nil beats))))
 
 ;;;# tree abstraction
 (defun make-leaf (obj) (list obj :leaf))
@@ -133,6 +133,11 @@ grid point. This is always the case, because we never leave the grid."
   (if (leafp tree)
       (list (pload tree))
       (mapcan #'fringe (items tree))))
+
+(defun fringe* (tree)
+  (if (leafp tree)
+      (list tree)
+      (mapcan #'fringe* (items tree))))
 
 ;;;# mapcar-state
 (defstruct mapcar-state
