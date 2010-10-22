@@ -35,12 +35,12 @@
 (defmethod print-object ((obj test-case) stream)
   (print-unreadable-object (obj stream :type t :identity t)
     (format stream "~A ~A ~A"
-	    (store-object-id obj) (name obj) (status obj))))
+            (store-object-id obj) (name obj) (status obj))))
 
 (unless (store-open-p)
   (let ((path (merge-pathnames
-	       "tests.db"
-	       (asdf:component-pathname (asdf:find-system :musicxml)))))
+               "tests.db"
+               (asdf:component-pathname (asdf:find-system :musicxml)))))
     (assert (probe-file path))
     (open-store path)))
 
@@ -52,20 +52,20 @@
 
 (defun apropos-test-case (name)
   (find-all (lambda (test-case)
-	      (search name (name test-case) :test #'char-equal))
-	    (list-test-cases)))
+              (search name (name test-case) :test #'char-equal))
+            (list-test-cases)))
 
 (defun make-entry (list)
   (destructuring-bind (name description enp musicxml status enp-screen-shot score)
       list
     (make-instance 'test-case
-		   :score score
-		   :enp-screen-shot enp-screen-shot
-		   :status status
-		   :musicxml musicxml
-		   :enp enp
-		   :description description
-		   :name name)
+                   :score score
+                   :enp-screen-shot enp-screen-shot
+                   :status status
+                   :musicxml musicxml
+                   :enp enp
+                   :description description
+                   :name name)
     t))
 
 (defun show-foto (test-case)
@@ -89,32 +89,32 @@
 
 (defun replace-nth-foto (n s)
   (setf (enp-screen-shot (nth n (list-by-class 'test-case)))
-	s))
+        s))
 
 #+nil
 (defun what-next ()
   (labels ((count-lines (string)
-	     (with-input-from-string (in string)
-	       (loop for i upfrom 0
-		  for line = (read-line in nil)
-		  while line
-		  finally (return i)))))
+             (with-input-from-string (in string)
+               (loop for i upfrom 0
+                  for line = (read-line in nil)
+                  while line
+                  finally (return i)))))
     (let (res)
       (dolist (tc (list-test-cases))
-	(handler-case
-	    (when (not (test::check-test-db-test-case tc))
-	      (push
-	       (list tc
-		     (count-lines
-		      (test::diff "/tmp/resc.xml" "/tmp/expc.xml")))
-	       res))
-	  (error nil)))
+        (handler-case
+            (when (not (test::check-test-db-test-case tc))
+              (push
+               (list tc
+                     (count-lines
+                      (test::diff "/tmp/resc.xml" "/tmp/expc.xml")))
+               res))
+          (error nil)))
       (dolist (tc (sort res #'< :key #'second))
-	(format t "~s~60t~s~%" (first tc) (second tc))))))
+        (format t "~s~60t~s~%" (first tc) (second tc))))))
 
 #+nil
 (defun skipped-tests-that-pass ()
   (dolist (tc (list-test-cases))
     (when (and (eql :skip (status tc))
-	       (ignore-errors (test::check-test-db-test-case tc)))
+               (ignore-errors (test::check-test-db-test-case tc)))
       (format t "~s~%" tc))))

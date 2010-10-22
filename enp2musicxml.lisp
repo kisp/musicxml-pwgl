@@ -20,40 +20,40 @@
 (defun convert-note2note (abs-dur unit-dur)
   (lambda (state note)
     (note (convert-note2pitch note)
-	  (/ abs-dur unit-dur)
-	  (abs-dur-name abs-dur)
-	  nil
-	  :chordp (not (mapcar-state-firstp state)))))
+          (/ abs-dur unit-dur)
+          (abs-dur-name abs-dur)
+          nil
+          :chordp (not (mapcar-state-firstp state)))))
 
 (defun convert-chord (unit-dur)
   (lambda (abs-dur chord)
     (multiple-value-bind (dur notes)
-	(destructure-chord chord)
+        (destructure-chord chord)
       (if (minusp dur)
-	  (list (note (rest*) (/ abs-dur unit-dur) (abs-dur-name abs-dur) nil))
-	  (mapcar-state (convert-note2note abs-dur unit-dur)
-			notes)))))
+          (list (note (rest*) (/ abs-dur unit-dur) (abs-dur-name abs-dur) nil))
+          (mapcar-state (convert-note2note abs-dur unit-dur)
+                        notes)))))
 
 (defun convert-measure (state measure)
   (labels ((previous ()
-	     (mapcar-state-previous state))
-	   (when-changed (reader)
-	     (when (or (null (previous))
-		       (not (equal (funcall reader (previous))
-				   (funcall reader measure))))
-	       (funcall reader measure))))
+             (mapcar-state-previous state))
+           (when-changed (reader)
+             (when (or (null (previous))
+                       (not (equal (funcall reader (previous))
+                                   (funcall reader measure))))
+               (funcall reader measure))))
     (let* ((division (measure-quarter-division measure))
-	   (unit-dur (/ 1/4 division)))
+           (unit-dur (/ 1/4 division)))
       `((:|measure| :|number| ,(ts (mapcar-state-index state)))
-	,(attributes :divisions (when-changed #'measure-quarter-division)
-		     :time (when-changed #'measure-time-signature)
-		     :clef (when (mapcar-state-firstp state)
-			     (list 'g 2)))
-	,@(mapcan (convert-chord unit-dur)
-		  (measure-abs-durs measure)
-		  (measure-chords measure))
-	,@(when (mapcar-state-lastp state)
-		'((:|barline| (:|bar-style| "light-heavy"))))))))
+        ,(attributes :divisions (when-changed #'measure-quarter-division)
+                     :time (when-changed #'measure-time-signature)
+                     :clef (when (mapcar-state-firstp state)
+                             (list 'g 2)))
+        ,@(mapcan (convert-chord unit-dur)
+                  (measure-abs-durs measure)
+                  (measure-chords measure))
+        ,@(when (mapcar-state-lastp state)
+                '((:|barline| (:|bar-style| "light-heavy"))))))))
 
 (defun convert-part (part)
   `((:|part| :|id| "P1")
@@ -63,7 +63,7 @@
   `((:|score-partwise| #+nil :|version| #+nil "2.0")
     (:|identification|
       (:|encoding| (:|encoding-date| "2010-10-12")
-	(:|software| "FOMUS v0.2.12")))
+        (:|software| "FOMUS v0.2.12")))
     (:|part-list|
       ((:|score-part| :|id| "P1")
        (:|part-name| "Violin")))
@@ -99,13 +99,13 @@ grid point. This is always the case, because we never leave the grid."
   "Minimal division of a quarter note that is needed to represent all
 \(absolute) durations within MEASURE."
   (reduce #'lcm
-	  (measure-abs-durs measure)
-	  :key #'minimal-quarter-division))
+          (measure-abs-durs measure)
+          :key #'minimal-quarter-division))
 
 (defun chordp (enp)
   (or (atom enp)               ;only needed for tree abstraction below
       (and (second enp)
-	   (atom (second enp)))))
+           (atom (second enp)))))
 (defun divp (enp) (not (chordp enp)))
 
 (defun div-dur (enp)
@@ -121,20 +121,20 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun destructure-chord (enp)
   (values (car enp)
-	  (getf (cdr enp) :notes)))
+          (getf (cdr enp) :notes)))
 
 (defun measure-abs-durs (measure)
   (labels ((rec (unit tree)
-	     (if (chordp tree)
-		 (list (* unit (chord-dur tree)))
-		 (let ((unit (/ (* unit (abs (div-dur tree)))
-				(reduce #'+ (div-items tree) :key #'first))))
-		   (mapcan (lambda (tree) (rec unit tree))
-			   (div-items tree))))))
+             (if (chordp tree)
+                 (list (* unit (chord-dur tree)))
+                 (let ((unit (/ (* unit (abs (div-dur tree)))
+                                (reduce #'+ (div-items tree) :key #'first))))
+                   (mapcan (lambda (tree) (rec unit tree))
+                           (div-items tree))))))
     (multiple-value-bind (beats plist)
-	(split-list-plist measure)
+        (split-list-plist measure)
       (rec 1 (list (apply #'/ (getf plist :time-signature))
-		   beats)))))
+                   beats)))))
 
 (defun measure-abs-dur-tree (measure)
   (labels ((rec (unit tree)
@@ -187,15 +187,15 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun mapcar-state (fn list)
   (labels ((rec (fn list index previous)
-	     (if (null list)
-		 nil
-		 (let ((value
-			(funcall fn
-				 (make-mapcar-state :index index
-						    :lastp (null (cdr list))
-						    :previous previous)
-				 (car list))))
-		   (cons value (rec fn (cdr list) (1+ index) (car list)))))))
+             (if (null list)
+                 nil
+                 (let ((value
+                        (funcall fn
+                                 (make-mapcar-state :index index
+                                                    :lastp (null (cdr list))
+                                                    :previous previous)
+                                 (car list))))
+                   (cons value (rec fn (cdr list) (1+ index) (car list)))))))
     (rec fn list 1 nil)))
 
 ;;;# utils
@@ -204,26 +204,26 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun plistp (list)
   (labels ((rec (list state)
-	     (if (and (null list)
-		      (eql state :key))
-		 t
-		 (ecase state
-		   (:key (when (keywordp (car list))
-			   (rec (cdr list) :value)))
-		   (:value (when (car list)
-			     (rec (cdr list) :key)))))))
+             (if (and (null list)
+                      (eql state :key))
+                 t
+                 (ecase state
+                   (:key (when (keywordp (car list))
+                           (rec (cdr list) :value)))
+                   (:value (when (car list)
+                             (rec (cdr list) :key)))))))
     (rec list :key)))
 
 (defun append-list-plist (list plist)
   (declare (type list list)
-	   (type (satisfies plistp) plist))
+           (type (satisfies plistp) plist))
   (append list plist))
 
 (defun split-list-plist (list)
   (let ((position (or (position-if #'keywordp list)
-		      (length list))))
+                      (length list))))
     (values (subseq list 0 position)
-	    (subseq list position))))
+            (subseq list position))))
 
 ;; Local Variables:
 ;; indent-tabs-mode: nil

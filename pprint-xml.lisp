@@ -27,15 +27,15 @@
        obj
      (pprint-logical-block (stream nil)
        (pprint-logical-block (stream nil :prefix "<" :suffix ">")
-	 (write-string (string elt) stream)
-	 (dolist (pair (group-in-pairs attributes))
-	   (write-char #\space stream)
-	   (pprint-newline :fill stream)
-	   (write-string (string (first pair)) stream)
-	   (write-string "='" stream)
-	   (write-string (second pair) stream)
-	   (write-string "'" stream))
-	 (pprint-newline :linear stream))
+         (write-string (string elt) stream)
+         (dolist (pair (group-in-pairs attributes))
+           (write-char #\space stream)
+           (pprint-newline :fill stream)
+           (write-string (string (first pair)) stream)
+           (write-string "='" stream)
+           (write-string (second pair) stream)
+           (write-string "'" stream))
+         (pprint-newline :linear stream))
        (format stream "~{~W~}" elts)
        (write-string "</" stream)
        (write-string (string elt) stream)
@@ -79,9 +79,9 @@
   "Remove any text elements that contain only whitespace."
   ;; TODO really remove them
   (flet ((whitespace-p (char)
-	   (member char '(#\space #\page #\newline #\return #\tab))))
+           (member char '(#\space #\page #\newline #\return #\tab))))
     (subst-if "" (lambda (obj) (and (stringp obj) (every #'whitespace-p obj)))
-	      dom)))
+              dom)))
 
 ;; Local Variables:
 ;; indent-tabs-mode: nil
