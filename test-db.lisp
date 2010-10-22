@@ -17,7 +17,8 @@
    #:status
    #:enp-screen-shot
    #:score
-   #:apropos-test-case))
+   #:apropos-test-case
+   #:what-next))
 
 (in-package #:tdb)
 
@@ -88,3 +89,23 @@
 (defun replace-nth-foto (n s)
   (setf (enp-screen-shot (nth n (list-by-class 'test-case)))
 	s))
+
+(defun what-next ()
+  (labels ((count-lines (string)
+	     (with-input-from-string (in string)
+	       (loop for i upfrom 0
+		  for line = (read-line in nil)
+		  while line
+		  finally (return i)))))
+    (let (res)
+      (dolist (tc (list-test-cases))
+	(handler-case
+	    (when (not (test::check-test-db-test-case tc))
+	      (push
+	       (list tc
+		     (count-lines
+		      (test::diff "/tmp/resc.xml" "/tmp/expc.xml")))
+	       res))
+	  (error nil)))
+      (dolist (tc (sort res #'< :key #'second))
+	(format t "~s~60t~s~%" (first tc) (second tc))))))
