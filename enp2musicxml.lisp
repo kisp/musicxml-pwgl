@@ -30,10 +30,7 @@
 			       (pitch 'c 0 4)
 			       (rest*))
 			   (/ abs-dur unit-dur)
-			   (ecase abs-dur
-			     (1/8 'eighth)
-			     (1/4 'quarter)
-			     (1/2 'half))
+			   (abs-dur-name abs-dur)
 			   nil))
 	,@(when (mapcar-state-lastp state)
 		'((:|barline| (:|bar-style| "light-heavy"))))))))
@@ -51,6 +48,12 @@
       ((:|score-part| :|id| "P1")
        (:|part-name| "Violin")))
     ,@(mapcar #'convert-part (enp-parts enp))))
+
+(defun abs-dur-name (abs-dur)
+  (ecase abs-dur
+    (1/8 'eighth)
+    (1/4 'quarter)
+    (1/2 'half)))
 
 ;;;# enp access
 (defun enp-parts (enp) enp)
