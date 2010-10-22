@@ -9,6 +9,16 @@
 (in-package #:e2m)
 
 ;;;# enp2musicxml
+(defun convert-chord (unit-dur)
+  (lambda (abs-dur chord)
+    (list
+     (note (if (plusp (chord-dur chord))
+	       (pitch 'c 0 4)
+	       (rest*))
+	   (/ abs-dur unit-dur)
+	   (abs-dur-name abs-dur)
+	   nil))))
+
 (defun convert-measure (state measure)
   (labels ((previous ()
 	     (mapcar-state-previous state))
@@ -24,14 +34,9 @@
 		     :time (when-changed #'measure-time-signature)
 		     :clef (when (mapcar-state-firstp state)
 			     (list 'g 2)))
-	,@(loop for abs-dur in (measure-abs-durs measure)
-	     for chord in (measure-chords measure)
-	     collect (note (if (plusp (chord-dur chord))
-			       (pitch 'c 0 4)
-			       (rest*))
-			   (/ abs-dur unit-dur)
-			   (abs-dur-name abs-dur)
-			   nil))
+	,@(mapcan (convert-chord unit-dur)
+		  (measure-abs-durs measure)
+		  (measure-chords measure))
 	,@(when (mapcar-state-lastp state)
 		'((:|barline| (:|bar-style| "light-heavy"))))))))
 
