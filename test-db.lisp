@@ -91,6 +91,7 @@
   (setf (enp-screen-shot (nth n (list-by-class 'test-case)))
 	s))
 
+#+nil
 (defun what-next ()
   (labels ((count-lines (string)
 	     (with-input-from-string (in string)
@@ -111,6 +112,7 @@
       (dolist (tc (sort res #'< :key #'second))
 	(format t "~s~60t~s~%" (first tc) (second tc))))))
 
+#+nil
 (defun skipped-tests-that-pass ()
   (dolist (tc (list-test-cases))
     (when (and (eql :skip (status tc))
