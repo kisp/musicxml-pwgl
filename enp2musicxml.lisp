@@ -10,14 +10,17 @@
 
 ;;;# enp2musicxml
 (defun convert-note2pitch (note)
-  (pitch 'c 0 4))
+  (ecase note
+    (60 (pitch 'c 0 4))
+    (67 (pitch 'g 0 4))))
 
 (defun convert-note2note (abs-dur unit-dur)
   (lambda (state note)
     (note (convert-note2pitch note)
 	  (/ abs-dur unit-dur)
 	  (abs-dur-name abs-dur)
-	  nil)))
+	  nil
+	  :chordp (not (mapcar-state-firstp state)))))
 
 (defun convert-chord (unit-dur)
   (lambda (abs-dur chord)
