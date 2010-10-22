@@ -18,7 +18,8 @@
    #:enp-screen-shot
    #:score
    #:apropos-test-case
-   #:what-next))
+   #:what-next
+   #:skipped-tests-that-pass))
 
 (in-package #:tdb)
 
@@ -109,3 +110,9 @@
 	  (error nil)))
       (dolist (tc (sort res #'< :key #'second))
 	(format t "~s~60t~s~%" (first tc) (second tc))))))
+
+(defun skipped-tests-that-pass ()
+  (dolist (tc (list-test-cases))
+    (when (and (eql :skip (status tc))
+	       (ignore-errors (test::check-test-db-test-case tc)))
+      (format t "~s~%" tc))))
