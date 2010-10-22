@@ -10,9 +10,12 @@
 
 ;;;# enp2musicxml
 (defun convert-note2pitch (note)
-  (ecase note
+  (case note
     (60 (pitch 'c 0 4))
-    (67 (pitch 'g 0 4))))
+    (67 (pitch 'g 0 4))
+    (69 (pitch 'a 0 4))
+    (71 (pitch 'b 0 4))
+    (t (pitch 'g 0 0))))
 
 (defun convert-note2note (abs-dur unit-dur)
   (lambda (state note)
