@@ -25,7 +25,10 @@
 		     :clef (when (mapcar-state-firstp state)
 			     (list 'g 2)))
 	,@(loop for abs-dur in (measure-abs-durs measure)
-	     collect (note (pitch 'c 0 4)
+	     for dur in (measure-chord-durs measure)
+	     collect (note (if (plusp dur)
+			       (pitch 'c 0 4)
+			       (rest*))
 			   (/ abs-dur unit-dur)
 			   (ecase abs-dur
 			     (1/8 'eighth)
@@ -72,7 +75,6 @@ grid point. This is always the case, because we never leave the grid."
 (defun measure-quarter-division (measure)
   "Minimal division of a quarter note that is needed to represent all
 \(absolute) durations within MEASURE."
-  (declare (ignore measure))
   (reduce #'lcm
 	  (measure-abs-durs measure)
 	  :key #'minimal-quarter-division))
@@ -106,6 +108,12 @@ grid point. This is always the case, because we never leave the grid."
 	(split-list-plist measure)
       (rec 1 (list (apply #'/ (getf plist :time-signature))
 		   beats)))))
+
+(defun measure-chord-durs (measure)
+  (multiple-value-bind (beats plist)
+      (split-list-plist measure)
+    (declare (ignore plist))
+    (fringe (make-node nil beats))))
 
 ;;;# tree abstraction
 (defun make-leaf (obj) (list obj :leaf))
