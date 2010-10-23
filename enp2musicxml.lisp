@@ -152,7 +152,7 @@ grid point. This is always the case, because we never leave the grid."
                     (div-items tree))))))
     (multiple-value-bind (beats plist)
         (split-list-plist measure)
-      (let ((tree (list (apply #'/ (getf plist :time-signature)) beats)))
+      (let ((tree (list (list2ratio (getf plist :time-signature)) beats)))
         (rec 1 tree nil (list tree) nil)))))
 
 ;;;# mapcar-state
@@ -204,6 +204,46 @@ grid point. This is always the case, because we never leave the grid."
                       (length list))))
     (values (subseq list 0 position)
             (subseq list position))))
+
+(defun power-of-two-p (x)
+  (cond
+    ((eql x 1) t)
+    ((> x 1) (and (evenp x)
+                  (power-of-two-p (truncate x 2))))
+    (t (error "power-of-two-p called with ~S" x))))
+
+(defun notable-dur-p (dur &optional (max-dots 3))
+  (flet ((h (numer denom)
+           (case numer
+             ((1) (power-of-two-p denom))
+             ((3) (and (> max-dots 0)
+                       (>= denom 2) (power-of-two-p denom)))
+             ((7) (and (> max-dots 1)
+                       (>= denom 4) (power-of-two-p denom)))
+             ((15) (and (> max-dots 2)
+                        (>= denom 8) (power-of-two-p denom)))
+             (t nil))))
+    (h (numerator dur)
+       (denominator dur))))
+
+(defun tuplet-ratio (dur div-num)
+  (let ((numer div-num))
+    (labels ((find-lower-match (denom)
+               (cond ((notable-dur-p (/ dur denom) 0)
+                      (list numer denom))
+                     ((>= denom 2)
+                      (find-higher-match 3))))
+             (find-higher-match (denom)
+               (cond ((notable-dur-p (/ dur denom) 0)
+                      (list numer denom))
+                     (t
+                      (find-higher-match (1+ denom))))))
+      (assert (> div-num 1))
+      (find-lower-match div-num))))
+
+(defun list2ratio (list)
+  (assert (null (cddr list)))
+  (/ (first list) (second list)))
 
 ;; Local Variables:
 ;; indent-tabs-mode: nil
