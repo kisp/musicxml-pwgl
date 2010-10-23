@@ -19,7 +19,9 @@
    #:score
    #:apropos-test-case
    #:what-next
-   #:skipped-tests-that-pass))
+   #:skipped-tests-that-pass
+   #:set-to-skip
+   #:set-to-run))
 
 (in-package #:tdb)
 
