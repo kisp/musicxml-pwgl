@@ -26,13 +26,15 @@
           :chordp (not (mapcar-state-firstp state)))))
 
 (defun convert-chord (unit-dur)
-  (lambda (abs-dur chord)
-    (multiple-value-bind (dur notes)
-        (destructure-chord chord)
-      (if (minusp dur)
-          (list (note (rest*) (/ abs-dur unit-dur) (abs-dur-name abs-dur) nil))
-          (mapcar-state (convert-note2note abs-dur unit-dur)
-                        notes)))))
+  (lambda (fringe)
+    (let ((abs-dur (caar fringe))
+          (chord (first (third fringe))))
+      (multiple-value-bind (dur notes)
+          (destructure-chord chord)
+        (if (minusp dur)
+            (list (note (rest*) (/ abs-dur unit-dur) (abs-dur-name abs-dur) nil))
+            (mapcar-state (convert-note2note abs-dur unit-dur)
+                          notes))))))
 
 (defun convert-measure (state measure)
   (labels ((previous ()
@@ -50,8 +52,7 @@
                      :clef (when (mapcar-state-firstp state)
                              (list 'g 2)))
         ,@(mapcan (convert-chord unit-dur)
-                  (measure-abs-durs measure)
-                  (measure-chords measure))
+                  (measure-fringe measure))
         ,@(when (mapcar-state-lastp state)
                 '((:|barline| (:|bar-style| "light-heavy"))))))))
 
@@ -124,17 +125,7 @@ grid point. This is always the case, because we never leave the grid."
           (getf (cdr enp) :notes)))
 
 (defun measure-abs-durs (measure)
-  (labels ((rec (unit tree)
-             (if (chordp tree)
-                 (list (* unit (chord-dur tree)))
-                 (let ((unit (/ (* unit (abs (div-dur tree)))
-                                (reduce #'+ (div-items tree) :key #'first))))
-                   (mapcan (lambda (tree) (rec unit tree))
-                           (div-items tree))))))
-    (multiple-value-bind (beats plist)
-        (split-list-plist measure)
-      (rec 1 (list (apply #'/ (getf plist :time-signature))
-                   beats)))))
+  (mapcar #'caar (measure-fringe measure)))
 
 (defun measure-fringe (measure)
   (labels ((rec (unit tree path pointers abs-durs)
@@ -163,27 +154,6 @@ grid point. This is always the case, because we never leave the grid."
       (let ((tree (list (apply #'/ (getf plist :time-signature)) beats)))
         (rec 1 tree nil (list tree) nil)))))
 
-(defun measure-abs-dur-tree (measure)
-  (labels ((rec (unit tree)
-             (if (chordp tree)
-                 (make-leaf (* unit (chord-dur tree)))
-                 (let* ((sum (reduce #'+ (div-items tree) :key #'first))
-                        (unit (/ (* unit (abs (div-dur tree)))
-                                 sum)))
-                   (make-node (* unit sum)
-                              (mapcar (lambda (tree) (rec unit tree))
-                                      (div-items tree)))))))
-    (multiple-value-bind (beats plist)
-        (split-list-plist measure)
-      (rec 1 (list (apply #'/ (getf plist :time-signature))
-                   beats)))))
-
-(defun measure-chords (measure)
-  (multiple-value-bind (beats plist)
-      (split-list-plist measure)
-    (declare (ignore plist))
-    (fringe* (make-node nil beats))))
-
 ;;;# tree abstraction
 (defun make-leaf (obj) (list obj :leaf))
 (defun make-node (obj nodes) (list obj nodes))
@@ -199,11 +169,6 @@ grid point. This is always the case, because we never leave the grid."
   (if (leafp tree)
       (list (pload tree))
       (mapcan #'fringe (items tree))))
-
-(defun fringe* (tree)
-  (if (leafp tree)
-      (list tree)
-      (mapcan #'fringe* (items tree))))
 
 ;;;# mapcar-state
 (defstruct mapcar-state
