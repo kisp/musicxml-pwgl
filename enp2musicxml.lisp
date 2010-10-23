@@ -154,22 +154,6 @@ grid point. This is always the case, because we never leave the grid."
       (let ((tree (list (apply #'/ (getf plist :time-signature)) beats)))
         (rec 1 tree nil (list tree) nil)))))
 
-;;;# tree abstraction
-(defun make-leaf (obj) (list obj :leaf))
-(defun make-node (obj nodes) (list obj nodes))
-(defun nodep (tree) (divp tree))
-(defun leafp (tree) (chordp tree))
-(defun items (tree) (unless (leafp tree) (div-items tree)))
-(defun pload (tree)
-  (if (leafp tree)
-      (car tree)
-      (div-dur tree)))
-
-(defun fringe (tree)
-  (if (leafp tree)
-      (list (pload tree))
-      (mapcan #'fringe (items tree))))
-
 ;;;# mapcar-state
 (defstruct mapcar-state
   index lastp previous)
