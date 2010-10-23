@@ -136,6 +136,33 @@ grid point. This is always the case, because we never leave the grid."
       (rec 1 (list (apply #'/ (getf plist :time-signature))
                    beats)))))
 
+(defun measure-fringe (measure)
+  (labels ((rec (unit tree path pointers abs-durs)
+             (if (chordp tree)
+                 ;; chord
+                 (list (list (cons (* unit (chord-dur tree))
+                                   abs-durs)
+                             path
+                             pointers))
+                 ;; div
+                 (let* ((sum (reduce #'+ (div-items tree) :key #'first))
+                        (unit (/ (* unit (abs (div-dur tree)))
+                                 sum)))
+                   (mapcan-state
+                    (lambda (state tree)
+                      (let ((path (cons (1- (mapcar-state-index state))
+                                        path))
+                            (pointers (cons tree pointers)))
+                        (rec unit tree path
+                             pointers
+                             (cons (* unit sum)
+                                   abs-durs))))
+                    (div-items tree))))))
+    (multiple-value-bind (beats plist)
+        (split-list-plist measure)
+      (let ((tree (list (apply #'/ (getf plist :time-signature)) beats)))
+        (rec 1 tree nil (list tree) nil)))))
+
 (defun measure-abs-dur-tree (measure)
   (labels ((rec (unit tree)
              (if (chordp tree)
@@ -197,6 +224,9 @@ grid point. This is always the case, because we never leave the grid."
                                  (car list))))
                    (cons value (rec fn (cdr list) (1+ index) (car list)))))))
     (rec fn list 1 nil)))
+
+(defun mapcan-state (fn list)
+  (apply #'nconc (mapcar-state fn list)))
 
 ;;;# utils
 (defgeneric ts (obj))
