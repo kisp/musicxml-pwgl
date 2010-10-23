@@ -32,7 +32,8 @@
       (multiple-value-bind (dur notes)
           (destructure-chord chord)
         (if (minusp dur)
-            (list (note (rest*) (/ abs-dur unit-dur) (abs-dur-name abs-dur) nil))
+            (list (note (rest*) (/ abs-dur unit-dur)
+                        (abs-dur-name abs-dur) nil))
             (mapcar-state (convert-note2note abs-dur unit-dur)
                           notes))))))
 
