@@ -105,17 +105,30 @@ grid point. This is always the case, because we never leave the grid."
           :key #'minimal-quarter-division))
 
 (defun chordp (enp)
-  (or (atom enp)               ;only needed for tree abstraction below
-      (and (second enp)
-           (atom (second enp)))))
+  (and (second enp)
+       (atom (second enp))))
+
 (defun divp (enp) (not (chordp enp)))
 
 (defun div-dur (enp)
   (declare ((satisfies divp) enp))
   (first enp))
+
 (defun div-items (enp)
   (declare ((satisfies divp) enp))
   (second enp))
+
+(defun div-items-sum (enp)
+  (reduce #'+ (div-items enp) :key #'first))
+
+(defun tuplet-ratio (enp)
+  (declare ((satisfies divp) enp))
+  (let ((dur (div-dur enp))
+        (sum (div-items-sum enp)))
+    (list sum
+          (if (<= sum dur)
+              dur
+              (* dur (expt 2 (truncate (log (/ sum dur) 2))))))))
 
 (defun chord-dur (enp)
   (declare ((satisfies chordp) enp))
@@ -137,7 +150,7 @@ grid point. This is always the case, because we never leave the grid."
                              path
                              pointers))
                  ;; div
-                 (let* ((sum (reduce #'+ (div-items tree) :key #'first))
+                 (let* ((sum (div-items-sum tree))
                         (unit (/ (* unit (abs (div-dur tree)))
                                  sum)))
                    (mapcan-state
@@ -226,20 +239,20 @@ grid point. This is always the case, because we never leave the grid."
     (h (numerator dur)
        (denominator dur))))
 
-(defun tuplet-ratio (dur div-num)
-  (let ((numer div-num))
-    (labels ((find-lower-match (denom)
-               (cond ((notable-dur-p (/ dur denom) 0)
-                      (list numer denom))
-                     ((>= denom 2)
-                      (find-higher-match 3))))
-             (find-higher-match (denom)
-               (cond ((notable-dur-p (/ dur denom) 0)
-                      (list numer denom))
-                     (t
-                      (find-higher-match (1+ denom))))))
-      (assert (> div-num 1))
-      (find-lower-match div-num))))
+;; (defun tuplet-ratio (dur div-num)
+;;   (let ((numer div-num))
+;;     (labels ((find-lower-match (denom)
+;;                (cond ((notable-dur-p (/ dur denom) 0)
+;;                       (list numer denom))
+;;                      ((>= denom 2)
+;;                       (find-higher-match 3))))
+;;              (find-higher-match (denom)
+;;                (cond ((notable-dur-p (/ dur denom) 0)
+;;                       (list numer denom))
+;;                      (t
+;;                       (find-higher-match (1+ denom))))))
+;;       (assert (> div-num 1))
+;;       (find-lower-match div-num))))
 
 (defun list2ratio (list)
   (assert (null (cddr list)))
