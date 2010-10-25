@@ -9,13 +9,38 @@
 (in-package #:e2m)
 
 ;;;# enp2musicxml
-(defun convert-note2pitch (note)
+(defun decode-midi (note enharmonic)
+  (declare (accidental enharmonic))
   (case note
-    (60 (pitch 'c 0 4))
-    (67 (pitch 'g 0 4))
-    (69 (pitch 'a 0 4))
-    (71 (pitch 'b 0 4))
-    (t (pitch 'g 0 0))))
+    (60 (values 'c 0 4))
+    (67 (values 'g 0 4))
+    (69 (values 'a 0 4))
+    (71 (values 'b 0 4))
+    (t (values 'g 0 0))))
+
+(defun decode-midi-enp (note enharmonic)
+  (declare (type (or null keyword) enharmonic))
+  (labels ((natural-or-sharp (note)
+             (if (diatonic-pitch-p note)
+                 :natural
+                 :sharp))
+           (diatonic-pitch-p (midi)
+             (and (integerp midi)
+                  (member (mod midi 12)
+                          '(0 2 4 5 7 9 11)))))
+    (let ((enharmonic (or enharmonic (natural-or-sharp note))))
+      (decode-midi note
+                   (ecase enharmonic
+                     (:flat 'flat)
+                     (:sharp 'sharp)
+                     (:natural 'natural))))))
+
+(defun convert-note2pitch (note)
+  (multiple-value-bind (step alter octave)
+      (if (atom note)
+          (decode-midi-enp note nil)
+          (decode-midi-enp (car note) (getf (cdr note) :enharmonic)))
+    (pitch step alter octave)))
 
 (defun convert-note2note (info unit-dur)
   (lambda (state note)
@@ -92,7 +117,8 @@
              (1/16 '16th)
              (1/8 'eighth)
              (1/4 'quarter)
-             (1/2 'half))))
+             (1/2 'half)
+             (1 'whole))))
     (ecase (numerator abs-dur)
       (1 (values (lookup abs-dur) 0))
       (3 (values (lookup (/ abs-dur 3/2)) 1))
@@ -166,7 +192,7 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun chord-dur (enp)
   (declare ((satisfies chordp) enp))
-  (the (integer 1) (abs (first enp))))
+  (the (integer 1) (truncate (abs (first enp)))))
 
 (defun chord-rest-p (enp)
   (declare ((satisfies chordp) enp))

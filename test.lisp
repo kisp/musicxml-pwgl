@@ -14,7 +14,8 @@
                 #:tuplet-ratio
                 #:measure-infos
                 #:info-tuplet-ratios
-                #:abs-dur-name))
+                #:abs-dur-name
+                #:decode-midi))
 
 (in-package #:test)
 
@@ -247,8 +248,11 @@
 (deftest test-db.w/o-beam-notations
   (assert (list-test-cases))
   (dolist (test-case (list-test-cases))
-    (unless (> (tdb::store-object-id test-case) 13)
-      (is-true (check-test-db-test-case test-case '("beam" "notations" "normal-type"))
+    (unless (> (tdb::store-object-id test-case) 23)
+      (is-true (check-test-db-test-case test-case '("beam"
+                                                    "notations"
+                                                    "normal-type"
+                                                    "tie"))
                "\"~A\" failed~%~A"
                (name test-case)
                (diff "/tmp/resc.xml" "/tmp/expc.xml")))))
@@ -334,6 +338,23 @@
   (is (equal '(quarter 1) (multiple-value-list (abs-dur-name 3/8))))
   (is (equal '(quarter 2) (multiple-value-list (abs-dur-name 7/16))))
   (is (equal '(half 3) (multiple-value-list (abs-dur-name 15/16)))))
+
+(defun step2pc (step)
+  (ecase step
+    (c 0) (d 2) (e 4)
+    (f 5) (g 7) (a 9) (b 11)))
+
+(deftest decode-midi
+  (for-all ((exp-step (gen-one-element 'c 'd 'e 'f 'g 'a 'b))
+            (exp-alter (gen-one-element 0 1))
+            (exp-octave (gen-integer :min 0 :max 8)))
+    (let ((midi (+ exp-alter (step2pc exp-step)
+                   (* (+ exp-octave 1) 12))))
+      (multiple-value-bind (step alter octave)
+          (decode-midi midi)
+        (is (eql exp-step step))
+        (is (= exp-alter alter))
+        (is (= exp-octave octave))))))
 
 (defun run-tests ()
   (run! :musicxml))

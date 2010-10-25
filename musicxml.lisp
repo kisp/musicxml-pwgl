@@ -47,7 +47,8 @@
    #:tuplet
    #:whole
    #:yes
-   #:attributes))
+   #:attributes
+   #:accidental))
 
 (in-package #:musicxml)
 
