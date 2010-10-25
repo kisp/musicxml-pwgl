@@ -13,7 +13,8 @@
                 #:chord-dur
                 #:tuplet-ratio
                 #:measure-infos
-                #:info-tuplet-ratios))
+                #:info-tuplet-ratios
+                #:abs-dur-name))
 
 (in-package #:test)
 
@@ -246,7 +247,7 @@
 (deftest test-db.w/o-beam-notations
   (assert (list-test-cases))
   (dolist (test-case (list-test-cases))
-    (unless (> (tdb::store-object-id test-case) 12)
+    (unless (> (tdb::store-object-id test-case) 13)
       (is-true (check-test-db-test-case test-case '("beam" "notations" "normal-type"))
                "\"~A\" failed~%~A"
                (name test-case)
@@ -329,7 +330,10 @@
                 '((1 ((1 :NOTES (60)) (1 :NOTES (60)) (1 :NOTES (60))))
                   :TIME-SIGNATURE (1 4))))))))
 
-
+(deftest abs-dur-name
+  (is (equal '(quarter 1) (multiple-value-list (abs-dur-name 3/8))))
+  (is (equal '(quarter 2) (multiple-value-list (abs-dur-name 7/16))))
+  (is (equal '(half 3) (multiple-value-list (abs-dur-name 15/16)))))
 
 (defun run-tests ()
   (run! :musicxml))

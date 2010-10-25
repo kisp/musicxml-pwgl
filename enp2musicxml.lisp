@@ -87,13 +87,17 @@
 
 (defun abs-dur-name (abs-dur)
   "The musicxml name of ABS-DUR and the number of dots."
-  (values
-   (ecase abs-dur
-     (1/16 '16th)
-     (1/8 'eighth)
-     (1/4 'quarter)
-     (1/2 'half))
-   0))
+  (flet ((lookup (dur)
+           (ecase dur
+             (1/16 '16th)
+             (1/8 'eighth)
+             (1/4 'quarter)
+             (1/2 'half))))
+    (ecase (numerator abs-dur)
+      (1 (values (lookup abs-dur) 0))
+      (3 (values (lookup (/ abs-dur 3/2)) 1))
+      (7 (values (lookup (/ abs-dur 7/4)) 2))
+      (15 (values (lookup (/ abs-dur 15/8)) 3)))))
 
 ;;;# enp access
 (defun enp-parts (enp) enp)
