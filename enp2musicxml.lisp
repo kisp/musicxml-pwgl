@@ -21,28 +21,35 @@
   (lambda (state note)
     (let ((abs-dur (info-abs-dur info))
           (time-modification (info-cumulative-tuplet-ratio info)))
-      (note (convert-note2pitch note)
-            (/ abs-dur unit-dur)
-            (abs-dur-name (* time-modification abs-dur))
-            nil
-            :chordp (not (mapcar-state-firstp state))
-            :time-modification
-            (unless (= 1 time-modification)
-              (time-modification (numerator time-modification)
-                                 (denominator time-modification)
-                                 nil))))))
+      (multiple-value-bind (type dots)
+          (abs-dur-name (* time-modification abs-dur))
+        (note (convert-note2pitch note)
+              (/ abs-dur unit-dur)
+              type
+              dots
+              nil
+              :chordp (not (mapcar-state-firstp state))
+              :time-modification
+              (unless (= 1 time-modification)
+                (time-modification (numerator time-modification)
+                                   (denominator time-modification)
+                                   nil)))))))
+
+(defun convert-rest (info unit-dur)
+  (let ((abs-dur (info-abs-dur info))
+        (time-modification (info-cumulative-tuplet-ratio info)))
+    (multiple-value-bind (type dots)
+        (abs-dur-name (* time-modification abs-dur))
+      (list (note (rest*) (/ abs-dur unit-dur)
+                  type dots nil)))))
 
 (defun convert-chord (unit-dur)
   (lambda (info)
-    (let ((abs-dur (info-abs-dur info))
-          (chord (info-chord info)))
-      (multiple-value-bind (dur notes)
-          (destructure-chord chord)
-        (if (minusp dur)
-            (list (note (rest*) (/ abs-dur unit-dur)
-                        (abs-dur-name abs-dur) nil))
-            (mapcar-state (convert-note2note info unit-dur)
-                          notes))))))
+    (let ((chord (info-chord info)))
+      (if (chord-rest-p chord)
+          (convert-rest info unit-dur)
+          (mapcar-state (convert-note2note info unit-dur)
+                        (chord-notes chord))))))
 
 (defun convert-measure (state measure)
   (labels ((previous ()
@@ -79,11 +86,14 @@
     ,@(mapcar #'convert-part (enp-parts enp))))
 
 (defun abs-dur-name (abs-dur)
-  (ecase abs-dur
-    (1/16 '16th)
-    (1/8 'eighth)
-    (1/4 'quarter)
-    (1/2 'half)))
+  "The musicxml name of ABS-DUR and the number of dots."
+  (values
+   (ecase abs-dur
+     (1/16 '16th)
+     (1/8 'eighth)
+     (1/4 'quarter)
+     (1/2 'half))
+   0))
 
 ;;;# enp access
 (defun enp-parts (enp) enp)
@@ -120,34 +130,47 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun div-dur (enp)
   (declare ((satisfies divp) enp))
-  (first enp))
+  ;; rational for time-signatures, which we introduce here when we
+  ;; wrap the beats
+  (the (rational (0)) (first enp)))
 
 (defun div-items (enp)
   (declare ((satisfies divp) enp))
   (second enp))
 
+(defun enp-dur (enp)
+  (if (divp enp)
+      (div-dur enp)
+      (chord-dur enp)))
+
 (defun div-items-sum (enp)
-  (reduce #'+ (div-items enp) :key #'first))
+  (the (integer 1)
+    (reduce #'+ (div-items enp) :key #'enp-dur)))
 
 (defun tuplet-ratio (enp)
   (declare ((satisfies divp) enp))
   (let ((dur (div-dur enp))
         (sum (div-items-sum enp)))
-    (list sum
-          (cond ((= sum 1)
-                 sum)
-                ((<= sum dur)
-                 dur)
-                (t
-                 (* dur (expt 2 (truncate (log (/ sum dur) 2)))))))))
+    (list (the (integer 1) sum)
+          (the (integer 1)
+            (cond ((= sum 1)
+                   sum)
+                  ((<= sum dur)
+                   dur)
+                  (t
+                   (* dur (expt 2 (truncate (log (/ sum dur) 2))))))))))
 
 (defun chord-dur (enp)
   (declare ((satisfies chordp) enp))
-  (first enp))
+  (the (integer 1) (abs (first enp))))
 
-(defun destructure-chord (enp)
-  (values (car enp)
-          (getf (cdr enp) :notes)))
+(defun chord-rest-p (enp)
+  (declare ((satisfies chordp) enp))
+  (minusp (car enp)))
+
+(defun chord-notes (enp)
+  (declare ((satisfies chordp) enp))
+  (getf (cdr enp) :notes))
 
 (defun measure-abs-durs (measure)
   (mapcar #'info-abs-dur (measure-infos measure)))

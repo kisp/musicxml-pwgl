@@ -36,4 +36,8 @@
    :END:
 ** TODO TDB 10 q triplet q q
    | 10 | triplet                        | q triplet q q                    |
-** TODO mxml note support dot
+** DONE mxml note support dot
+   :LOGBOOK:
+   CLOCK: [2010-10-25 Mon 17:52]--[2010-10-25 Mon 18:24] =>  0:32
+   :END:
+

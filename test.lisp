@@ -158,7 +158,18 @@
                    (:|duration| "1")
                    ((:|tie| :|type| "start"))
                    (:|type| "quarter")
-                   (:|accidental| "flat"))))
+                   (:|accidental| "flat"))
+                  (:|note|
+                   (:|pitch| (:|step| "C") (:|octave| "4"))
+                   (:|duration| "1")
+                   (:|type| "quarter")
+                   (:|dot|))
+                  (:|note|
+                   (:|pitch| (:|step| "C") (:|octave| "4"))
+                   (:|duration| "1")
+                   (:|type| "eighth")
+                   (:|dot|)
+                   (:|dot|))))
     (is (equal lxml (to-lxml (from-lxml lxml))))
     (is (equal lxml (to-lxml
                      (eval (make-constructor-form (from-lxml lxml))))))))

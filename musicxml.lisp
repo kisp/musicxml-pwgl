@@ -204,6 +204,7 @@
   pitch-or-rest duration chordp staff
   (accidental nil :type accidental)
   (type nil :type note-type)
+  (dots nil :type (integer 0 3))
   notations tie
   (time-modification nil :type (or null time-modification))
   beam-begin beam-continue beam-end)
@@ -240,6 +241,7 @@
                  :staff (and staff (parse-integer (second staff)))
                  :accidental (and accidental (intern* (second accidental)))
                  :type (and type (intern* (second type)))
+                 :dots (count '(:|dot|) (cdr dom) :test #'equal)
                  :notations (mapcar #'from-lxml (rest notations))
                  :tie (and tie (intern* (third (first tie))))
                  :time-modification (and time-modification
@@ -258,6 +260,7 @@
                   ,(string-downcase (symbol-name (note-tie note)))))))
      ,@(when (note-type note)
              `((:|type| ,(string-downcase (symbol-name (note-type note))))))
+     ,@(loop repeat (note-dots note) collect '(:|dot|))
      ,@(when (note-accidental note)
              `((:|accidental|
                  ,(string-downcase (symbol-name (note-accidental note))))))
@@ -281,6 +284,7 @@
   `(note ,(note-pitch-or-rest note)
          ,(note-duration note)
          ',(note-type note)
+         ,(note-dots note)
          ',(note-accidental note)
          :chordp ,(note-chordp note)
          :tie ',(note-tie note)
@@ -291,7 +295,7 @@
          :beam-continue ,(note-beam-continue note)
          :beam-end ,(note-beam-end note)))
 
-(defun note (pitch-or-rest duration type accidental
+(defun note (pitch-or-rest duration type dots accidental
              &key chordp staff notations tie
              time-modification
              beam-begin beam-continue beam-end)
@@ -301,7 +305,8 @@
              :time-modification time-modification
              :beam-begin beam-begin
              :beam-continue beam-continue
-             :beam-end beam-end))
+             :beam-end beam-end
+             :dots dots))
 
 (set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
 
