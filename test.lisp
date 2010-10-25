@@ -201,12 +201,14 @@
     (is (equal lxml (to-lxml
                      (eval (make-constructor-form (from-lxml lxml))))))))
 
-(defun check-test-db-test-case (test-case)
+(defun check-test-db-test-case (test-case &optional filtered-elements)
   (with-open-file (out "/tmp/res.xml"
                        :direction :output
                        :if-exists :supersede)
     (write-line "<?xml version='1.0' encoding='UTF-8' ?>" out)
     (print-musicxml (e2m:enp2musicxml (enp test-case)) :stream out :no-header t))
+  (when filtered-elements
+    (xml-filter:filter-file "/tmp/res.xml" "/tmp/res.xml" filtered-elements))
   (canonicalise "/tmp/res.xml" "/tmp/resc.xml")
   (alexandria:write-string-into-file
    (with-output-to-string (out)
@@ -214,6 +216,8 @@
                    out))
    "/tmp/exp-o.xml" :if-exists :supersede)
   (cxml::trim-xml-file "/tmp/exp-o.xml" "/tmp/exp.xml")
+  (when filtered-elements
+    (xml-filter:filter-file "/tmp/exp.xml" "/tmp/exp.xml" filtered-elements))
   (canonicalise "/tmp/exp.xml" "/tmp/expc.xml")
   (files-eql-p "/tmp/resc.xml" "/tmp/expc.xml"))
 
@@ -228,13 +232,21 @@
                 (name test-case)
                 (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
 
+(deftest test-db.w/o-beam-notations
+  (assert (list-test-cases))
+  (dolist (test-case (list-test-cases))
+    (unless (> (tdb::store-object-id test-case) 12)
+      (is-true (check-test-db-test-case test-case '("beam" "notations" "normal-type"))
+               "\"~A\" failed~%~A"
+               (name test-case)
+               (diff "/tmp/resc.xml" "/tmp/expc.xml")))))
+
 (deftest pprint-xml-nil
   (is
    (string= "
 <huhu>123<zzz></zzz></huhu>"
             (with-output-to-string (out)
               (ppxml:pprint-xml '(:|huhu| "123" (:|zzz| nil)) :stream out)))))
-
 
 (defun gen-keyword ()
   (lambda ()

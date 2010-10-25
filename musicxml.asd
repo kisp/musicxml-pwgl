@@ -12,6 +12,7 @@
 	       (:file "musicxml")
 	       (:file "enp2musicxml")
 	       (:file "test-db")
+	       (:file "xml-filter")
 	       (:file "test")))
 
 (defmethod perform ((op asdf:test-op)

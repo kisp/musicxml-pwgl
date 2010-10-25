@@ -80,6 +80,7 @@
 
 (defun abs-dur-name (abs-dur)
   (ecase abs-dur
+    (1/16 '16th)
     (1/8 'eighth)
     (1/4 'quarter)
     (1/2 'half)))
@@ -137,7 +138,7 @@ grid point. This is always the case, because we never leave the grid."
                  sum)
                 ((<= sum dur)
                  dur)
-                (t 
+                (t
                  (* dur (expt 2 (truncate (log (/ sum dur) 2)))))))))
 
 (defun chord-dur (enp)
