@@ -26,9 +26,9 @@
           :chordp (not (mapcar-state-firstp state)))))
 
 (defun convert-chord (unit-dur)
-  (lambda (fringe)
-    (let ((abs-dur (caar fringe))
-          (chord (first (third fringe))))
+  (lambda (info)
+    (let ((abs-dur (info-abs-dur info))
+          (chord (info-chord info)))
       (multiple-value-bind (dur notes)
           (destructure-chord chord)
         (if (minusp dur)
@@ -53,7 +53,7 @@
                      :clef (when (mapcar-state-firstp state)
                              (list 'g 2)))
         ,@(mapcan (convert-chord unit-dur)
-                  (measure-fringe measure))
+                  (measure-info measure))
         ,@(when (mapcar-state-lastp state)
                 '((:|barline| (:|bar-style| "light-heavy"))))))))
 
@@ -139,16 +139,25 @@ grid point. This is always the case, because we never leave the grid."
           (getf (cdr enp) :notes)))
 
 (defun measure-abs-durs (measure)
-  (mapcar #'caar (measure-fringe measure)))
+  (mapcar #'info-abs-dur (measure-info measure)))
 
-(defun measure-fringe (measure)
+(defstruct info
+  abs-durs path pointers)
+
+(defun info-abs-dur (info)
+  (car (info-abs-durs info)))
+
+(defun info-chord (info)
+  (car (info-pointers info)))
+
+(defun measure-info (measure)
   (labels ((rec (unit tree path pointers abs-durs)
              (if (chordp tree)
                  ;; chord
-                 (list (list (cons (* unit (chord-dur tree))
-                                   abs-durs)
-                             path
-                             pointers))
+                 (list (make-info :abs-durs (cons (* unit (chord-dur tree))
+                                                  abs-durs)
+                                  :path path
+                                  :pointers pointers))
                  ;; div
                  (let* ((sum (div-items-sum tree))
                         (unit (/ (* unit (abs (div-dur tree)))
@@ -179,12 +188,13 @@ grid point. This is always the case, because we never leave the grid."
   (labels ((rec (fn list index previous)
              (if (null list)
                  nil
-                 (let ((value
-                        (funcall fn
-                                 (make-mapcar-state :index index
-                                                    :lastp (null (cdr list))
-                                                    :previous previous)
-                                 (car list))))
+                 (let ((value (funcall
+                               fn
+                               (make-mapcar-state
+                                :index index
+                                :lastp (null (cdr list))
+                                :previous previous)
+                               (car list))))
                    (cons value (rec fn (cdr list) (1+ index) (car list)))))))
     (rec fn list 1 nil)))
 
