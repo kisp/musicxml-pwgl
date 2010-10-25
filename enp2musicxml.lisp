@@ -9,17 +9,29 @@
 (in-package #:e2m)
 
 ;;;# enp2musicxml
+(defun accidental-alter (accidental)
+  (ecase accidental
+    (sharp 1)
+    (flat -1)
+    (natural 0)))
+
 (defun decode-midi (note enharmonic)
   (declare (accidental enharmonic))
-  (case note
-    (60 (values 'c 0 4))
-    (67 (values 'g 0 4))
-    (69 (values 'a 0 4))
-    (71 (values 'b 0 4))
-    (t (values 'g 0 0))))
+  (let ((diatonic-pitch (- note (accidental-alter enharmonic))))
+    (values (ecase (mod diatonic-pitch 12)
+              (0 'c) (2 'd) (4 'e)
+              (5 'f) (7 'g) (9 'a) (11 'b))
+            (accidental-alter enharmonic)
+            (1- (floor diatonic-pitch 12)))))
 
-(defun decode-midi-enp (note enharmonic)
-  (declare (type (or null keyword) enharmonic))
+(defun convert-note2pitch (note)
+  (multiple-value-bind (step alter octave)
+      (decode-midi
+       (if (atom note) note (car note))
+       (enp-note-accidental note))
+    (pitch step alter octave)))
+
+(defun enp-note-accidental (note)
   (labels ((natural-or-sharp (note)
              (if (diatonic-pitch-p note)
                  :natural
@@ -28,19 +40,14 @@
              (and (integerp midi)
                   (member (mod midi 12)
                           '(0 2 4 5 7 9 11)))))
-    (let ((enharmonic (or enharmonic (natural-or-sharp note))))
-      (decode-midi note
-                   (ecase enharmonic
-                     (:flat 'flat)
-                     (:sharp 'sharp)
-                     (:natural 'natural))))))
-
-(defun convert-note2pitch (note)
-  (multiple-value-bind (step alter octave)
-      (if (atom note)
-          (decode-midi-enp note nil)
-          (decode-midi-enp (car note) (getf (cdr note) :enharmonic)))
-    (pitch step alter octave)))
+    (let ((enharmonic (and (consp note)
+                           (getf (cdr note) :enharmonic))))
+      (values
+       (ecase (or enharmonic (natural-or-sharp note))
+         (:natural 'natural)
+         (:sharp 'sharp)
+         (:flat 'flat))
+       enharmonic))))
 
 (defun convert-note2note (info unit-dur)
   (lambda (state note)
@@ -48,17 +55,20 @@
           (time-modification (info-cumulative-tuplet-ratio info)))
       (multiple-value-bind (type dots)
           (abs-dur-name (* time-modification abs-dur))
-        (note (convert-note2pitch note)
-              (/ abs-dur unit-dur)
-              type
-              dots
-              nil
-              :chordp (not (mapcar-state-firstp state))
-              :time-modification
-              (unless (= 1 time-modification)
-                (time-modification (numerator time-modification)
-                                   (denominator time-modification)
-                                   nil)))))))
+        (multiple-value-bind (accidental explicit)
+            (enp-note-accidental note)
+          (note (convert-note2pitch note)
+                (/ abs-dur unit-dur)
+                type
+                dots
+                (when (or explicit (not (eql 'natural accidental)))
+                  accidental)
+                :chordp (not (mapcar-state-firstp state))
+                :time-modification
+                (unless (= 1 time-modification)
+                  (time-modification (numerator time-modification)
+                                     (denominator time-modification)
+                                     nil))))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))
@@ -76,39 +86,44 @@
           (mapcar-state (convert-note2note info unit-dur)
                         (chord-notes chord))))))
 
-(defun convert-measure (state measure)
-  (labels ((previous ()
-             (mapcar-state-previous state))
-           (when-changed (reader)
-             (when (or (null (previous))
-                       (not (equal (funcall reader (previous))
-                                   (funcall reader measure))))
-               (funcall reader measure))))
-    (let* ((division (measure-quarter-division measure))
-           (unit-dur (/ 1/4 division)))
-      `((:|measure| :|number| ,(ts (mapcar-state-index state)))
-        ,(attributes :divisions (when-changed #'measure-quarter-division)
-                     :time (when-changed #'measure-time-signature)
-                     :clef (when (mapcar-state-firstp state)
-                             (list 'g 2)))
-        ,@(mapcan (convert-chord unit-dur)
-                  (measure-infos measure))
-        ,@(when (mapcar-state-lastp state)
-                '((:|barline| (:|bar-style| "light-heavy"))))))))
+(defun convert-measure (clef)
+  (lambda (state measure)
+    (labels ((previous ()
+               (mapcar-state-previous state))
+             (when-changed (reader)
+               (when (or (null (previous))
+                         (not (equal (funcall reader (previous))
+                                     (funcall reader measure))))
+                 (funcall reader measure))))
+      (let* ((division (measure-quarter-division measure))
+             (unit-dur (/ 1/4 division)))
+        `((:|measure| :|number| ,(ts (mapcar-state-index state)))
+          ,(attributes :divisions (when-changed #'measure-quarter-division)
+                       :time (when-changed #'measure-time-signature)
+                       :clef (when (mapcar-state-firstp state) clef))
+          ,@(mapcan (convert-chord unit-dur)
+                    (measure-infos measure))
+          ,@(when (mapcar-state-lastp state)
+                  '((:|barline| (:|bar-style| "light-heavy")))))))))
 
-(defun convert-part (part)
-  `((:|part| :|id| "P1")
-    ,@(mapcar-state #'convert-measure (part-measures part))))
+(defun convert-part (state part)
+  `((:|part| :|id| ,(format nil "P~A" (mapcar-state-index state)))
+    ,@(mapcar-state (convert-measure (part-initial-clef part))
+                    (part-measures part))))
+
+(defun part2score-part (state part)
+  `((:|score-part| :|id| ,(format nil "P~A" (mapcar-state-index state)))
+    (:|part-name|
+      ,(string-capitalize
+        (string (getf (cdr part) :instrument 'violin))))))
 
 (defun enp2musicxml (enp)
   `((:|score-partwise| #+nil :|version| #+nil "2.0")
     (:|identification|
       (:|encoding| (:|encoding-date| "2010-10-12")
         (:|software| "FOMUS v0.2.12")))
-    (:|part-list|
-      ((:|score-part| :|id| "P1")
-       (:|part-name| "Violin")))
-    ,@(mapcar #'convert-part (enp-parts enp))))
+    (:|part-list| ,@(mapcar-state #'part2score-part enp))
+    ,@(mapcar-state #'convert-part (enp-parts enp))))
 
 (defun abs-dur-name (abs-dur)
   "The musicxml name of ABS-DUR and the number of dots."
@@ -127,6 +142,11 @@
 
 ;;;# enp access
 (defun enp-parts (enp) enp)
+
+(defun part-initial-clef (part)
+  (ecase (getf (cdr part) :staff :treble-staff)
+    (:treble-staff (list 'g 2))
+    (:alto-staff (list 'c 3))))
 
 (defun part-measures (part) (first part))
 

@@ -248,14 +248,15 @@
 (deftest test-db.w/o-beam-notations
   (assert (list-test-cases))
   (dolist (test-case (list-test-cases))
-    (unless (> (tdb::store-object-id test-case) 23)
-      (is-true (check-test-db-test-case test-case '("beam"
-                                                    "notations"
-                                                    "normal-type"
-                                                    "tie"))
-               "\"~A\" failed~%~A"
-               (name test-case)
-               (diff "/tmp/resc.xml" "/tmp/expc.xml")))))
+    (is-true (check-test-db-test-case test-case '("beam"
+                                                  "notations"
+                                                  "normal-type"
+                                                  "tie"
+                                                  "direction"
+                                                  "part-group"))
+             "\"~A\" failed~%~A"
+             (name test-case)
+             (diff "/tmp/resc.xml" "/tmp/expc.xml"))))
 
 (deftest pprint-xml-nil
   (is
@@ -346,12 +347,15 @@
 
 (deftest decode-midi
   (for-all ((exp-step (gen-one-element 'c 'd 'e 'f 'g 'a 'b))
-            (exp-alter (gen-one-element 0 1))
+            (exp-alter (gen-one-element 0 1 -1))
             (exp-octave (gen-integer :min 0 :max 8)))
     (let ((midi (+ exp-alter (step2pc exp-step)
                    (* (+ exp-octave 1) 12))))
       (multiple-value-bind (step alter octave)
-          (decode-midi midi)
+          (decode-midi midi (ecase exp-alter
+                              (0 'natural)
+                              (1 'sharp)
+                              (-1 'flat)))
         (is (eql exp-step step))
         (is (= exp-alter alter))
         (is (= exp-octave octave))))))
