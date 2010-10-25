@@ -23,7 +23,7 @@
           (time-modification (info-cumulative-tuplet-ratio info)))
       (note (convert-note2pitch note)
             (/ abs-dur unit-dur)
-            (abs-dur-name abs-dur)
+            (abs-dur-name (* time-modification abs-dur))
             nil
             :chordp (not (mapcar-state-firstp state))
             :time-modification

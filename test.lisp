@@ -224,7 +224,7 @@
       (:skip #+nil(skip "~A -- ~A" (name test-case) (description test-case)))
       (:run
        (is-true (check-test-db-test-case test-case)
-                "~A failed~%~A"
+                "\"~A\" failed~%~A"
                 (name test-case)
                 (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
 
