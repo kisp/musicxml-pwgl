@@ -10,7 +10,10 @@
                 #:divp
                 #:div-dur
                 #:div-items
-                #:chord-dur))
+                #:chord-dur
+                #:tuplet-ratio
+                #:measure-infos
+                #:info-tuplet-ratios))
 
 (in-package #:test)
 
@@ -270,6 +273,40 @@
 (deftest chord-dur
   (is (= 1 (chord-dur '(1 :START-TIME 4.0 :NOTES (60)))))
   (signals error (chord-dur '(10 ((1 :START-TIME 4.0 :NOTES (60)))))))
+
+(deftest tuplet-ratio
+  (flet ((check (expected dur div)
+           (let ((enp `(,dur ,(loop repeat div collect '(1 :NOTES (60))))))
+             (is (equal expected (tuplet-ratio enp))
+                 "~S ~S should be ~S" dur div expected))))
+    (check '(2 2) 1 2)
+    (check '(3 2) 1 3)
+    (check '(4 4) 1 4)
+    (check '(5 4) 1 5)
+    (check '(6 4) 1 6)
+    (check '(7 4) 1 7)
+    (check '(8 8) 1 8)
+    (check '(9 8) 1 9)
+    (check '(1 1) 1 1)
+    (check '(1 1) 2 1)
+    (check '(2 3) 3 2)
+    (check '(5 7) 7 5)))
+
+(deftest info-tuplet-ratios
+  (is (equal '((1 1) (1 1))
+             (info-tuplet-ratios
+              (first
+               (measure-infos
+                '((1 ((1 :NOTES (60))))
+                  :TIME-SIGNATURE (1 4)))))))
+  (is (equal '((3 2) (1 1))
+             (info-tuplet-ratios
+              (first
+               (measure-infos
+                '((1 ((1 :NOTES (60)) (1 :NOTES (60)) (1 :NOTES (60))))
+                  :TIME-SIGNATURE (1 4))))))))
+
+
 
 (defun run-tests ()
   (run! :musicxml))

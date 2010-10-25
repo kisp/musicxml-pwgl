@@ -17,13 +17,20 @@
     (71 (pitch 'b 0 4))
     (t (pitch 'g 0 0))))
 
-(defun convert-note2note (abs-dur unit-dur)
+(defun convert-note2note (info unit-dur)
   (lambda (state note)
-    (note (convert-note2pitch note)
-          (/ abs-dur unit-dur)
-          (abs-dur-name abs-dur)
-          nil
-          :chordp (not (mapcar-state-firstp state)))))
+    (let ((abs-dur (info-abs-dur info))
+          (time-modification (info-cumulative-tuplet-ratio info)))
+      (note (convert-note2pitch note)
+            (/ abs-dur unit-dur)
+            (abs-dur-name abs-dur)
+            nil
+            :chordp (not (mapcar-state-firstp state))
+            :time-modification
+            (unless (= 1 time-modification)
+              (time-modification (numerator time-modification)
+                                 (denominator time-modification)
+                                 nil))))))
 
 (defun convert-chord (unit-dur)
   (lambda (info)
@@ -34,7 +41,7 @@
         (if (minusp dur)
             (list (note (rest*) (/ abs-dur unit-dur)
                         (abs-dur-name abs-dur) nil))
-            (mapcar-state (convert-note2note abs-dur unit-dur)
+            (mapcar-state (convert-note2note info unit-dur)
                           notes))))))
 
 (defun convert-measure (state measure)
@@ -53,7 +60,7 @@
                      :clef (when (mapcar-state-firstp state)
                              (list 'g 2)))
         ,@(mapcan (convert-chord unit-dur)
-                  (measure-info measure))
+                  (measure-infos measure))
         ,@(when (mapcar-state-lastp state)
                 '((:|barline| (:|bar-style| "light-heavy"))))))))
 
@@ -126,9 +133,12 @@ grid point. This is always the case, because we never leave the grid."
   (let ((dur (div-dur enp))
         (sum (div-items-sum enp)))
     (list sum
-          (if (<= sum dur)
-              dur
-              (* dur (expt 2 (truncate (log (/ sum dur) 2))))))))
+          (cond ((= sum 1)
+                 sum)
+                ((<= sum dur)
+                 dur)
+                (t 
+                 (* dur (expt 2 (truncate (log (/ sum dur) 2)))))))))
 
 (defun chord-dur (enp)
   (declare ((satisfies chordp) enp))
@@ -139,7 +149,7 @@ grid point. This is always the case, because we never leave the grid."
           (getf (cdr enp) :notes)))
 
 (defun measure-abs-durs (measure)
-  (mapcar #'info-abs-dur (measure-info measure)))
+  (mapcar #'info-abs-dur (measure-infos measure)))
 
 (defstruct info
   abs-durs path pointers)
@@ -150,7 +160,14 @@ grid point. This is always the case, because we never leave the grid."
 (defun info-chord (info)
   (car (info-pointers info)))
 
-(defun measure-info (measure)
+(defun info-tuplet-ratios (info)
+  (mapcar #'tuplet-ratio (cdr (info-pointers info))))
+
+(defun info-cumulative-tuplet-ratio (info)
+  (reduce #'* (info-tuplet-ratios info)
+          :key #'list2ratio))
+
+(defun measure-infos (measure)
   (labels ((rec (unit tree path pointers abs-durs)
              (if (chordp tree)
                  ;; chord
