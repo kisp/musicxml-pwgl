@@ -9,7 +9,12 @@
   :depends-on (s-xml cxml myam sqlite-orm)
   :serial t
   :components ((:file "pprint-xml")
-               (:file "musicxml")
-               (:file "enp2musicxml")
-               (:file "test-db")
-               (:file "test")))
+	       (:file "musicxml")
+	       (:file "enp2musicxml")
+	       (:file "test-db")
+	       (:file "test")))
+
+(defmethod perform ((op asdf:test-op)
+		    (system (eql (asdf:find-system :musicxml))))
+  (asdf:oos 'asdf:load-op :musicxml)
+  (funcall (intern "RUN!" "MYAM") :musicxml))
