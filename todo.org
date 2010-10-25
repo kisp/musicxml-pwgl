@@ -20,14 +20,12 @@
 | 30 | violin and viola               | 1 bar 4 times c each             |
 
 * Tasks
+** TODO mapcar-state allocate only once		      :optimization:refactor:
+   [[file:enp2musicxml.lisp::(defun%20mapcar-state%20(fn%20list)][file:enp2musicxml.lisp::(defun mapcar-state (fn list)]]
 ** DONE intern* string-upcase					   :refactor:
    CLOSED: [2010-09-28 Di 14:12]
 ** DONE test file should use mxml
    CLOSED: [2010-09-28 Di 18:11]
-** TODO mapcar-state allocate only once		      :optimization:refactor:
-   [[file:enp2musicxml.lisp::(defun%20mapcar-state%20(fn%20list)][file:enp2musicxml.lisp::(defun mapcar-state (fn list)]]
-** TODO TDB 10 q triplet q q
-   | 10 | triplet                        | q triplet q q                    |
 ** DONE info-tuplet-ratios
    :LOGBOOK:
    CLOCK: [2010-10-25 Mon 11:57]--[2010-10-25 Mon 12:05] =>  0:08
@@ -36,3 +34,6 @@
    :LOGBOOK:
    CLOCK: [2010-10-25 Mon 12:31]--[2010-10-25 Mon 12:43] =>  0:12
    :END:
+** TODO TDB 10 q triplet q q
+   | 10 | triplet                        | q triplet q q                    |
+** TODO mxml note support dot
