@@ -40,4 +40,4 @@
    :LOGBOOK:
    CLOCK: [2010-10-25 Mon 17:52]--[2010-10-25 Mon 18:24] =>  0:32
    :END:
-
+** TODO note braucht so etwas wie :tie-start und :tie-stop

@@ -49,7 +49,7 @@
          (:flat 'flat))
        enharmonic))))
 
-(defun convert-note2note (info unit-dur)
+(defun convert-note2note (info unit-dur next-chord)
   (lambda (state note)
     (let ((abs-dur (info-abs-dur info))
           (time-modification (info-cumulative-tuplet-ratio info)))
@@ -79,11 +79,13 @@
                   type dots nil)))))
 
 (defun convert-chord (unit-dur)
-  (lambda (info)
-    (let ((chord (info-chord info)))
+  (lambda (state info)
+    (let ((chord (info-chord info))
+          (next-chord (when (mapcar-state-next state)
+                        (info-chord (mapcar-state-next state)))))
       (if (chord-rest-p chord)
           (convert-rest info unit-dur)
-          (mapcar-state (convert-note2note info unit-dur)
+          (mapcar-state (convert-note2note info unit-dur next-chord)
                         (chord-notes chord))))))
 
 (defun convert-measure (clef)
@@ -96,13 +98,17 @@
                                      (funcall reader measure))))
                  (funcall reader measure))))
       (let* ((division (measure-quarter-division measure))
-             (unit-dur (/ 1/4 division)))
+             (unit-dur (/ 1/4 division))
+             (infos (measure-infos measure))
+             (next-measure (mapcar-state-next state)))
         `((:|measure| :|number| ,(ts (mapcar-state-index state)))
           ,(attributes :divisions (when-changed #'measure-quarter-division)
                        :time (when-changed #'measure-time-signature)
                        :clef (when (mapcar-state-firstp state) clef))
-          ,@(mapcan (convert-chord unit-dur)
-                    (measure-infos measure))
+          ,@(mapcan-state (convert-chord unit-dur)
+                          (append infos (when next-measure
+                                          (list (measure-first-info next-measure))))
+                          :repeat (length infos))
           ,@(when (mapcar-state-lastp state)
                   '((:|barline| (:|bar-style| "light-heavy")))))))))
 
@@ -268,29 +274,36 @@ grid point. This is always the case, because we never leave the grid."
       (let ((tree (list (list2ratio (getf plist :time-signature)) beats)))
         (rec 1 tree nil (list tree) nil)))))
 
+(defun measure-first-info (measure)
+  (first (measure-infos measure)))
+
 ;;;# mapcar-state
 (defstruct mapcar-state
-  index lastp previous)
+  index lastp previous next)
 
 (defun mapcar-state-firstp (state)
   (= 1 (mapcar-state-index state)))
 
-(defun mapcar-state (fn list)
+(defun mapcar-state (fn list &key repeat)
   (labels ((rec (fn list index previous)
-             (if (null list)
-                 nil
-                 (let ((value (funcall
-                               fn
-                               (make-mapcar-state
-                                :index index
-                                :lastp (null (cdr list))
-                                :previous previous)
-                               (car list))))
-                   (cons value (rec fn (cdr list) (1+ index) (car list)))))))
+             (cond ((null list)
+                    nil)
+                   ((and repeat (> index repeat))
+                    nil)
+                   (t
+                    (let ((value (funcall
+                                  fn
+                                  (make-mapcar-state
+                                   :index index
+                                   :lastp (null (cdr list))
+                                   :previous previous
+                                   :next (cadr list))
+                                  (car list))))
+                      (cons value (rec fn (cdr list) (1+ index) (car list))))))))
     (rec fn list 1 nil)))
 
-(defun mapcan-state (fn list)
-  (apply #'nconc (mapcar-state fn list)))
+(defun mapcan-state (fn list &key repeat)
+  (apply #'nconc (mapcar-state fn list :repeat repeat)))
 
 ;;;# utils
 (defgeneric ts (obj))
