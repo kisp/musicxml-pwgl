@@ -57,9 +57,9 @@
     (write-line
      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" stream)
     (write-line "<!DOCTYPE score-partwise PUBLIC" stream)
-    (write-line "	\"-//Recordare//DTD MusicXML 2.0 Partwise//EN\""
+    (write-line "       \"-//Recordare//DTD MusicXML 2.0 Partwise//EN\""
                 stream)
-    (write-line "	\"http://www.musicxml.org/dtds/partwise.dtd\">"
+    (write-line "       \"http://www.musicxml.org/dtds/partwise.dtd\">"
                 stream))
   (ppxml:pprint-xml dom :stream stream))
 
@@ -495,7 +495,3 @@
   (apply #'make-attributes args))
 
 (set-pprint-dispatch 'attributes 'generic-pretty-printer 0 *pprint-xml-table*)
-
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:

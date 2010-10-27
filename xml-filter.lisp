@@ -10,7 +10,7 @@
 
 (defclass filter (cxml:sax-proxy)
   ((names     :accessor names     :initarg :names
-	      :initform '("b"))
+              :initform '("b"))
    (gate-open :accessor gate-open :initform t)))
 
 (defmethod sax:start-element
@@ -32,18 +32,18 @@
 
 (defun filter-string (string element-names)
   (let* ((octets (sb-ext:string-to-octets string))
-	 (dom (cxml:parse-octets octets (cxml-dom:make-dom-builder))))
+         (dom (cxml:parse-octets octets (cxml-dom:make-dom-builder))))
     (dom:map-document
      (make-instance 'filter
-		    :names element-names
-		    :chained-handler (cxml:make-string-sink :canonical t))
+                    :names element-names
+                    :chained-handler (cxml:make-string-sink :canonical t))
      dom)))
 
 (defun filter-file (path out-path element-names)
   (let ((dom (cxml:parse-file path (cxml-dom:make-dom-builder))))
     (with-open-file (out out-path :direction :output :if-exists :supersede)
       (dom:map-document (make-instance
-			 'filter
-			 :names element-names
-			 :chained-handler
-			 (cxml:make-character-stream-sink out)) dom))))
+                         'filter
+                         :names element-names
+                         :chained-handler
+                         (cxml:make-character-stream-sink out)) dom))))

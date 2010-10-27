@@ -49,7 +49,8 @@
          (:flat 'flat))
        enharmonic))))
 
-(defun convert-note2note (info unit-dur next-chord)
+(
+ defun convert-note2note (info unit-dur next-chord)
   (lambda (state note)
     (let ((abs-dur (info-abs-dur info))
           (time-modification (info-cumulative-tuplet-ratio info)))
@@ -371,7 +372,3 @@ grid point. This is always the case, because we never leave the grid."
 (defun list2ratio (list)
   (assert (null (cddr list)))
   (/ (first list) (second list)))
-
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:

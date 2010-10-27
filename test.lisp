@@ -362,7 +362,3 @@
 
 (defun run-tests ()
   (run! :musicxml))
-
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:
