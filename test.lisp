@@ -371,5 +371,30 @@
   (is (not (mxml-equal (pitch 'c 0 4)
                        (pitch 'c 1 4)))))
 
+(deftest note-ties
+  (let ((state (e2m::make-mapcar-state :index 1)))
+    (labels ((info (chord-dur notes)
+               (first (measure-infos `((1 ((,chord-dur :notes ',notes))) :time-signature (1 4)))))
+             (convert (chord-dur notes next-chord)
+               (funcall (e2m::convert-note2note (info chord-dur notes) 1/4 next-chord)
+                        state (first notes))))
+      ;; stop
+      (let ((note (convert 1 '(60) nil)))
+        (is-false (mxml::note-tie-stop note))
+        (is-false (mxml::note-tie-start note)))
+      (let ((note (convert 1.0 '(60) nil)))
+        (is-true (mxml::note-tie-stop note))
+        (is-false (mxml::note-tie-start note)))
+      (let ((note (convert 1.0 '((60 :attack-p t)) nil)))
+        (is-false (mxml::note-tie-stop note))
+        (is-false (mxml::note-tie-start note)))
+      ;; start
+      (let ((note (convert 1 '(60) '(1.0 :notes (60)))))
+        (is-false (mxml::note-tie-stop note))
+        (is-true (mxml::note-tie-start note)))
+      (let ((note (convert 1 '(60) '(1.0 :notes ((60 :attack-p t))))))
+        (is-false (mxml::note-tie-stop note))
+        (is-false (mxml::note-tie-start note))))))
+
 (defun run-tests ()
   (run! :musicxml))

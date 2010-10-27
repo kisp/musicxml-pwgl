@@ -27,7 +27,7 @@
 (defun convert-note2pitch (note)
   (multiple-value-bind (step alter octave)
       (decode-midi
-       (if (atom note) note (car note))
+       (note-pitch note)
        (enp-note-accidental note))
     (pitch step alter octave)))
 
@@ -55,7 +55,8 @@
     (declare (type mapcar-state state)
              (type note* note))
     (let ((abs-dur (info-abs-dur info))
-          (time-modification (info-cumulative-tuplet-ratio info)))
+          (time-modification (info-cumulative-tuplet-ratio info))
+          (chord (info-chord info)))
       (multiple-value-bind (type dots)
           (abs-dur-name (* time-modification abs-dur))
         (multiple-value-bind (accidental explicit)
@@ -71,7 +72,16 @@
                 (unless (= 1 time-modification)
                   (time-modification (numerator time-modification)
                                      (denominator time-modification)
-                                     nil))))))))
+                                     nil))
+                :tie-stop
+                (and (chord-tied-p chord)
+                     (not (note-attack-p note)))
+                :tie-start
+                (when next-chord
+                  (and (chord-tied-p next-chord)
+                       (let ((chord-note (find-note-in-chord note next-chord)))
+                         (not (and chord-note
+                                   (note-attack-p chord-note))))))))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))
@@ -246,9 +256,30 @@ grid point. This is always the case, because we never leave the grid."
   (declare (chord enp))
   (minusp (car enp)))
 
+(defun chord-tied-p (enp)
+  (declare (chord enp))
+  (floatp (car enp)))
+
 (defun chord-notes (enp)
   (declare (chord enp))
   (getf (cdr enp) :notes))
+
+(defun find-note-in-chord (note chord)
+  (declare (type note* note)
+           (type chord chord))
+  (find-if (lambda (chord-note)
+             (= (note-pitch note)
+                (note-pitch chord-note)))
+           (chord-notes chord)))
+
+(defun note-pitch (note)
+  (declare (type note* note))
+  (if (atom note) note (car note)))
+
+(defun note-attack-p (note)
+  (declare (type note* note))
+  (and (consp note)
+       (getf (cdr note) :attack-p)))
 
 (defun measure-abs-durs (measure)
   (mapcar #'info-abs-dur (measure-infos measure)))
