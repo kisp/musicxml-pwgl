@@ -206,7 +206,7 @@
   (accidental nil :type accidental)
   (type nil :type note-type)
   (dots nil :type (integer 0 3))
-  notations tie
+  notations tie-start tie-stop
   (time-modification nil :type (or null time-modification))
   beam-begin beam-continue beam-end)
 
@@ -232,7 +232,7 @@
 (defmethod translate-from-lxml (dom (type (eql ':|note|)))
   (assoc-bind* (duration chord rest pitch staff
                          accidental type notations
-                         tie time-modification)
+                         time-modification)
       dom
     (multiple-value-bind (beam-begin beam-continue beam-end)
         (decode-beams (remove-if-not 'beam-element-p dom))
@@ -244,7 +244,10 @@
                  :type (and type (intern* (second type)))
                  :dots (count '(:|dot|) (cdr dom) :test #'equal)
                  :notations (mapcar #'from-lxml (rest notations))
-                 :tie (and tie (intern* (third (first tie))))
+                 :tie-start (find '((:|tie| :|type| "start"))
+                                  (cdr dom) :test #'equal)
+                 :tie-stop (find '((:|tie| :|type| "stop"))
+                                 (cdr dom) :test #'equal)
                  :time-modification (and time-modification
                                          (from-lxml time-modification))
                  :beam-begin beam-begin
@@ -256,9 +259,8 @@
      ,@(when (note-chordp note) '(:|chord|))
      ,(translate-to-lxml (note-pitch-or-rest note))
      (:|duration| ,(princ-to-string (note-duration note)))
-     ,@(when (note-tie note)
-             `(((:|tie| :|type|
-                  ,(string-downcase (symbol-name (note-tie note)))))))
+     ,@(when (note-tie-stop note) '(((:|tie| :|type| "stop"))))
+     ,@(when (note-tie-start note) '(((:|tie| :|type| "start"))))
      ,@(when (note-type note)
              `((:|type| ,(string-downcase (symbol-name (note-type note))))))
      ,@(loop repeat (note-dots note) collect '(:|dot|))
@@ -288,7 +290,8 @@
          ,(note-dots note)
          ',(note-accidental note)
          :chordp ,(note-chordp note)
-         :tie ',(note-tie note)
+         :tie-start ',(note-tie-start note)
+         :tie-stop ',(note-tie-stop note)
          :staff ,(note-staff note)
          :notations ,(note-notations note)
          :time-modification ,(note-time-modification note)
@@ -297,17 +300,19 @@
          :beam-end ,(note-beam-end note)))
 
 (defun note (pitch-or-rest duration type dots accidental
-             &key chordp staff notations tie
+             &key chordp staff notations tie-start tie-stop
              time-modification
              beam-begin beam-continue beam-end)
   (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp
              :staff staff :accidental accidental :type type
-             :notations notations :tie tie
+             :notations notations
              :time-modification time-modification
              :beam-begin beam-begin
              :beam-continue beam-continue
              :beam-end beam-end
-             :dots dots))
+             :dots dots
+             :tie-start tie-start
+             :tie-stop tie-stop))
 
 (set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
 
