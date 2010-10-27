@@ -80,8 +80,8 @@
                 (when next-chord
                   (and (chord-tied-p next-chord)
                        (let ((chord-note (find-note-in-chord note next-chord)))
-                         (not (and chord-note
-                                   (note-attack-p chord-note))))))))))))
+                         (and chord-note
+                              (not (note-attack-p chord-note))))))))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))

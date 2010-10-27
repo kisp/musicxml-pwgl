@@ -256,7 +256,6 @@
     (is-true (check-test-db-test-case test-case '("beam"
                                                   "notations"
                                                   "normal-type"
-                                                  "tie"
                                                   "direction"
                                                   "part-group"))
              "\"~A\" failed~%~A"
@@ -393,6 +392,12 @@
         (is-false (mxml::note-tie-stop note))
         (is-true (mxml::note-tie-start note)))
       (let ((note (convert 1 '(60) '(1.0 :notes ((60 :attack-p t))))))
+        (is-false (mxml::note-tie-stop note))
+        (is-false (mxml::note-tie-start note)))
+      (let ((note (convert 1 '(60) '(1.0 :notes (61)))))
+        (is-false (mxml::note-tie-stop note))
+        (is-false (mxml::note-tie-start note)))
+      (let ((note (convert 1 '(60) '(-1 :notes (60)))))
         (is-false (mxml::note-tie-stop note))
         (is-false (mxml::note-tie-start note))))))
 
