@@ -93,6 +93,8 @@
 
 (defun convert-measure (clef)
   (lambda (state measure)
+    (declare (type mapcar-state state)
+             (type measure measure))
     (labels ((previous ()
                (mapcar-state-previous state))
              (when-changed (reader)
@@ -109,8 +111,9 @@
                        :time (when-changed #'measure-time-signature)
                        :clef (when (mapcar-state-firstp state) clef))
           ,@(mapcan-state (convert-chord unit-dur)
-                          (append infos (when next-measure
-                                          (list (measure-first-info next-measure))))
+                          (append infos
+                                  (when next-measure
+                                    (list (measure-first-info next-measure))))
                           :repeat (length infos))
           ,@(when (mapcar-state-lastp state)
                   '((:|barline| (:|bar-style| "light-heavy")))))))))
@@ -190,11 +193,18 @@ grid point. This is always the case, because we never leave the grid."
 (defun %notep (enp) (or (member :enharmonic (cdr enp))
                         (member :attack-p (cdr enp))))
 
+(defun %measurep (enp)
+  (multiple-value-bind (list plist)
+      (split-list-plist enp)
+    (declare (ignore list))
+    (member :time-signature plist)))
+
 (deftype chord () '(and cons (satisfies %chordp)))
 (deftype div () '(and cons (satisfies %divp)))
 (deftype note* () '(or (integer 0)
                     (and (cons (integer 0) cons)
                      (satisfies %notep))))
+(deftype measure () '(and cons (satisfies %measurep)))
 
 (defun div-dur (enp)
   (declare (div enp))
@@ -311,7 +321,8 @@ grid point. This is always the case, because we never leave the grid."
                                    :previous previous
                                    :next (cadr list))
                                   (car list))))
-                      (cons value (rec fn (cdr list) (1+ index) (car list))))))))
+                      (cons value
+                            (rec fn (cdr list) (1+ index) (car list))))))))
     (rec fn list 1 nil)))
 
 (defun mapcan-state (fn list &key repeat)
