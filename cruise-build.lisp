@@ -12,6 +12,10 @@
          asdf:*central-registry*
          :test #'equal)
 
+(require 'arnesi)
+
+(asdf:oos 'arnesi:clean-op :musicxml)
+
 (require 'musicxml)
 
 (assert (test:run-tests))

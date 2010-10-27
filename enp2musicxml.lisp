@@ -49,9 +49,10 @@
          (:flat 'flat))
        enharmonic))))
 
-(
- defun convert-note2note (info unit-dur next-chord)
+(defun convert-note2note (info unit-dur next-chord)
+  (declare (type info info) ((or null chord) next-chord))
   (lambda (state note)
+    (declare (type mapcar-state state))
     (let ((abs-dur (info-abs-dur info))
           (time-modification (info-cumulative-tuplet-ratio info)))
       (multiple-value-bind (type dots)
@@ -185,14 +186,17 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun divp (enp) (not (chordp enp)))
 
+(deftype chord () '(and cons (satisfies chordp)))
+(deftype div () '(and cons (satisfies divp)))
+
 (defun div-dur (enp)
-  (declare ((satisfies divp) enp))
+  (declare (div enp))
   ;; rational for time-signatures, which we introduce here when we
   ;; wrap the beats
   (the (rational (0)) (first enp)))
 
 (defun div-items (enp)
-  (declare ((satisfies divp) enp))
+  (declare (div enp))
   (second enp))
 
 (defun enp-dur (enp)
@@ -205,7 +209,7 @@ grid point. This is always the case, because we never leave the grid."
     (reduce #'+ (div-items enp) :key #'enp-dur)))
 
 (defun tuplet-ratio (enp)
-  (declare ((satisfies divp) enp))
+  (declare (div enp))
   (let ((dur (div-dur enp))
         (sum (div-items-sum enp)))
     (list (the (integer 1) sum)
@@ -218,15 +222,15 @@ grid point. This is always the case, because we never leave the grid."
                    (* dur (expt 2 (truncate (log (/ sum dur) 2))))))))))
 
 (defun chord-dur (enp)
-  (declare ((satisfies chordp) enp))
+  (declare (chord enp))
   (the (integer 1) (truncate (abs (first enp)))))
 
 (defun chord-rest-p (enp)
-  (declare ((satisfies chordp) enp))
+  (declare (chord enp))
   (minusp (car enp)))
 
 (defun chord-notes (enp)
-  (declare ((satisfies chordp) enp))
+  (declare (chord enp))
   (getf (cdr enp) :notes))
 
 (defun measure-abs-durs (measure)
