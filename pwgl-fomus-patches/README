@@ -1,0 +1,19 @@
+
+
+
+we did this in pwgl listener
+
+CL-USER> (td:open-connection "plt60.local" 9091)
+#<COMM:SOCKET-STREAM 200BA537>
+CL-USER> (cl:defparameter *c* * "REPL generated global variable.")
+*C*
+CL-USER> (td:open-connection "plt60.local" 48251)
+#<COMM:SOCKET-STREAM 251E268F>
+CL-USER> (cl:defparameter *c2* * "REPL generated global variable.")
+*C2*
+CL-USER> (td:make-stub-package *c* "VALIDATE-MUSICXML")
+NIL
+CL-USER> (td:make-stub-package *c2* "TDB")
+NIL
+
+
