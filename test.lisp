@@ -6,8 +6,8 @@
   (:import-from #:e2m
                 #:split-list-plist
                 #:append-list-plist
-                #:chordp
-                #:divp
+                #:%chordp
+                #:%divp
                 #:div-dur
                 #:div-items
                 #:chord-dur
@@ -293,8 +293,8 @@
       (is (equal plist new-plist)))))
 
 (deftest chordp
-  (is-true (chordp '(1 :START-TIME 4.0 :NOTES (60))))
-  (is-false (chordp '(1 ((1 :START-TIME 4.0 :NOTES (60)))))))
+  (is-true (%chordp '(1 :START-TIME 4.0 :NOTES (60))))
+  (is-false (%chordp '(1 ((1 :START-TIME 4.0 :NOTES (60)))))))
 
 (deftest div-dur-div-items
   (is (= 10 (div-dur '(10 ((1 :START-TIME 4.0 :NOTES (60)))))))

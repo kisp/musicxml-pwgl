@@ -52,7 +52,8 @@
 (defun convert-note2note (info unit-dur next-chord)
   (declare (type info info) ((or null chord) next-chord))
   (lambda (state note)
-    (declare (type mapcar-state state))
+    (declare (type mapcar-state state)
+             (type note* note))
     (let ((abs-dur (info-abs-dur info))
           (time-modification (info-cumulative-tuplet-ratio info)))
       (multiple-value-bind (type dots)
@@ -180,14 +181,20 @@ grid point. This is always the case, because we never leave the grid."
           (measure-abs-durs measure)
           :key #'minimal-quarter-division))
 
-(defun chordp (enp)
+(defun %chordp (enp)
   (and (second enp)
        (atom (second enp))))
 
-(defun divp (enp) (not (chordp enp)))
+(defun %divp (enp) (not (%chordp enp)))
 
-(deftype chord () '(and cons (satisfies chordp)))
-(deftype div () '(and cons (satisfies divp)))
+(defun %notep (enp) (or (member :enharmonic (cdr enp))
+                        (member :attack-p (cdr enp))))
+
+(deftype chord () '(and cons (satisfies %chordp)))
+(deftype div () '(and cons (satisfies %divp)))
+(deftype note* () '(or (integer 0)
+                    (and (cons (integer 0) cons)
+                     (satisfies %notep))))
 
 (defun div-dur (enp)
   (declare (div enp))
@@ -200,7 +207,7 @@ grid point. This is always the case, because we never leave the grid."
   (second enp))
 
 (defun enp-dur (enp)
-  (if (divp enp)
+  (if (typep enp 'div)
       (div-dur enp)
       (chord-dur enp)))
 
@@ -254,7 +261,7 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun measure-infos (measure)
   (labels ((rec (unit tree path pointers abs-durs)
-             (if (chordp tree)
+             (if (typep tree 'chord)
                  ;; chord
                  (list (make-info :abs-durs (cons (* unit (chord-dur tree))
                                                   abs-durs)
