@@ -270,6 +270,7 @@ grid point. This is always the case, because we never leave the grid."
           :key #'list2ratio))
 
 (defun measure-infos (measure)
+  (declare (type measure measure))
   (labels ((rec (unit tree path pointers abs-durs)
              (if (typep tree 'chord)
                  ;; chord

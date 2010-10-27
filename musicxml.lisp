@@ -4,6 +4,7 @@
   (:nicknames #:mxml)
   (:use #:cl #:pprint-xml)
   (:export
+   #:mxml-equal
    #:128th
    #:16th
    #:256th
@@ -137,6 +138,10 @@
 
 (defun intern* (name)
   (intern (string-upcase name) (find-package "MXML")))
+
+(defun mxml-equal (a b)
+  (equal (translate-to-lxml a)
+         (translate-to-lxml b)))
 
 (defstruct musicxml-object)
 

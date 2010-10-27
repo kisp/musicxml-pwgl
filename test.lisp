@@ -365,5 +365,11 @@
         (is (= exp-alter alter))
         (is (= exp-octave octave))))))
 
+(deftest mxml-equal
+  (is (mxml-equal (pitch 'c 0 4)
+                  (pitch 'c 0 4)))
+  (is (not (mxml-equal (pitch 'c 0 4)
+                       (pitch 'c 1 4)))))
+
 (defun run-tests ()
   (run! :musicxml))
