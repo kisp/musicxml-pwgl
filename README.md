@@ -2,7 +2,7 @@
 
 [MusicXML](http://www.recordare.com/xml.html) export for [PWGL](http://siba.fi/PWGL/).
 
-*This project has just been set up. Development will start shortly.*
+*Development is in progress. No release has been made yet.*
 
 Licensing
 ----------------
