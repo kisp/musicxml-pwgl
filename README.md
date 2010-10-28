@@ -12,4 +12,3 @@ Acknowledgments
 ----------------
 Special thanks to [Johannes Kretz](http://www.mdw.ac.at/zimt/johanneskretz.html)
 at [ZiMT](http://www.mdw.ac.at/zimt/) for offering financial support for this project.
-
