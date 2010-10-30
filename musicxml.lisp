@@ -220,6 +220,11 @@
        (consp (first dom))
        (eql :|beam| (caar dom))))
 
+(defun tied-element-p (dom)
+  (and (consp dom)
+       (consp (first dom))
+       (eql :|tied| (caar dom))))
+
 (defun decode-beams (list-of-beams)
   "Returns list of beams for start, continue and end."
   (flet ((beam-number (beam)
@@ -248,7 +253,8 @@
                  :accidental (and accidental (intern* (second accidental)))
                  :type (and type (intern* (second type)))
                  :dots (count '(:|dot|) (cdr dom) :test #'equal)
-                 :notations (mapcar #'from-lxml (rest notations))
+                 :notations (mapcar #'from-lxml
+                                    (remove-if #'tied-element-p (rest notations)))
                  :tie-start (find '((:|tie| :|type| "start"))
                                   (cdr dom) :test #'equal)
                  :tie-stop (find '((:|tie| :|type| "stop"))
@@ -285,8 +291,8 @@
      ,@(mapcar (lambda (n) `((:|beam| :|number| ,(princ-to-string n))
                              "end"))
                (note-beam-end note))
-     ,@(when (note-notations note)
-             `((:|notations| ,@(mapcar #'to-lxml (note-notations note)))))))
+     ,@(when (note-notations* note)
+             `((:|notations| ,@(mapcar #'to-lxml (note-notations* note)))))))
 
 (defmethod make-constructor-form ((note note))
   `(note ,(note-pitch-or-rest note)
@@ -298,7 +304,7 @@
          :tie-start ',(note-tie-start note)
          :tie-stop ',(note-tie-stop note)
          :staff ,(note-staff note)
-         :notations ,(note-notations note)
+         :notations ',(remove-if #'tied-element-p (note-notations note))
          :time-modification ,(note-time-modification note)
          :beam-begin ,(note-beam-begin note)
          :beam-continue ,(note-beam-continue note)
@@ -310,14 +316,19 @@
              beam-begin beam-continue beam-end)
   (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp
              :staff staff :accidental accidental :type type
-             :notations notations
              :time-modification time-modification
              :beam-begin beam-begin
              :beam-continue beam-continue
              :beam-end beam-end
              :dots dots
              :tie-start tie-start
-             :tie-stop tie-stop))
+             :tie-stop tie-stop
+             :notations notations))
+
+(defun note-notations* (note)
+  (append (when (note-tie-stop note) '(((:|tied| :|type| "stop"))))
+          (when (note-tie-start note) '(((:|tied| :|type| "start"))))
+          (note-notations note)))
 
 (set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
 

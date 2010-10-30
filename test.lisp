@@ -160,7 +160,9 @@
                    (:|duration| "1")
                    ((:|tie| :|type| "start"))
                    (:|type| "quarter")
-                   (:|accidental| "flat"))
+                   (:|accidental| "flat")
+                   (:|notations|
+                    ((:|tied| :|type| "start"))))
                   (:|note|
                    (:|pitch| (:|step| "C") (:|octave| "4"))
                    (:|duration| "1")
@@ -176,7 +178,10 @@
                    (:|pitch| (:|step| "C") (:|octave| "4"))
                    (:|duration| "1")
                    ((:|tie| :|type| "stop"))
-                   ((:|tie| :|type| "start")))))
+                   ((:|tie| :|type| "start"))
+                   (:|notations|
+                    ((:|tied| :|type| "stop"))
+                    ((:|tied| :|type| "start"))))))
     (is (equal lxml (to-lxml (from-lxml lxml))))
     (is (equal lxml (to-lxml
                      (eval (make-constructor-form (from-lxml lxml))))))))
@@ -253,14 +258,24 @@
 (deftest test-db.w/o-beam-notations
   (assert (list-test-cases))
   (dolist (test-case (list-test-cases))
-    (is-true (check-test-db-test-case test-case '("beam"
-                                                  "notations"
-                                                  "normal-type"
-                                                  "direction"
-                                                  "part-group"))
-             "\"~A\" failed~%~A"
-             (name test-case)
-             (diff "/tmp/resc.xml" "/tmp/expc.xml"))))
+    (cond
+      ((equal "partially tied chord" (name test-case))
+       (is-true (check-test-db-test-case test-case '("beam"
+                                                     "normal-type"
+                                                     "direction"
+                                                     "part-group"))
+                "\"~A\" failed~%~A"
+                (name test-case)
+                (diff "/tmp/resc.xml" "/tmp/expc.xml")))
+      (t
+       (is-true (check-test-db-test-case test-case '("beam"
+                                                     "notations"
+                                                     "normal-type"
+                                                     "direction"
+                                                     "part-group"))
+                "\"~A\" failed~%~A"
+                (name test-case)
+                (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
 
 (deftest pprint-xml-nil
   (is
