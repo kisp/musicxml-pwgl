@@ -211,7 +211,9 @@
   (accidental nil :type accidental)
   (type nil :type note-type)
   (dots nil :type (integer 0 3))
-  notations tie-start tie-stop
+  notations
+  (tie-start nil :type boolean)
+  (tie-stop nil :type boolean)
   (time-modification nil :type (or null time-modification))
   beam-begin beam-continue beam-end)
 
@@ -255,10 +257,12 @@
                  :dots (count '(:|dot|) (cdr dom) :test #'equal)
                  :notations (mapcar #'from-lxml
                                     (remove-if #'tied-element-p (rest notations)))
-                 :tie-start (find '((:|tie| :|type| "start"))
-                                  (cdr dom) :test #'equal)
-                 :tie-stop (find '((:|tie| :|type| "stop"))
-                                 (cdr dom) :test #'equal)
+                 :tie-start (when (find '((:|tie| :|type| "start"))
+                                        (cdr dom) :test #'equal)
+                              t)
+                 :tie-stop (when (find '((:|tie| :|type| "stop"))
+                                       (cdr dom) :test #'equal)
+                             t)
                  :time-modification (and time-modification
                                          (from-lxml time-modification))
                  :beam-begin beam-begin
@@ -301,8 +305,8 @@
          ,(note-dots note)
          ',(note-accidental note)
          :chordp ,(note-chordp note)
-         :tie-start ',(note-tie-start note)
-         :tie-stop ',(note-tie-stop note)
+         :tie-start ,(note-tie-start note)
+         :tie-stop ,(note-tie-stop note)
          :staff ,(note-staff note)
          :notations ',(remove-if #'tied-element-p (note-notations note))
          :time-modification ,(note-time-modification note)
