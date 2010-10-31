@@ -398,9 +398,9 @@
                  :actual-type (intern*
                                (second (assoc :|tuplet-type|
                                               (cdr tuplet-actual))))
-                 :normal-number (parse-integer
-                                 (second (assoc :|tuplet-number|
-                                                (cdr tuplet-normal))))
+                 :normal-number (let ((x (second (assoc :|tuplet-number|
+                                                        (cdr tuplet-normal)))))
+                                  (and x (parse-integer x)))
                  :normal-type (intern*
                                (second (assoc :|tuplet-type|
                                               (cdr tuplet-normal))))
@@ -417,12 +417,16 @@
     (:|tuplet-actual|
       (:|tuplet-number|
         ,(princ-to-string (tuplet-actual-number tuplet)))
-      (:|tuplet-type|
-        ,(string-downcase (symbol-name (tuplet-actual-type tuplet)))))
-    (:|tuplet-normal|
-      (:|tuplet-number| ,(princ-to-string (tuplet-normal-number tuplet)))
-      (:|tuplet-type|
-        ,(string-downcase (symbol-name (tuplet-normal-type tuplet)))))))
+      ,@(when (tuplet-actual-type tuplet)
+              `((:|tuplet-type|
+                  ,(string-downcase (symbol-name (tuplet-actual-type tuplet)))))))
+    ,@(when (tuplet-normal-number tuplet)
+            `((:|tuplet-normal|
+                ,@(when (tuplet-normal-number tuplet)
+                        `((:|tuplet-number| ,(princ-to-string (tuplet-normal-number tuplet)))))
+                ,@(when (tuplet-normal-type tuplet)
+                        `((:|tuplet-type|
+                            ,(string-downcase (symbol-name (tuplet-normal-type tuplet)))))))))))
 
 (defmethod make-constructor-form ((tuplet tuplet))
   `(tuplet ',(tuplet-type tuplet)
