@@ -392,9 +392,9 @@
   (assoc-bind* (tuplet-actual tuplet-normal) (cdr dom)
     (make-tuplet :type (intern* (third (car dom)))
                  :id (parse-integer (fifth (car dom)))
-                 :actual-number (parse-integer
-                                 (second (assoc :|tuplet-number|
-                                                (cdr tuplet-actual))))
+                 :actual-number (let ((x (second (assoc :|tuplet-number|
+                                                        (cdr tuplet-actual)))))
+                                  (and x (parse-integer x)))
                  :actual-type (intern*
                                (second (assoc :|tuplet-type|
                                               (cdr tuplet-actual))))
@@ -414,12 +414,13 @@
       ,@(when (tuplet-bracket tuplet)
               `(:|bracket|
                  ,(string-downcase (symbol-name (tuplet-bracket tuplet))))))
-    (:|tuplet-actual|
-      (:|tuplet-number|
-        ,(princ-to-string (tuplet-actual-number tuplet)))
-      ,@(when (tuplet-actual-type tuplet)
-              `((:|tuplet-type|
-                  ,(string-downcase (symbol-name (tuplet-actual-type tuplet)))))))
+    ,@(when (tuplet-actual-number tuplet)
+            `((:|tuplet-actual|
+                (:|tuplet-number|
+                  ,(princ-to-string (tuplet-actual-number tuplet)))
+                ,@(when (tuplet-actual-type tuplet)
+                        `((:|tuplet-type|
+                            ,(string-downcase (symbol-name (tuplet-actual-type tuplet)))))))))
     ,@(when (tuplet-normal-number tuplet)
             `((:|tuplet-normal|
                 ,@(when (tuplet-normal-number tuplet)
@@ -435,10 +436,9 @@
            ',(tuplet-actual-type tuplet)
            ,(tuplet-normal-number tuplet)
            ',(tuplet-normal-type tuplet)
-           :bracket ',(tuplet-bracket tuplet)))
+           ',(tuplet-bracket tuplet)))
 
-(defun tuplet (type id actual-number actual-type normal-number normal-type
-               &key bracket)
+(defun tuplet (type id &optional actual-number actual-type normal-number normal-type bracket)
   (make-tuplet :type type
                :id id
                :actual-number actual-number

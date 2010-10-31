@@ -93,7 +93,15 @@
                               (not (note-attack-p chord-note))))))
                 :beam-continue beam-continue
                 :beam-end beam-end
-                :beam-begin beam-begin))))))
+                :beam-begin beam-begin
+                :notations `(,@(when (and (info-beat-end-p info)
+                                          (/= 1 (list2ratio (nth (1- (position (info-beat info) (info-pointers info)))
+                                                                 (info-tuplet-ratios info)))))
+                                     (list (tuplet 'stop 1)))
+                               ,@(when (and (info-beat-start-p info)
+                                            (/= 1 (list2ratio (nth (1- (position (info-beat info) (info-pointers info)))
+                                                                   (info-tuplet-ratios info)))))
+                                       (list (tuplet 'start 1 3 nil nil nil 'yes))))))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))
@@ -357,6 +365,9 @@ grid point. This is always the case, because we never leave the grid."
             (mapcar (lambda (div) (length (div-items div)))
                     (rest (butlast (info-pointers info)))))))
 
+(defun info-beat (info)
+  (car (last (info-pointers info) 2)))
+
 (defun measure-infos (measure)
   (declare (type measure measure))
   (labels ((rec (unit tree path pointers abs-durs)
@@ -425,8 +436,8 @@ grid point. This is always the case, because we never leave the grid."
                   dur-constraints
                   grouping-constraints)))
     (loop for info in infos
-         for b in beaming
-         do (setf (info-beaming info) b))
+       for b in beaming
+       do (setf (info-beaming info) b))
     infos))
 
 (defun measure-first-info (measure)
@@ -515,8 +526,8 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun map-neighbours (fn list)
   (loop for a in list
-       for b in (cdr list)
-       collect (funcall fn a b)))
+     for b in (cdr list)
+     collect (funcall fn a b)))
 
 (defun 1-to-n (n)
   (declare (type (integer 0)))

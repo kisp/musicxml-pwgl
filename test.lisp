@@ -212,6 +212,7 @@
 (deftest tuplet
   (dolist (lxml '(((:|tuplet| :|type| "start" :|number| "1")
                    (:|tuplet-actual| (:|tuplet-number| "5")))
+                  ((:|tuplet| :|type| "stop" :|number| "1"))
                   ((:|tuplet| :|type| "start" :|number| "1")
                    (:|tuplet-actual| (:|tuplet-number| "5") (:|tuplet-type| "16th"))
                    (:|tuplet-normal| (:|tuplet-number| "4") (:|tuplet-type| "16th")))
