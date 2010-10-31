@@ -49,6 +49,11 @@
          (:flat 'flat))
        enharmonic))))
 
+(defun convert-expression (expression)
+  (ecase expression
+    (:accent :|accent|)
+    (:staccato :|staccato|)))
+
 (defun convert-note2note (info unit-dur next-chord)
   (declare (type info info) ((or null chord) next-chord))
   (lambda (state note)
@@ -102,7 +107,9 @@
                                        (let ((tuplet-ratio (nth (1- (position (info-beat info) (info-pointers info)))
                                                                 (info-tuplet-ratios info))))
                                          (when (/= 1 (list2ratio tuplet-ratio))
-                                           (list (tuplet 'start 1 (first tuplet-ratio) nil nil nil 'yes))))))))))))
+                                           (list (tuplet 'start 1 (first tuplet-ratio) nil nil nil 'yes)))))
+                               ,@(when (chord-expressions chord)
+                                       `((:|articulations| ,@(mapcar #'convert-expression (chord-expressions chord))))))))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))
@@ -284,6 +291,10 @@ grid point. This is always the case, because we never leave the grid."
 (defun chord-notes (enp)
   (declare (chord enp))
   (getf (cdr enp) :notes))
+
+(defun chord-expressions (enp)
+  (declare (chord enp))
+  (getf (cdr enp) :expressions))
 
 (defun find-note-in-chord (note chord)
   (declare (type note* note)

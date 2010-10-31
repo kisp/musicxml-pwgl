@@ -253,29 +253,9 @@
   (assert (list-test-cases))
   (dolist (test-case (list-test-cases))
     (ecase (status test-case)
-      (:skip #+nil(skip "~A -- ~A" (name test-case) (description test-case)))
+      (:skip (skip "~A -- ~A" (name test-case) (description test-case)))
       (:run
        (is-true (check-test-db-test-case test-case)
-                "\"~A\" failed~%~A"
-                (name test-case)
-                (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
-
-(deftest test-db.w/o-beam-notations
-  (assert (list-test-cases))
-  (dolist (test-case (list-test-cases))
-    (cond
-      ((equal "partially tied chord" (name test-case))
-       (is-true (check-test-db-test-case test-case '("normal-type"
-                                                     "direction"
-                                                     "part-group"))
-                "\"~A\" failed~%~A"
-                (name test-case)
-                (diff "/tmp/resc.xml" "/tmp/expc.xml")))
-      (t
-       (is-true (check-test-db-test-case test-case '("notations"
-                                                     "normal-type"
-                                                     "direction"
-                                                     "part-group"))
                 "\"~A\" failed~%~A"
                 (name test-case)
                 (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
