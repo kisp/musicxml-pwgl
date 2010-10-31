@@ -15,7 +15,9 @@
                 #:measure-infos
                 #:info-tuplet-ratios
                 #:abs-dur-name
-                #:decode-midi))
+                #:decode-midi
+                #:info-abs-dur
+                #:info-beaming))
 
 (in-package #:test)
 
@@ -260,16 +262,14 @@
   (dolist (test-case (list-test-cases))
     (cond
       ((equal "partially tied chord" (name test-case))
-       (is-true (check-test-db-test-case test-case '("beam"
-                                                     "normal-type"
+       (is-true (check-test-db-test-case test-case '("normal-type"
                                                      "direction"
                                                      "part-group"))
                 "\"~A\" failed~%~A"
                 (name test-case)
                 (diff "/tmp/resc.xml" "/tmp/expc.xml")))
       (t
-       (is-true (check-test-db-test-case test-case '("beam"
-                                                     "notations"
+       (is-true (check-test-db-test-case test-case '("notations"
                                                      "normal-type"
                                                      "direction"
                                                      "part-group"))
@@ -415,6 +415,31 @@
       (let ((note (convert 1 '(60) '(-1 :notes (60)))))
         (is-false (mxml::note-tie-stop note))
         (is-false (mxml::note-tie-start note))))))
+
+(deftest info-beaming
+  (let ((infos (measure-infos
+                '((1 ((1 :notes (60)) (1 :notes (60)))) :time-signature (1 4)))))
+    (is (equal '(1/8 1/8)
+               (mapcar #'info-abs-dur infos)))
+    (is (equal '((0 1) (1 0))
+               (mapcar #'info-beaming infos))))
+  (let ((infos (measure-infos
+                '((1 ((2 :notes (60))
+                      (1 :notes (60))
+                      (1 :notes (60)))) :time-signature (1 4)))))
+    (is (equal '(1/8 1/16 1/16)
+               (mapcar #'info-abs-dur infos)))
+    (is (equal '((0 1) (1 2) (2 0))
+               (mapcar #'info-beaming infos)))))
+
+(deftest info-beaming.2
+  (let ((infos (measure-infos
+                '((1 ((1 :notes (60)) (1 :notes (60))))
+                  (1 ((1 :notes (60)) (1 :notes (60)))) :time-signature (2 4)))))
+    (is (equal '(1/8 1/8 1/8 1/8)
+               (mapcar #'info-abs-dur infos)))
+    (is (equal '((0 1) (1 0) (0 1) (1 0))
+               (mapcar #'info-beaming infos)))))
 
 (defun run-tests ()
   (run! :musicxml))

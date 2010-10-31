@@ -54,9 +54,18 @@
   (lambda (state note)
     (declare (type mapcar-state state)
              (type note* note))
-    (let ((abs-dur (info-abs-dur info))
-          (time-modification (info-cumulative-tuplet-ratio info))
-          (chord (info-chord info)))
+    (let* ((abs-dur (info-abs-dur info))
+           (time-modification (info-cumulative-tuplet-ratio info))
+           (chord (info-chord info))
+           (beam-continue (1-to-n (apply #'min (info-beaming info))))
+           (beam-begin
+            (set-difference
+             (1-to-n (second (info-beaming info)))
+             beam-continue))
+           (beam-end
+            (set-difference
+             (1-to-n (first (info-beaming info)))
+             beam-continue)))
       (multiple-value-bind (type dots)
           (abs-dur-name (* time-modification abs-dur))
         (multiple-value-bind (accidental explicit)
@@ -81,7 +90,10 @@
                   (and (chord-tied-p next-chord)
                        (let ((chord-note (find-note-in-chord note next-chord)))
                          (and chord-note
-                              (not (note-attack-p chord-note))))))))))))
+                              (not (note-attack-p chord-note))))))
+                :beam-continue beam-continue
+                :beam-end beam-end
+                :beam-begin beam-begin))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))
@@ -284,11 +296,30 @@ grid point. This is always the case, because we never leave the grid."
 (defun measure-abs-durs (measure)
   (mapcar #'info-abs-dur (measure-infos measure)))
 
-(defstruct info
-  abs-durs path pointers)
+(defstruct (info (:print-object print-info))
+  abs-durs path pointers beaming)
+
+(defun print-info (obj stream)
+  (print-unreadable-object (obj stream :type t)
+    (format stream "abs-durs ~W~_~
+                    notated-durs ~W~_~
+                    path ~W~_~
+                    chord ~W~_~
+                    tuplet-ratios ~W~_~
+                    beat: start ~W end ~W"
+            (info-abs-durs obj)
+            (info-notated-durs obj)
+            (info-path obj)
+            (info-chord obj)
+            (info-tuplet-ratios obj)
+            (info-beat-start-p obj)
+            (info-beat-end-p obj))))
 
 (defun info-abs-dur (info)
   (car (info-abs-durs info)))
+
+(defun info-notated-dur (info)
+  (car (info-notated-durs info)))
 
 (defun info-chord (info)
   (car (info-pointers info)))
@@ -296,9 +327,35 @@ grid point. This is always the case, because we never leave the grid."
 (defun info-tuplet-ratios (info)
   (mapcar #'tuplet-ratio (cdr (info-pointers info))))
 
+(defun info-notated-durs (info)
+  (mapcar #'*
+          (info-abs-durs info)
+          (info-cumulative-tuplet-ratios info)))
+
 (defun info-cumulative-tuplet-ratio (info)
-  (reduce #'* (info-tuplet-ratios info)
-          :key #'list2ratio))
+  (let ((former-code (reduce #'* (info-tuplet-ratios info)
+                             :key #'list2ratio))
+        (new-code (car (info-cumulative-tuplet-ratios info))))
+    (assert (= former-code new-code))
+    new-code))
+
+(defun info-cumulative-tuplet-ratios (info)
+  (reduce (lambda (a b) (cons (* a (first b)) b))
+          (info-tuplet-ratios info)
+          :key #'list2ratio
+          :initial-value '(1)
+          :from-end t))
+
+(defun info-beat-start-p (info)
+  (every #'zerop (butlast (info-path info))))
+
+(defun info-beat-end-p (info)
+  (flet ((one-smaller (x y)
+           (= 1 (- y x))))
+    (every* #'one-smaller
+            (butlast (info-path info))
+            (mapcar (lambda (div) (length (div-items div)))
+                    (rest (butlast (info-pointers info)))))))
 
 (defun measure-infos (measure)
   (declare (type measure measure))
@@ -325,8 +382,52 @@ grid point. This is always the case, because we never leave the grid."
                     (div-items tree))))))
     (multiple-value-bind (beats plist)
         (split-list-plist measure)
-      (let ((tree (list (list2ratio (getf plist :time-signature)) beats)))
-        (rec 1 tree nil (list tree) nil)))))
+      (let* ((tree (list (list2ratio (getf plist :time-signature)) beats))
+             (infos (rec 1 tree nil (list tree) nil)))
+        (infos-compute-beaming infos)))))
+
+(defun notated-dur2beam-number (dur)
+  "The maximum number of beams that can be used with DUR."
+  (multiple-value-bind (name dots)
+      (abs-dur-name dur)
+    (declare (ignore name))
+    (let ((zero-dots-dur (/ dur
+                            (ecase dots
+                              (0 1)
+                              (1 3/2)
+                              (2 7/4)
+                              (3 15/8)))))
+      (max 0
+           (- (truncate (log (denominator zero-dots-dur) 2))
+              2)))))
+
+(defun infos-compute-beaming (infos)
+  (let* ((notated-durs (mapcar #'info-notated-dur infos))
+         (beam-numbers (mapcar #'notated-dur2beam-number notated-durs))
+         (dur-constraints
+          (map-neighbours #'list
+                          (append (list 0)
+                                  (map-neighbours #'min beam-numbers)
+                                  (list 0))))
+         (grouping-constraints
+          (mapcar (lambda (info)
+                    (list (if (info-beat-start-p info)
+                              0
+                              most-positive-fixnum)
+                          (if (info-beat-end-p info)
+                              0
+                              most-positive-fixnum)))
+                  infos))
+         (beaming
+          (mapcar (lambda (a b)
+                    (list (min (first a) (first b))
+                          (min (second a) (second b))))
+                  dur-constraints
+                  grouping-constraints)))
+    (loop for info in infos
+         for b in beaming
+         do (setf (info-beaming info) b))
+    infos))
 
 (defun measure-first-info (measure)
   (first (measure-infos measure)))
@@ -408,21 +509,21 @@ grid point. This is always the case, because we never leave the grid."
     (h (numerator dur)
        (denominator dur))))
 
-;; (defun tuplet-ratio (dur div-num)
-;;   (let ((numer div-num))
-;;     (labels ((find-lower-match (denom)
-;;                (cond ((notable-dur-p (/ dur denom) 0)
-;;                       (list numer denom))
-;;                      ((>= denom 2)
-;;                       (find-higher-match 3))))
-;;              (find-higher-match (denom)
-;;                (cond ((notable-dur-p (/ dur denom) 0)
-;;                       (list numer denom))
-;;                      (t
-;;                       (find-higher-match (1+ denom))))))
-;;       (assert (> div-num 1))
-;;       (find-lower-match div-num))))
-
 (defun list2ratio (list)
   (assert (null (cddr list)))
   (/ (first list) (second list)))
+
+(defun map-neighbours (fn list)
+  (loop for a in list
+       for b in (cdr list)
+       collect (funcall fn a b)))
+
+(defun 1-to-n (n)
+  (declare (type (integer 0)))
+  (unless (zerop n)
+    (loop for i from 1 to n collect i)))
+
+(defun every* (fn a b)
+  (assert (= (length a)
+             (length b)))
+  (every fn a b))
