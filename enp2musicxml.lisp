@@ -51,8 +51,12 @@
 
 (defun convert-expression (expression)
   (ecase expression
-    (:accent :|accent|)
-    (:staccato :|staccato|)))
+    (:accent        :|accent|)
+    (:accent-grave  :|strong-accent|)
+    (:staccato      :|staccato|)
+    (:tenuto        :|tenuto|)
+    (:staccatissimo :|staccatissimo|)
+    (:breath-mark   :|breath-mark|)))
 
 (defun convert-note2note (info unit-dur next-chord)
   (declare (type info info) ((or null chord) next-chord))
