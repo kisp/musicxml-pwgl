@@ -36,7 +36,8 @@
 
 (defmethod print-object ((obj test-case) stream)
   (handler-case
-      (let ((info (format nil "~A ~A ~A" (store-object-id obj) (name obj) (status obj))))
+      (let ((info (format nil "~A ~A ~A" (store-object-id obj) (name obj)
+                          (status obj))))
         (print-unreadable-object (obj stream :type t :identity t)
           (write-string info stream)))
     (error () (call-next-method))))
@@ -60,7 +61,8 @@
             (list-test-cases)))
 
 (defun make-entry (list)
-  (destructuring-bind (name description enp musicxml status enp-screen-shot score)
+  (destructuring-bind (name description enp musicxml status enp-screen-shot
+                            score)
       list
     (make-instance 'test-case
                    :score score
@@ -100,9 +102,9 @@
   (labels ((count-lines (string)
              (with-input-from-string (in string)
                (loop for i upfrom 0
-                  for line = (read-line in nil)
-                  while line
-                  finally (return i)))))
+                    for line = (read-line in nil)
+                    while line
+                    finally (return i)))))
     (let (res)
       (dolist (tc (list-test-cases))
         (handler-case
