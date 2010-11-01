@@ -59,7 +59,7 @@
      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" stream)
     (format stream "<!DOCTYPE score-partwise PUBLIC ~
                    \"-//Recordare//DTD MusicXML 2.0 Partwise//EN\" ~
-                   \"http://www.musicxml.org/dtds/partwise.dtd\">"))
+                   \"http://www.musicxml.org/dtds/partwise.dtd\">~%"))
   (ppxml:pprint-xml dom :stream stream))
 
 (defun from-lxml (dom)
