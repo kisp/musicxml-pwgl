@@ -35,9 +35,11 @@
    (score :accessor score :initarg :score)))
 
 (defmethod print-object ((obj test-case) stream)
-  (print-unreadable-object (obj stream :type t :identity t)
-    (format stream "~A ~A ~A"
-            (store-object-id obj) (name obj) (status obj))))
+  (handler-case
+      (let ((info (format nil "~A ~A ~A" (store-object-id obj) (name obj) (status obj))))
+        (print-unreadable-object (obj stream :type t :identity t)
+          (write-string info stream)))
+    (error () (call-next-method))))
 
 (unless (store-open-p)
   (let ((path (merge-pathnames
