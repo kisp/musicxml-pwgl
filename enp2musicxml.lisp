@@ -164,8 +164,10 @@
 (defun part2score-part (state part)
   `((:|score-part| :|id| ,(format nil "P~A" (mapcar-state-index state)))
     (:|part-name|
-      ,(string-capitalize
-        (string (getf (cdr part) :instrument 'violin))))))
+      ,(let ((name (getf (cdr part) :instrument 'violin)))
+            (if name
+                (string-capitalize (string name))
+                "")))))
 
 (defun enp2musicxml (enp)
   `((:|score-partwise| #+nil :|version| #+nil "2.0")
