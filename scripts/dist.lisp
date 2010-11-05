@@ -5,6 +5,7 @@
 
 (load (merge-pathnames ".sbclrc" (user-homedir-pathname)))
 (require :alexandria)
+(require :cl-fad)
 
 (defpackage #:dist
   (:use #:cl #:alexandria))
@@ -14,7 +15,7 @@
 (defvar *tmp-dir* (ensure-directories-exist
                    (format nil "/tmp/musicxml-~A/" (sb-posix:getpid))))
 
-(push (lambda () (sb-ext:delete-directory *tmp-dir* :recursive t))
+(push (lambda () (cl-fad:delete-directory-and-files *tmp-dir*))
       sb-ext:*exit-hooks*)
 
 (defvar *version* (asdf:component-version (asdf:find-system :musicxml)))
