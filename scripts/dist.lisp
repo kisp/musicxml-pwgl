@@ -22,7 +22,7 @@
 (defvar *name-version* (format nil "~A-~A" *name* *version*))
 (defvar *dir* (ensure-directories-exist
                (merge-pathnames
-                (make-pathname :directory `(:relative ,*name-version*))
+                (make-pathname :directory `(:relative ,*name*))
                 *tmp-dir*)))
 
 (defun src (path)
