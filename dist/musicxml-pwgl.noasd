@@ -3,7 +3,7 @@
 (require "comm")
 
 (asdf:defsystem musicxml-pwgl
-  :version "0.1.2"
+  :version "0.1.3"
   :description "musicxml export for pwgl"
   :maintainer "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :author "Kilian Sprotte <kilian.sprotte@gmail.com>"
