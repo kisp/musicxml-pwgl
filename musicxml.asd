@@ -1,7 +1,7 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (asdf:defsystem musicxml
-  :version "0.1.1"
+  :version "0.1.2"
   :description "musicxml export for pwgl"
   :maintainer "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :author "Kilian Sprotte <kilian.sprotte@gmail.com>"
