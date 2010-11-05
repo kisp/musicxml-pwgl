@@ -28,7 +28,7 @@
             (1- (floor diatonic-pitch 12)))))
 
 (defun decode-note (note)
-  (declare (note* note))
+  (declare (type note* note))
   (decode-midi
    (note-pitch note)
    (enp-note-accidental note)))
