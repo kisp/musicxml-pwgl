@@ -10,4 +10,4 @@ def safe_system(command)
 end
 
 safe_system "git clean -f -x -d"
-safe_system "sbcl --script cruise-build.lisp"
+safe_system "sbcl --script scripts/cruise-build.lisp"

@@ -141,7 +141,9 @@
   (equal (translate-to-lxml a)
          (translate-to-lxml b)))
 
-(defstruct musicxml-object)
+;;; eval-when currently needed by PWGL
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defstruct musicxml-object))
 
 (defmethod print-object ((musicxml-object musicxml-object) stream)
   (write-string "#." stream)
@@ -156,9 +158,9 @@
 
 (defmethod translate-from-lxml (dom (type (eql ':|pitch|)))
   (assoc-bind (step alter octave) (cdr dom)
-    (make-pitch :step (intern* step)
-                :alter (if (null alter) 0 (read-from-string alter))
-                :octave (parse-integer octave))))
+              (make-pitch :step (intern* step)
+                          :alter (if (null alter) 0 (read-from-string alter))
+                          :octave (parse-integer octave))))
 
 (defmethod translate-to-lxml ((pitch pitch))
   `(:|pitch|
@@ -243,29 +245,29 @@
   (assoc-bind* (duration chord rest pitch staff
                          accidental type notations
                          time-modification)
-      dom
-    (multiple-value-bind (beam-begin beam-continue beam-end)
-        (decode-beams (remove-if-not 'beam-element-p dom))
-      (make-note :pitch-or-rest (if rest (rest*) (from-lxml pitch))
-                 :duration (parse-integer (second duration))
-                 :chordp chord
-                 :staff (and staff (parse-integer (second staff)))
-                 :accidental (and accidental (intern* (second accidental)))
-                 :type (and type (intern* (second type)))
-                 :dots (count '(:|dot|) (cdr dom) :test #'equal)
-                 :notations (mapcar #'from-lxml
-                                    (remove-if #'tied-element-p (rest notations)))
-                 :tie-start (when (find '((:|tie| :|type| "start"))
-                                        (cdr dom) :test #'equal)
-                              t)
-                 :tie-stop (when (find '((:|tie| :|type| "stop"))
-                                       (cdr dom) :test #'equal)
-                             t)
-                 :time-modification (and time-modification
-                                         (from-lxml time-modification))
-                 :beam-begin beam-begin
-                 :beam-continue beam-continue
-                 :beam-end beam-end))))
+               dom
+               (multiple-value-bind (beam-begin beam-continue beam-end)
+                   (decode-beams (remove-if-not 'beam-element-p dom))
+                 (make-note :pitch-or-rest (if rest (rest*) (from-lxml pitch))
+                            :duration (parse-integer (second duration))
+                            :chordp chord
+                            :staff (and staff (parse-integer (second staff)))
+                            :accidental (and accidental (intern* (second accidental)))
+                            :type (and type (intern* (second type)))
+                            :dots (count '(:|dot|) (cdr dom) :test #'equal)
+                            :notations (mapcar #'from-lxml
+                                               (remove-if #'tied-element-p (rest notations)))
+                            :tie-start (when (find '((:|tie| :|type| "start"))
+                                                   (cdr dom) :test #'equal)
+                                         t)
+                            :tie-stop (when (find '((:|tie| :|type| "stop"))
+                                                  (cdr dom) :test #'equal)
+                                        t)
+                            :time-modification (and time-modification
+                                                    (from-lxml time-modification))
+                            :beam-begin beam-begin
+                            :beam-continue beam-continue
+                            :beam-end beam-end))))
 
 (defmethod translate-to-lxml ((note note))
   `(:|note|
@@ -344,10 +346,10 @@
 
 (defmethod translate-from-lxml (dom (type (eql ':|time-modification|)))
   (assoc-bind (actual-notes normal-notes normal-type) (cdr dom)
-    (make-time-modification
-     :actual-notes (parse-integer actual-notes)
-     :normal-notes (parse-integer normal-notes)
-     :normal-type (intern* normal-type))))
+              (make-time-modification
+               :actual-notes (parse-integer actual-notes)
+               :normal-notes (parse-integer normal-notes)
+               :normal-type (intern* normal-type))))
 
 (defmethod translate-to-lxml ((time-modification time-modification))
   `(:|time-modification|
@@ -388,21 +390,21 @@
 
 (defmethod translate-from-lxml (dom (type (eql ':|tuplet|)))
   (assoc-bind* (tuplet-actual tuplet-normal) (cdr dom)
-    (make-tuplet :type (intern* (third (car dom)))
-                 :id (parse-integer (fifth (car dom)))
-                 :actual-number (let ((x (second (assoc :|tuplet-number|
-                                                        (cdr tuplet-actual)))))
-                                  (and x (parse-integer x)))
-                 :actual-type (intern*
-                               (second (assoc :|tuplet-type|
-                                              (cdr tuplet-actual))))
-                 :normal-number (let ((x (second (assoc :|tuplet-number|
-                                                        (cdr tuplet-normal)))))
-                                  (and x (parse-integer x)))
-                 :normal-type (intern*
-                               (second (assoc :|tuplet-type|
-                                              (cdr tuplet-normal))))
-                 :bracket nil)))
+               (make-tuplet :type (intern* (third (car dom)))
+                            :id (parse-integer (fifth (car dom)))
+                            :actual-number (let ((x (second (assoc :|tuplet-number|
+                                                                   (cdr tuplet-actual)))))
+                                             (and x (parse-integer x)))
+                            :actual-type (intern*
+                                          (second (assoc :|tuplet-type|
+                                                         (cdr tuplet-actual))))
+                            :normal-number (let ((x (second (assoc :|tuplet-number|
+                                                                   (cdr tuplet-normal)))))
+                                             (and x (parse-integer x)))
+                            :normal-type (intern*
+                                          (second (assoc :|tuplet-type|
+                                                         (cdr tuplet-normal))))
+                            :bracket nil)))
 
 (defmethod translate-to-lxml ((tuplet tuplet))
   `((:|tuplet|
@@ -456,20 +458,20 @@
 
 (defmethod translate-from-lxml (dom (type (eql ':|attributes|)))
   (assoc-bind* (divisions time clef staves key) (cdr dom)
-    (make-attributes :divisions (and divisions
-                                     (parse-integer (second divisions)))
-                     :staves (and staves (parse-integer (second staves)))
-                     :key (and key
-                               (assoc-bind (fifths) (cdr key)
-                                 (parse-integer fifths)))
-                     :time (and time
-                                (assoc-bind (beats beat-type) (cdr time)
-                                  (list (parse-integer beats)
-                                        (parse-integer beat-type))))
-                     :clef (and clef
-                                (assoc-bind (sign line) (cdr clef)
-                                  (list (intern* sign)
-                                        (and line (parse-integer line))))))))
+               (make-attributes :divisions (and divisions
+                                                (parse-integer (second divisions)))
+                                :staves (and staves (parse-integer (second staves)))
+                                :key (and key
+                                          (assoc-bind (fifths) (cdr key)
+                                                      (parse-integer fifths)))
+                                :time (and time
+                                           (assoc-bind (beats beat-type) (cdr time)
+                                                       (list (parse-integer beats)
+                                                             (parse-integer beat-type))))
+                                :clef (and clef
+                                           (assoc-bind (sign line) (cdr clef)
+                                                       (list (intern* sign)
+                                                             (and line (parse-integer line))))))))
 
 (defmethod translate-to-lxml ((attributes attributes))
   (let ((dom `(:|attributes|
