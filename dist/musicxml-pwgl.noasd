@@ -1,5 +1,7 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
+(require "comm")
+
 (asdf:defsystem musicxml-pwgl
   :version "0.1.1"
   :description "musicxml export for pwgl"
