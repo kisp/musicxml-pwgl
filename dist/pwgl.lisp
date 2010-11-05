@@ -28,6 +28,8 @@
     (with-open-file (out path :direction :output :if-exists :supersede)
       (mxml:print-musicxml (e2m:enp2musicxml enp) :stream out))))
 
+(install-menu musicxml-pwgl)
+
 ;;; http
 (defun read-line* (stream)
   (prog1
@@ -99,7 +101,7 @@
            ))))
 
 
-(define-box upgrade ()
+(defun upgrade ()
   (with-open-file (out "/tmp/f.tgz" :direction :output
                        :if-exists :supersede)
     (write-sequence
@@ -118,10 +120,31 @@
                             location))
   (asdf:oos 'asdf:load-op :musicxml-pwgl))
 
+(defun upgrade-check ()
+  (let ((installed-version
+         (parse-version (asdf:component-version (asdf:find-system :musicxml-pwgl))))
+        (available-version
+         (parse-version (get-version))))
+    (when (list< installed-version available-version)
+      (when (capi:prompt-for-confirmation "Download new version now (recommended)?"
+                                          :default-button :ok)
+        (handler-case
+            (progn
+              (upgrade)
+              (capi:display-message "Upgrade successful."))
+          (error ()
+            (capi:display-message "Downloading and installing the new version failed. ~
+                                   Consider installing it manually.")))))))
+
 (defvar *version-check-done* nil)
 
 (unless *version-check-done*
   (ignore-errors (version-check))
   (setq *version-check-done* t))
 
-(install-menu musicxml-pwgl)
+(defvar *upgrade-check-done* nil)
+
+#+macosx
+(unless *upgrade-check-done*
+  (ignore-errors (upgrade-check))
+  (setq *upgrade-check-done* t))
