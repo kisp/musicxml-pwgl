@@ -17,7 +17,10 @@
                 #:abs-dur-name
                 #:decode-midi
                 #:info-abs-dur
-                #:info-beaming))
+                #:info-beaming
+                #:enp-note-accidental
+                #:make-accidental-store
+                #:register-accidental))
 
 (in-package #:test)
 
@@ -369,7 +372,8 @@
                        (pitch 'c 1 4)))))
 
 (deftest note-ties
-  (let ((state (e2m::make-mapcar-state :index 1)))
+  (let ((e2m::*accidental-store* (make-accidental-store))
+        (state (e2m::make-mapcar-state :index 1)))
     (labels ((info (chord-dur notes)
                (first (measure-infos `((1 ((,chord-dur :notes ',notes))) :time-signature (1 4)))))
              (convert (chord-dur notes next-chord)
@@ -423,6 +427,21 @@
                (mapcar #'info-abs-dur infos)))
     (is (equal '((0 1) (1 0) (0 1) (1 0))
                (mapcar #'info-beaming infos)))))
+
+(deftest enp-note-accidental
+  (is (eql 'mxml:natural (enp-note-accidental 60)))
+  (is (eql 'mxml:natural (enp-note-accidental '(60 :enharmonic nil))))
+  (is (eql 'mxml:sharp (enp-note-accidental 61)))
+  (is (eql 'mxml:sharp (enp-note-accidental '(61 :enharmonic nil)))))
+
+(deftest accidental-store
+  (let ((store (make-accidental-store)))
+    (is-true (register-accidental store 'c 4 1))
+    (is-false (register-accidental store 'c 4 1))
+    (is-false (register-accidental store 'd 4 0))
+    (is-false (register-accidental store 'd 4 0))
+    (is-true (register-accidental store 'd 4 1))
+    (is-false (register-accidental store 'd 4 1))))
 
 (defun run-tests ()
   (run! :musicxml))

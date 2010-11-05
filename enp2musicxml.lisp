@@ -8,6 +8,9 @@
 
 (in-package #:e2m)
 
+;;;# specials
+(defvar *accidental-store*)
+
 ;;;# enp2musicxml
 (defun accidental-alter (accidental)
   (ecase accidental
@@ -15,25 +18,29 @@
     (flat -1)
     (natural 0)))
 
-(defun decode-midi (note enharmonic)
+(defun decode-midi (midi enharmonic)
   (declare (accidental enharmonic))
-  (let ((diatonic-pitch (- note (accidental-alter enharmonic))))
+  (let ((diatonic-pitch (- midi (accidental-alter enharmonic))))
     (values (ecase (mod diatonic-pitch 12)
               (0 'c) (2 'd) (4 'e)
               (5 'f) (7 'g) (9 'a) (11 'b))
             (accidental-alter enharmonic)
             (1- (floor diatonic-pitch 12)))))
 
+(defun decode-note (note)
+  (declare (note* note))
+  (decode-midi
+   (note-pitch note)
+   (enp-note-accidental note)))
+
 (defun convert-note2pitch (note)
   (multiple-value-bind (step alter octave)
-      (decode-midi
-       (note-pitch note)
-       (enp-note-accidental note))
+      (decode-note note)
     (pitch step alter octave)))
 
 (defun enp-note-accidental (note)
   (labels ((natural-or-sharp (note)
-             (if (diatonic-pitch-p note)
+             (if (diatonic-pitch-p (note-pitch note))
                  :natural
                  :sharp))
            (diatonic-pitch-p (midi)
@@ -42,12 +49,10 @@
                           '(0 2 4 5 7 9 11)))))
     (let ((enharmonic (and (consp note)
                            (getf (cdr note) :enharmonic))))
-      (values
-       (ecase (or enharmonic (natural-or-sharp note))
-         (:natural 'natural)
-         (:sharp 'sharp)
-         (:flat 'flat))
-       enharmonic))))
+      (ecase (or enharmonic (natural-or-sharp note))
+        (:natural 'natural)
+        (:sharp 'sharp)
+        (:flat 'flat)))))
 
 (defun convert-expression (expression)
   (ecase expression
@@ -57,6 +62,12 @@
     (:tenuto        :|tenuto|)
     (:staccatissimo :|staccatissimo|)
     (:breath-mark   :|breath-mark|)))
+
+(defun register-note (note)
+  (multiple-value-bind (step alter octave)
+      (decode-note note)
+    (register-accidental *accidental-store*
+                         step octave alter)))
 
 (defun convert-note2note (info unit-dur next-chord)
   (declare (type info info) ((or null chord) next-chord))
@@ -77,43 +88,40 @@
              beam-continue)))
       (multiple-value-bind (type dots)
           (abs-dur-name (* time-modification abs-dur))
-        (multiple-value-bind (accidental explicit)
-            (enp-note-accidental note)
-          (note (convert-note2pitch note)
-                (/ abs-dur unit-dur)
-                type
-                dots
-                (when (or explicit (not (eql 'natural accidental)))
-                  accidental)
-                :chordp (not (mapcar-state-firstp state))
-                :time-modification
-                (unless (= 1 time-modification)
-                  (time-modification (numerator time-modification)
-                                     (denominator time-modification)
-                                     nil))
-                :tie-stop
-                (and (chord-tied-p chord)
-                     (not (note-attack-p note)))
-                :tie-start
-                (when next-chord
-                  (and (chord-tied-p next-chord)
-                       (let ((chord-note (find-note-in-chord note next-chord)))
-                         (and chord-note
-                              (not (note-attack-p chord-note))))))
-                :beam-continue beam-continue
-                :beam-end beam-end
-                :beam-begin beam-begin
-                :notations `(,@(when (and (info-beat-end-p info)
-                                          (/= 1 (list2ratio (nth (1- (position (info-beat info) (info-pointers info)))
-                                                                 (info-tuplet-ratios info)))))
-                                     (list (tuplet 'stop 1)))
-                               ,@(when (and (info-beat-start-p info))
-                                       (let ((tuplet-ratio (nth (1- (position (info-beat info) (info-pointers info)))
-                                                                (info-tuplet-ratios info))))
-                                         (when (/= 1 (list2ratio tuplet-ratio))
-                                           (list (tuplet 'start 1 (first tuplet-ratio) nil nil nil 'yes)))))
-                               ,@(when (chord-expressions chord)
-                                       `((:|articulations| ,@(mapcar #'convert-expression (chord-expressions chord))))))))))))
+        (note (convert-note2pitch note)
+              (/ abs-dur unit-dur)
+              type
+              dots
+              (when (register-note note) (enp-note-accidental note))
+              :chordp (not (mapcar-state-firstp state))
+              :time-modification
+              (unless (= 1 time-modification)
+                (time-modification (numerator time-modification)
+                                   (denominator time-modification)
+                                   nil))
+              :tie-stop
+              (and (chord-tied-p chord)
+                   (not (note-attack-p note)))
+              :tie-start
+              (when next-chord
+                (and (chord-tied-p next-chord)
+                     (let ((chord-note (find-note-in-chord note next-chord)))
+                       (and chord-note
+                            (not (note-attack-p chord-note))))))
+              :beam-continue beam-continue
+              :beam-end beam-end
+              :beam-begin beam-begin
+              :notations `(,@(when (and (info-beat-end-p info)
+                                        (/= 1 (list2ratio (nth (1- (position (info-beat info) (info-pointers info)))
+                                                               (info-tuplet-ratios info)))))
+                                   (list (tuplet 'stop 1)))
+                             ,@(when (and (info-beat-start-p info))
+                                     (let ((tuplet-ratio (nth (1- (position (info-beat info) (info-pointers info)))
+                                                              (info-tuplet-ratios info))))
+                                       (when (/= 1 (list2ratio tuplet-ratio))
+                                         (list (tuplet 'start 1 (first tuplet-ratio) nil nil nil 'yes)))))
+                             ,@(when (chord-expressions chord)
+                                     `((:|articulations| ,@(mapcar #'convert-expression (chord-expressions chord)))))))))))
 
 (defun convert-rest (info unit-dur)
   (let ((abs-dur (info-abs-dur info))
@@ -144,7 +152,8 @@
                          (not (equal (funcall reader (previous))
                                      (funcall reader measure))))
                  (funcall reader measure))))
-      (let* ((division (measure-quarter-division measure))
+      (let* ((*accidental-store* (make-accidental-store))
+             (division (measure-quarter-division measure))
              (unit-dur (/ 1/4 division))
              (infos (measure-infos measure))
              (next-measure (mapcar-state-next state)))
@@ -489,6 +498,15 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun mapcan-state (fn list &key repeat)
   (apply #'nconc (mapcar-state fn list :repeat repeat)))
+
+;;;# accidental-store
+(defun make-accidental-store ()
+  (make-hash-table :test #'equal))
+
+(defun register-accidental (store step octave alter)
+  (let ((previous-alter (gethash (list step octave) store 0)))
+    (setf (gethash (list step octave) store) alter)
+    (/= alter previous-alter)))
 
 ;;;# utils
 (defgeneric ts (obj))
