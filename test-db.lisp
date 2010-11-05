@@ -102,9 +102,9 @@
   (labels ((count-lines (string)
              (with-input-from-string (in string)
                (loop for i upfrom 0
-                    for line = (read-line in nil)
-                    while line
-                    finally (return i)))))
+                  for line = (read-line in nil)
+                  while line
+                  finally (return i)))))
     (let (res)
       (dolist (tc (list-test-cases))
         (handler-case
