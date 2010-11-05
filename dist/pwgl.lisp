@@ -28,8 +28,6 @@
     (with-open-file (out path :direction :output :if-exists :supersede)
       (mxml:print-musicxml (e2m:enp2musicxml enp) :stream out))))
 
-(install-menu musicxml-pwgl)
-
 ;;; http
 (defun read-line* (stream)
   (prog1
@@ -78,11 +76,14 @@
           (and (= (car a) (car b))
                (list< (cdr a) (cdr b))))))
 
+(defun get-version ()
+  (get-request "46.4.11.6" 80 "/musicxml-pwgl/version"))
+
 (defun version-check ()
   (let ((installed-version
          (parse-version (asdf:component-version (asdf:find-system :musicxml-pwgl))))
         (available-version
-         (parse-version (get-request "46.4.11.6" 80 "/musicxml-pwgl/version")))
+         (parse-version (get-version)))
         (thanks "Thanks for trying out the MusicXML export. ~
                  A simple demo patch is provided under ~
                  PWGL help... > Library Tutorials."))
@@ -97,4 +98,30 @@
            ;; oops...
            ))))
 
-(ignore-errors (version-check))
+
+(define-box upgrade ()
+  (with-open-file (out "/tmp/f.tgz" :direction :output
+                       :if-exists :supersede)
+    (write-sequence
+     (get-request
+      "46.4.11.6" 80
+      (format nil "/musicxml-pwgl/tarballs/musicxml-pwgl-~A.tgz"
+              (get-version)))
+     out))
+  (when (probe-file "/tmp/musicxml-pwgl/")
+    (cl-fad:delete-directory-and-files "/tmp/musicxml-pwgl/"))
+  (asdf:run-shell-command "cd /tmp && tar xfz f.tgz")
+  (let ((location (asdf:component-pathname (asdf:find-system :musicxml-pwgl))))
+    (cl-fad:delete-directory-and-files location)
+    (asdf:run-shell-command "mv '~A' '~A'"
+                            "/tmp/musicxml-pwgl"
+                            location))
+  (asdf:oos 'asdf:load-op :musicxml-pwgl))
+
+(defvar *version-check-done* nil)
+
+(unless *version-check-done*
+  (ignore-errors (version-check))
+  (setq *version-check-done* t))
+
+(install-menu musicxml-pwgl)
