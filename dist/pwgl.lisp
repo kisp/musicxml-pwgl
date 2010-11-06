@@ -1,7 +1,7 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (defpackage #:musicxml-pwgl
-  (:use #:cl #:ompw)
+  (:use #:cl #:ompw #:simple-http)
   (:export #:export-musicxml))
 
 (in-package #:musicxml-pwgl)
@@ -30,40 +30,7 @@
 
 (install-menu musicxml-pwgl)
 
-;;; http
-(defun read-line* (stream)
-  (prog1
-      (with-output-to-string (out)
-        (loop for ch = (read-char stream)
-           until (char= ch #.(code-char 13))
-           do (write-char ch out)))
-    (read-char stream)))
-
-(defun get-request (host port uri)
-  (with-open-stream (http (comm:open-tcp-stream
-                           host port
-                           :errorp t :timeout 3))
-    (format http "GET ~A HTTP/1.1~C~CHost: ~A~C~C~C~C"
-            uri
-            (code-char 13) (code-char 10)
-            host
-            (code-char 13) (code-char 10)
-            (code-char 13) (code-char 10))
-    (force-output http)
-    (destructuring-bind (start-line . headers)
-        (loop for line = (read-line* http)
-           until (zerop (length line))
-           collect line)
-      (unless (string= start-line "HTTP/1.1 200 OK")
-        (error "start-line is ~a" start-line))
-      (let ((content-length (parse-integer
-                             (find "Content-Length" headers
-                                   :test (lambda (a b) (string= a b :end2 (length a))))
-                             :start 15)))
-        (with-output-to-string (out)
-          (loop repeat content-length
-             do (write-char (read-char http) out)))))))
-
+;;; version check
 (defun parse-version (string)
   (let ((pos (position #\. string)))
     (if pos
@@ -101,6 +68,7 @@
            ))))
 
 
+;;; upgrade
 (defun upgrade ()
   (with-open-file (out "/tmp/f.tgz" :direction :output
                        :if-exists :supersede)
@@ -137,13 +105,11 @@
                                    Consider installing it manually.")))))))
 
 (defvar *version-check-done* nil)
-
 (unless *version-check-done*
   (ignore-errors (version-check))
   (setq *version-check-done* t))
 
 (defvar *upgrade-check-done* nil)
-
 #+macosx
 (unless *upgrade-check-done*
   (ignore-errors (upgrade-check))

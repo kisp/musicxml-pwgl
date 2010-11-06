@@ -13,4 +13,5 @@
   :components ((:file "pprint-xml")
                (:file "musicxml")
                (:file "enp2musicxml")
+               (:file "simple-http")
                (:file "pwgl")))
