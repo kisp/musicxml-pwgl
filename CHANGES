@@ -1,3 +1,6 @@
+* Changes in 0.1.114 relative to 0.1.113:
+** internal changes
+
 * Changes in 0.1.113 relative to 0.1.112:
 ** bugfix: the ENP score editor handles dynamic markings as groups
    that are attached to a number of chords (possibly overlapping).
