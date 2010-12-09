@@ -3,7 +3,7 @@
 [MusicXML](http://www.recordare.com/xml.html) export for [PWGL](http://siba.fi/PWGL/).
 
 Latest release can be downloaded at:
-[http://lisp.homelinux.net/musicxml-pwgl/latest]
+[http://lisp.homelinux.net/musicxml-pwgl/latest](http://lisp.homelinux.net/musicxml-pwgl/latest)
 
 Licensing
 ----------------
