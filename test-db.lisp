@@ -1,6 +1,23 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
-(defpackage #:test-db
+;;; This file is part of MusicXML-PWGL.
+
+;;; Copyright (c) 2010, Kilian Sprotte. All rights reserved.
+
+;;; This program is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+(defpackage #:musicxml-pwgl.test-db
   (:nicknames #:tdb)
   (:use #:cl #:sqlite-orm #:alexandria)
   (:export
@@ -21,9 +38,11 @@
    #:what-next
    #:skipped-tests-that-pass
    #:set-to-skip
-   #:set-to-run))
+   #:set-to-run
+   #:make-entry*
+   #:env))
 
-(in-package #:tdb)
+(in-package #:musicxml-pwgl.test-db)
 
 (defpclass test-case ()
   ((name            :accessor name            :initarg :name)
@@ -32,7 +51,8 @@
    (musicxml        :accessor musicxml        :initarg :musicxml)
    (status          :accessor status          :initarg :status)
    (enp-screen-shot :accessor enp-screen-shot :initarg :enp-screen-shot)
-   (score :accessor score :initarg :score)))
+   (score :accessor score :initarg :score)
+   (env :accessor env :initarg :env :initform nil)))
 
 (defmethod print-object ((obj test-case) stream)
   (handler-case
@@ -45,7 +65,7 @@
 (unless (store-open-p)
   (let ((path (merge-pathnames
                "tests.db"
-               (asdf:component-pathname (asdf:find-system :musicxml)))))
+               (asdf:component-pathname (asdf:find-system :musicxml-pwgl)))))
     (assert (probe-file path))
     (open-store path)))
 
@@ -73,6 +93,18 @@
                    :description description
                    :name name)
     t))
+
+(defun make-entry* (name description enp musicxml status enp-screen-shot
+                    score)
+  (make-instance 'test-case
+                 :score score
+                 :enp-screen-shot enp-screen-shot
+                 :status status
+                 :musicxml musicxml
+                 :enp enp
+                 :description description
+                 :name name)
+  t)
 
 (defun show-foto (test-case)
   (write-byte-vector-into-file
@@ -124,3 +156,8 @@
     (when (and (eql :skip (status tc))
                (ignore-errors (test::check-test-db-test-case tc)))
       (format t "~s~%" tc))))
+
+;; (tdb::make-entry* "organ staffs" "organ empty bar"
+;;                   (read-from-string (alexandria:read-file-into-string "/tmp/enp.lisp"))
+;;                   (alexandria:read-file-into-string "/tmp/e.xml")
+;;                   :run nil nil)

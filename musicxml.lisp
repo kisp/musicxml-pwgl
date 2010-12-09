@@ -1,66 +1,78 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
-(defpackage #:musicxml
-  (:nicknames #:mxml)
-  (:use #:cl #:pprint-xml)
-  (:export
-   #:mxml-equal
-   #:128th
-   #:16th
-   #:256th
-   #:32nd
-   #:64th
-   #:a
-   #:b
-   #:breve
-   #:c
-   #:d
-   #:double-sharp
-   #:e
-   #:eighth
-   #:f
-   #:flat
-   #:flat-flat
-   #:from-lxml
-   #:g
-   #:half
-   #:long
-   #:make-constructor-form
-   #:natural
-   #:natural-flat
-   #:natural-sharp
-   #:no
-   #:note
-   #:pitch
-   #:print-musicxml
-   #:quarter
-   #:quarter-flat
-   #:quarter-sharp
-   #:rest*
-   #:sharp
-   #:sharp-sharp
-   #:start
-   #:stop
-   #:three-quarters-flat
-   #:three-quarters-sharp
-   #:time-modification
-   #:to-lxml
-   #:tuplet
-   #:whole
-   #:yes
-   #:attributes
-   #:accidental))
+;;; This file is part of MusicXML-PWGL.
 
-(in-package #:musicxml)
+;;; Copyright (c) 2010, Kilian Sprotte. All rights reserved.
+
+;;; This program is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation, either version 3 of the License, or
+;;; (at your option) any later version.
+
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+(in-package #:musicxml-pwgl.musicxml)
+
+;;;define-element
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun mkstr (&rest args)
+    (with-output-to-string (s)
+      (dolist (a args) (princ a s))))
+  (defun symb (&rest args)
+    (values (intern (apply #'mkstr args))))
+  (defun kw (&rest args)
+    (values (intern (apply #'mkstr args) "KEYWORD")))
+  (defun list! (thing)
+    (if (consp thing) thing (list thing))))
+
+(defmacro define-element (name-options &body body)
+  (labels ((accessor-form (slot-name obj)
+             `(list 'quote
+                    (,(symb obj "-" slot-name) ,obj))))
+    (let ((slot-names (mapcar (lambda (x) (car (list! x))) body)))
+      (destructuring-bind (name &key boa)
+          (list! name-options)
+        `(progn
+           (defstruct (,name (:include musicxml-object))
+             ,@body)
+           ,(if boa
+                `(defun ,name (,@slot-names)
+                   (,(symb "MAKE-" name)
+                     ,@(mapcan (lambda (name) (list (kw name) name))
+                               slot-names)))
+                `(defun ,name (&rest args &key ,@slot-names)
+                   (declare (ignore ,@slot-names))
+                   (apply #',(symb "MAKE-" name) args)))
+           ,(if boa
+                `(defmethod make-constructor-form ((,name ,name))
+                   (cons ',name
+                         (list
+                          ,@(loop for a in slot-names
+                               collect (accessor-form a name)))))
+                `(defmethod make-constructor-form ((,name ,name))
+                   (cons ',name
+                         (list
+                          ,@(loop for a in slot-names
+                               collect (kw a)
+                               collect (accessor-form a name))))))
+           (set-pprint-dispatch
+            ',name 'generic-pretty-printer 0 *pprint-xml-table*))))))
 
 (defun print-musicxml (dom &key (stream t) no-header)
-  (unless no-header
-    (write-line
-     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" stream)
-    (format stream "<!DOCTYPE score-partwise PUBLIC ~
+  (let ((*print-circle* nil))
+    (unless no-header
+      (write-line
+       "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" stream)
+      (format stream "<!DOCTYPE score-partwise PUBLIC ~
                    \"-//Recordare//DTD MusicXML 2.0 Partwise//EN\" ~
                    \"http://www.musicxml.org/dtds/partwise.dtd\">~%"))
-  (ppxml:pprint-xml dom :stream stream))
+    (musicxml-pwgl.pprint-xml:pprint-xml dom :stream stream)))
 
 (defun from-lxml (dom)
   (cond ((and (consp dom)
@@ -135,7 +147,7 @@
          ,@body))))
 
 (defun intern* (name)
-  (intern (string-upcase name) (find-package "MXML")))
+  (intern (string-upcase name) (find-package "MUSICXML-PWGL.MUSICXML")))
 
 (defun mxml-equal (a b)
   (equal (translate-to-lxml a)
@@ -153,7 +165,7 @@
 (deftype pitch-step ()
   '(member c d e f g a b))
 
-(defstruct (pitch (:include musicxml-object))
+(define-element (pitch :boa t)
   (step nil :type pitch-step) alter octave)
 
 (defmethod translate-from-lxml (dom (type (eql ':|pitch|)))
@@ -170,18 +182,8 @@
         `((:|alter| ,(princ-to-string (pitch-alter pitch)))))
      (:|octave| ,(princ-to-string (pitch-octave pitch)))))
 
-(defmethod make-constructor-form ((pitch pitch))
-  `(pitch ',(pitch-step pitch)
-          ,(pitch-alter pitch)
-          ,(pitch-octave pitch)))
-
-(defun pitch (step alter octave)
-  (make-pitch :step step :alter alter :octave octave))
-
-(set-pprint-dispatch 'pitch 'generic-pretty-printer 0 *pprint-xml-table*)
-
 ;;; rest*
-(defstruct (rest* (:include musicxml-object)))
+(define-element rest*)
 
 (defmethod translate-from-lxml (dom (type (eql ':|rest|)))
   (make-rest*))
@@ -189,16 +191,9 @@
 (defmethod translate-to-lxml ((rest* rest*))
   :|rest|)
 
-(defmethod make-constructor-form ((rest* rest*))
-  '(rest*))
-
-(defun rest* () (make-rest*))
-
-(set-pprint-dispatch 'rest* 'generic-pretty-printer 0 *pprint-xml-table*)
-
 ;;; note
 (deftype accidental ()
-  '(member nil sharp natural flat double-sharp sharp-sharp flat-flat
+  '(member nil unspecific sharp natural flat double-sharp sharp-sharp flat-flat
     natural-sharp natural-flat quarter-flat quarter-sharp three-quarters-flat
     three-quarters-sharp))
 
@@ -207,14 +202,14 @@
     eighth quarter half whole breve long))
 
 (defstruct (note (:include musicxml-object))
-  pitch-or-rest duration chordp staff
+  pitch-or-rest duration chordp staff gracep
   (accidental nil :type accidental)
   (type nil :type note-type)
   (dots nil :type (integer 0 3))
   notations
   (tie-start nil :type boolean)
   (tie-stop nil :type boolean)
-  (time-modification nil :type (or null time-modification))
+  (time-modification nil #-pwgl :type #-pwgl (or null time-modification))
   beam-begin beam-continue beam-end)
 
 (defun beam-element-p (dom)
@@ -256,7 +251,8 @@
                  :type (and type (intern* (second type)))
                  :dots (count '(:|dot|) (cdr dom) :test #'equal)
                  :notations (mapcar #'from-lxml
-                                    (remove-if #'tied-element-p (rest notations)))
+                                    (remove-if #'tied-element-p
+                                               (rest notations)))
                  :tie-start (when (find '((:|tie| :|type| "start"))
                                         (cdr dom) :test #'equal)
                               t)
@@ -271,17 +267,22 @@
 
 (defmethod translate-to-lxml ((note note))
   `(:|note|
+     ,@(when (note-gracep note) '(:|grace|))
      ,@(when (note-chordp note) '(:|chord|))
      ,(translate-to-lxml (note-pitch-or-rest note))
-     (:|duration| ,(princ-to-string (note-duration note)))
+     ,@(when (note-duration note)
+             `((:|duration|
+                 ,(princ-to-string (note-duration note)))))
      ,@(when (note-tie-stop note) '(((:|tie| :|type| "stop"))))
      ,@(when (note-tie-start note) '(((:|tie| :|type| "start"))))
      ,@(when (note-type note)
              `((:|type| ,(string-downcase (symbol-name (note-type note))))))
      ,@(loop repeat (note-dots note) collect '(:|dot|))
      ,@(when (note-accidental note)
-             `((:|accidental|
-                 ,(string-downcase (symbol-name (note-accidental note))))))
+             (case (note-accidental note)
+               (unspecific '((:|accidental|)))
+               (t `((:|accidental|
+                      ,(string-downcase (symbol-name (note-accidental note))))))))
      ,@(when (note-time-modification note)
              (list (translate-to-lxml (note-time-modification note))))
      ,@(when (note-staff note)
@@ -318,7 +319,7 @@
          :beam-end ,(note-beam-end note)))
 
 (defun note (pitch-or-rest duration type dots accidental
-             &key chordp staff notations tie-start tie-stop
+             &key chordp gracep staff notations tie-start tie-stop
              time-modification
              beam-begin beam-continue beam-end)
   (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp
@@ -330,7 +331,8 @@
              :dots dots
              :tie-start tie-start
              :tie-stop tie-stop
-             :notations notations))
+             :notations notations
+             :gracep gracep))
 
 (defun note-notations* (note)
   (append (when (note-tie-stop note) '(((:|tied| :|type| "stop"))))
@@ -340,7 +342,7 @@
 (set-pprint-dispatch 'note 'generic-pretty-printer 0 *pprint-xml-table*)
 
 ;;; time-modification
-(defstruct (time-modification (:include musicxml-object))
+(define-element (time-modification :boa t)
   actual-notes normal-notes
   (normal-type nil :type note-type))
 
@@ -361,20 +363,6 @@
              `((:|normal-type|
                  ,(string-downcase (symbol-name (time-modification-normal-type
                                                  time-modification))))))))
-
-(defmethod make-constructor-form ((time-modification time-modification))
-  `(time-modification
-    ,(time-modification-actual-notes time-modification)
-    ,(time-modification-normal-notes time-modification)
-    ',(time-modification-normal-type time-modification)))
-
-(defun time-modification (actual-notes normal-notes normal-type)
-  (make-time-modification :actual-notes actual-notes
-                          :normal-notes normal-notes
-                          :normal-type normal-type))
-
-(set-pprint-dispatch 'time-modification 'generic-pretty-printer
-                     0 *pprint-xml-table*)
 
 ;;; tuplet
 (deftype start-stop ()
@@ -420,14 +408,18 @@
                   ,(princ-to-string (tuplet-actual-number tuplet)))
                 ,@(when (tuplet-actual-type tuplet)
                         `((:|tuplet-type|
-                            ,(string-downcase (symbol-name (tuplet-actual-type tuplet)))))))))
+                            ,(string-downcase
+                              (symbol-name (tuplet-actual-type tuplet)))))))))
     ,@(when (tuplet-normal-number tuplet)
             `((:|tuplet-normal|
                 ,@(when (tuplet-normal-number tuplet)
-                        `((:|tuplet-number| ,(princ-to-string (tuplet-normal-number tuplet)))))
+                        `((:|tuplet-number|
+                            ,(princ-to-string (tuplet-normal-number tuplet)))))
                 ,@(when (tuplet-normal-type tuplet)
                         `((:|tuplet-type|
-                            ,(string-downcase (symbol-name (tuplet-normal-type tuplet)))))))))))
+                            ,(string-downcase
+                              (symbol-name
+                               (tuplet-normal-type tuplet)))))))))))
 
 (defmethod make-constructor-form ((tuplet tuplet))
   `(tuplet ',(tuplet-type tuplet)
@@ -438,7 +430,8 @@
            ',(tuplet-normal-type tuplet)
            ',(tuplet-bracket tuplet)))
 
-(defun tuplet (type id &optional actual-number actual-type normal-number normal-type bracket)
+(defun tuplet (type id &optional
+               actual-number actual-type normal-number normal-type bracket)
   (make-tuplet :type type
                :id id
                :actual-number actual-number
@@ -453,8 +446,8 @@
 (deftype clef-sign ()
   '(member g))
 
-(defstruct (attributes (:include musicxml-object))
-  divisions time clef staves key)
+(define-element attributes
+  divisions time clefs staves key)
 
 (defmethod translate-from-lxml (dom (type (eql ':|attributes|)))
   (assoc-bind* (divisions time clef staves key) (cdr dom)
@@ -468,10 +461,17 @@
                                 (assoc-bind (beats beat-type) (cdr time)
                                   (list (parse-integer beats)
                                         (parse-integer beat-type))))
-                     :clef (and clef
-                                (assoc-bind (sign line) (cdr clef)
-                                  (list (intern* sign)
-                                        (and line (parse-integer line))))))))
+                     ;; this is wrong
+                     :clefs (cond ((and staves
+                                        (= 2 (parse-integer (second staves))))
+                                   (list (list 'g)
+                                         (list 'f)))
+                                  (clef
+                                   (list (assoc-bind (sign line) (cdr clef)
+                                           (list (intern* sign)
+                                                 (and line
+                                                      (parse-integer line))))))
+                                  (t nil)))))
 
 (defmethod translate-to-lxml ((attributes attributes))
   (let ((dom `(:|attributes|
@@ -491,39 +491,61 @@
                             (:|beat-type|
                               ,(princ-to-string
                                 (second (attributes-time attributes)))))))
-                ,@(when (attributes-staves attributes)
+                ,@(when (and (attributes-staves attributes)
+                             (/= 1 (attributes-staves attributes)))
                         `((:|staves|
                             ,(princ-to-string
                               (attributes-staves attributes)))))
-                ,@(cond
-                   ;; KLUDGE
-                   ((and (attributes-staves attributes)
-                         (= 2 (attributes-staves attributes)))
-                    '(((:|clef| :|number| "1") (:|sign| "G"))
-                      ((:|clef| :|number| "2") (:|sign| "F"))))
-                   ((attributes-clef attributes)
-                    `((:|clef|
+                ,@(mapcar-state
+                   (lambda (state clef)
+                     `(,(if (= 1 (length (attributes-clefs attributes)))
+                            :|clef|
+                            `(:|clef|
+                               :|number|
+                               ,(princ-to-string
+                                 (mapcar-state-index state))))
                         (:|sign|
-                          ,(symbol-name (first (attributes-clef attributes))))
+                          ,(symbol-name (first clef)))
                         ,@(when
-                           (second (attributes-clef attributes))
+                           (second clef)
                            `((:|line|
                                ,(princ-to-string
-                                 (second (attributes-clef attributes)))))))))
-                   (t nil)))))
+                                 (second clef)))))))
+                   (attributes-clefs attributes)))))
     (if (cdr dom)
         dom
         nil)))
 
-(defmethod make-constructor-form ((attributes attributes))
-  `(attributes :divisions ,(attributes-divisions attributes)
-               :key ,(attributes-key attributes)
-               :staves ,(attributes-staves attributes)
-               :time ',(attributes-time attributes)
-               :clef ',(attributes-clef attributes)))
+;;; direction
+(define-element (direction :boa t)
+  direction-types)
 
-(defun attributes (&rest args &key divisions time clef staves key)
-  (declare (ignore divisions time clef staves key))
-  (apply #'make-attributes args))
+(defmethod translate-from-lxml (dom (type (eql ':|direction|)))
+  (make-direction :direction-types (mapcar #'from-lxml (cdr dom))))
 
-(set-pprint-dispatch 'attributes 'generic-pretty-printer 0 *pprint-xml-table*)
+(defmethod translate-to-lxml ((direction direction))
+  `((:|direction| :|placement| "below")
+    ,@(mapcar #'to-lxml (direction-direction-types direction))))
+
+;;; direction-type
+(define-element (direction-type :boa t)
+  dynamics)
+
+(defmethod translate-from-lxml (dom (type (eql ':|direction-type|)))
+  (make-direction-type
+   :dynamics (mapcar #'from-lxml (cdr dom))))
+
+(defmethod translate-to-lxml ((direction-type direction-type))
+  `(:|direction-type| ,@(mapcar #'to-lxml (direction-type-dynamics direction-type))))
+
+;;; dynamic
+(define-element (dynamic :boa t)
+  symbol)
+
+(defmethod translate-from-lxml (dom (type (eql ':|dynamic|)))
+  (make-dynamic :symbol (second dom)))
+
+(defmethod translate-to-lxml ((dynamic dynamic))
+  `(:|dynamics|
+     ,(intern (string-downcase (symbol-name (dynamic-symbol dynamic)))
+              "KEYWORD")))

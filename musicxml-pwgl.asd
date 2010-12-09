@@ -17,20 +17,24 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(require "comm")
-
 (asdf:defsystem musicxml-pwgl
   :version "0.1.113"
   :description "musicxml export for pwgl"
   :maintainer "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :author "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :licence "GPLv3"
-  :depends-on (ompw)
+  :depends-on (s-xml cxml myam sqlite-orm drakma alexandria)
   :serial t
   :components ((:file "packages")
                (:file "mapcar-state")
                (:file "pprint-xml")
                (:file "musicxml")
                (:file "enp2musicxml")
-               (:file "simple-http")
-               (:file "pwgl")))
+               (:file "test-db")
+               (:file "xml-filter")
+               (:file "test")))
+
+(defmethod perform ((op asdf:test-op)
+                    (system (eql (asdf:find-system :musicxml-pwgl))))
+  (asdf:oos 'asdf:load-op :musicxml-pwgl)
+  (funcall (intern "RUN!" "MYAM") :musicxml-pwgl))

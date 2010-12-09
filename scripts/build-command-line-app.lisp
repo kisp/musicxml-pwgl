@@ -35,4 +35,15 @@
 
 (require 'musicxml-pwgl)
 
-(assert (musicxml-pwgl.test:run-tests))
+(defun main ()
+  (let ((input (if (second sb-ext:*posix-argv*)
+                   (with-open-file (in (second sb-ext:*posix-argv*))
+                     (read in nil))
+                   (read *standard-input* nil))))
+    (when input
+      (musicxml-pwgl.pprint-xml:pprint-xml
+       (musicxml-pwgl.enp2musicxml:enp2musicxml input)))))
+
+(sb-ext:save-lisp-and-die "enp2mxml"
+                          :toplevel 'main
+                          :executable t)
