@@ -1,0 +1,105 @@
+---------------
+## Changes in 0.1.114 relative to 0.1.113:
+
+**internal**: no user-visible changes
+
+---------------
+## Changes in 0.1.113 relative to 0.1.112:
+
+**bugfix**: the ENP score editor handles dynamic markings as groups
+that are attached to a number of chords (possibly overlapping).
+
+As a simple example consider a measure with 4 chords and a dynamic
+group `"p"` that spans the entire measure. In the MusicXML export a
+dynamic marking was created for every chord `(p p p p)`. This has been
+fixed now, so that a dynamic marking is only notated at the beginning
+of each dynamic group.
+
+Even the case of multiple dynamic markings for a single chord, which
+ENP allows, should be exported equivalently to the MusicXML.
+
+---------------
+## Changes in 0.1.112 relative to 0.1.111:
+
+**new feature**: wedges
+
+---------------
+## Changes in 0.1.111 relative to 0.1.110:
+
+**new feature**: slurs
+
+*NB*: in ENP the slurs needs to be attached to chord, not to individual
+notes
+
+---------------
+## Changes in 0.1.110 relative to 0.1.109:
+
+**bugfix**: beaming information is ok now
+
+---------------
+## Changes in 0.1.109 relative to 0.1.99:
+
+**feature**: added support for nested tuplets
+
+---------------
+## Changes in 0.1.99 relative to 0.1.95:
+
+**feature**: added support for eighth-tones; this special encoding
+needs to be enabled via the EIGHTH-TONE-ENCODING setting in the Edit
+Preferences... dialog
+
+---------------
+## Changes in 0.1.95 relative to 0.1.92:
+
+**internal**: big refactoring resulting in the new function
+CONVERT-NOTE: "A single function for creating a rest or an individual
+note of a chord."
+
+---------------
+## Changes in 0.1.92 relative to 0.1.89:
+
+**bugfix**: rests also need beam begin / continue / end information
+
+---------------
+## Changes in 0.1.89 relative to 0.1.88:
+
+**feature**: for debugging, the exporter performs a self-validating
+check on the beaming information that it generates
+
+---------------
+## Changes in 0.1.88 relative to 0.1.87:
+
+**bugfix**: rest handling within tuplets
+
+**bugfix**: rests can carry an expression
+
+---------------
+## Changes in 0.1.87 relative to 0.1.86:
+
+**bugfix**: tuplets always provide a "normal-number"
+
+---------------
+## Changes in 0.1.86 relative to 0.1.85:
+
+**new feature**: added support for dynamics: f, p, sfz...
+
+---------------
+## Changes in 0.1.85 relative to 0.1.84:
+
+Rests inside tuplets had an incorrect time-modification
+information. This actually assigned them a wrong duration and tuplet
+brackets would not align correctly to the end of the tuplet.
+
+---------------
+## Changes in 0.1.84 relative to 0.1.83:
+
+Fixed a bug where a grace note between two pairs of eighth notes would
+result in incorrect beaming
+
+---------------
+## Changes in 0.1.83 relative to 0.1.82:
+
+In PWGL you can use durations for a single chord of "5", notated with
+a + instead of a dot. This notation does not seem to be possible in
+MusicXML. This was fixed this in a way that the chord is split into 3
++ 2 with a tie.
