@@ -19,15 +19,7 @@
 
 (require "ASDF")
 
-(pushnew (merge-pathnames ".nkzs-reg/asd/"
-                          (user-homedir-pathname))
-         asdf:*central-registry*
-         :test #'equal)
-
-(pushnew (merge-pathnames ".clnk/asd/"
-                          (user-homedir-pathname))
-         asdf:*central-registry*
-         :test #'equal)
+(load (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname)))
 
 (require 'arnesi)
 
