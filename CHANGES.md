@@ -1,4 +1,9 @@
 ---------------
+## Changes in 0.1.116 relative to 0.1.114:
+
+**internal**: needed exercises in releasing a new version...
+
+---------------
 ## Changes in 0.1.114 relative to 0.1.113:
 
 **internal**: no user-visible changes
