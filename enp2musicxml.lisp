@@ -244,7 +244,7 @@
   (declare (type chord chord))
   (labels ((convert-articulation (expression)
              (list
-              (case expression
+              (case (atom-or-first expression)
                 (:accent        :|accent|)
                 (:accent-grave  :|strong-accent|)
                 (:staccato      :|staccato|)

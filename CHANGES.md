@@ -1,4 +1,10 @@
 ---------------
+## Changes in 0.1.117 relative to 0.1.116:
+
+**bugfix**: Expressions (like an accent) were not exported at all if
+the graphical position in the score has been tweaked by the user.
+
+---------------
 ## Changes in 0.1.116 relative to 0.1.114:
 
 **internal**: needed exercises in releasing a new version...
