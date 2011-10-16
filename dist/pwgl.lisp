@@ -86,7 +86,9 @@
     (export-musicxml-to-stream score out)))
 
 (defun readably-to-string (obj)
-  (with-standard-io-syntax (write-to-string obj)))
+  (with-standard-io-syntax
+    (let ((*print-readably* nil))
+      (write-to-string obj))))
 
 (defun error-to-string (error)
   (with-standard-io-syntax
