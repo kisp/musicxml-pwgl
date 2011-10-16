@@ -757,24 +757,24 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun info-starting-tuplets (info)
   (loop for div in (rest (info-pointers info))
-       for pos in (info-path info)
-       for tuplet-ratio in (info-tuplet-ratios info)
-       for notated-dur in (rest (info-notated-durs info))
-       while (or (zerop pos)
-                 (every #'grace-div-p (subseq (div-items div) 0 pos)))
-       when (/= 1 (list2ratio tuplet-ratio))
-       collect (list div
-                     tuplet-ratio
-                     ;; tuplet-type
-                     (abs-dur-name (/ notated-dur (second tuplet-ratio))))))
+     for pos in (info-path info)
+     for tuplet-ratio in (info-tuplet-ratios info)
+     for notated-dur in (rest (info-notated-durs info))
+     while (or (zerop pos)
+               (every #'grace-div-p (subseq (div-items div) 0 pos)))
+     when (/= 1 (list2ratio tuplet-ratio))
+     collect (list div
+                   tuplet-ratio
+                   ;; tuplet-type
+                   (abs-dur-name (/ notated-dur (second tuplet-ratio))))))
 
 (defun info-ending-tuplets (info)
   (loop for div in (rest (info-pointers info))
-       for pos in (info-path info)
-       for tuplet-ratio in (info-tuplet-ratios info)
-       while (= (1+ pos) (length (div-items div)))
-       when (/= 1 (list2ratio tuplet-ratio))
-       collect (list div tuplet-ratio)))
+     for pos in (info-path info)
+     for tuplet-ratio in (info-tuplet-ratios info)
+     while (= (1+ pos) (length (div-items div)))
+     when (/= 1 (list2ratio tuplet-ratio))
+     collect (list div tuplet-ratio)))
 
 (defun measure-infos (measure)
   (declare (type measure measure))
@@ -852,8 +852,8 @@ grid point. This is always the case, because we never leave the grid."
                     dur-constraints
                     grouping-constraints)))
       (loop for info in infos
-           for b in beaming
-           do (setf (info-beaming info) b))))
+         for b in beaming
+         do (setf (info-beaming info) b))))
   all-infos)
 
 (defun validate-beaming (measure-content)
@@ -1057,7 +1057,7 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun plist-keys (plist)
   (loop for key in plist by #'cddr
-       collect key))
+     collect key))
 
 (defun power-of-two-p (x)
   (cond
@@ -1086,8 +1086,8 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun map-neighbours (fn list)
   (loop for a in list
-       for b in (cdr list)
-       collect (funcall fn a b)))
+     for b in (cdr list)
+     collect (funcall fn a b)))
 
 (defun 1-to-n (n)
   (declare (type (integer 0)))
