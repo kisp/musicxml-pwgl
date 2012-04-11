@@ -43,7 +43,9 @@
   (handler-case
       (let ((enp
              (handler-case
-                 (ccl::enp-score-notation score :exclude nil)
+                 (typecase score
+                   (cons score)         ;score is enp
+                   (t (ccl::enp-score-notation score :exclude nil)))
                (error (c)
                  (send-report-with-env
                   "/musicxml-pwgl/enp-score-notation-error"
