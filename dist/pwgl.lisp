@@ -26,6 +26,11 @@
 
 (in-package #:musicxml-pwgl)
 
+(defun decompile* (obj)
+  (typecase obj
+    (list obj)
+    (t (ccl::pwgl-decompile obj))))
+
 (define-menu musicxml-pwgl :print-name "MusicXML-PWGL")
 (in-menu musicxml-pwgl)
 
@@ -49,7 +54,7 @@
                (error (c)
                  (send-report-with-env
                   "/musicxml-pwgl/enp-score-notation-error"
-                  `(("score" . ,(readably-to-string (ccl::pwgl-decompile score)))
+                  `(("score" . ,(readably-to-string (decompile* score)))
                     ("error" . ,(error-to-string c))))
                  (error c)))))
         (let ((dom (handler-case
@@ -57,7 +62,7 @@
                      (error (c)
                        (send-report-with-env "/musicxml-pwgl/enp-musicxml-error"
                                              `(("score" . ,(readably-to-string
-                                                            (ccl::pwgl-decompile score)))
+                                                            (decompile* score)))
                                                ("enp" . ,(readably-to-string enp))
                                                ("error" . ,(error-to-string c))))
                        (error c)))))
@@ -66,13 +71,13 @@
             (error (c)
               (send-report-with-env "/musicxml-pwgl/print-musicxml-error"
                                     `(("score" . ,(readably-to-string
-                                                   (ccl::pwgl-decompile score)))
+                                                   (decompile* score)))
                                       ("enp" . ,(readably-to-string enp))
                                       ("error" . ,(error-to-string c))))
               (error c)))
           (let ((size 50000))
             (send-report-with-env "/musicxml-pwgl/export-musicxml-ok"
-                                  `(("score" . ,(limit-string size (readably-to-string (ccl::pwgl-decompile score))))
+                                  `(("score" . ,(limit-string size (readably-to-string (decompile* score))))
                                     ("enp" . ,(limit-string size (readably-to-string enp))))))
           nil))
     (error (c)

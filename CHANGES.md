@@ -1,5 +1,5 @@
 ---------------
-## Changes in 0.1.119 relative to 0.1.118:
+## Changes in 0.1.120 relative to 0.1.118:
 
 **new feature**: export-musicxml also accepts enp-score-notation.
 

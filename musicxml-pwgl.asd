@@ -18,7 +18,7 @@
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 (asdf:defsystem musicxml-pwgl
-  :version "0.1.119"
+  :version "0.1.120"
   :description "musicxml export for pwgl"
   :maintainer "Kilian Sprotte <kilian.sprotte@gmail.com>"
   :author "Kilian Sprotte <kilian.sprotte@gmail.com>"
