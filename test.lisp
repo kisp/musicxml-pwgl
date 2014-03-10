@@ -509,6 +509,7 @@
          while enp collect (list id enp)))))
 
 (deftest bad-scores
+  (skip*)
   (dolist (list (get-bad-scores))
     (destructuring-bind (id score)
         list
