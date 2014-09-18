@@ -420,7 +420,7 @@
           #.(format nil "MusicXML-PWGL v~A"
                     (asdf:component-version
                      (asdf:find-system :musicxml-pwgl))))))
-    (:|part-list| ,@(mapcar-state #'part2score-part enp))
+    (:|part-list| ,@(mapcar-state #'part2score-part (enp-parts enp)))
     ,@(mapcar-state #'convert-part (enp-parts enp))))
 
 (defun abs-dur-name (abs-dur)
@@ -445,7 +445,8 @@
       (15 (values (lookup (/ abs-dur 15/8)) 3)))))
 
 ;;;# enp access
-(defun enp-parts (enp) enp)
+(defun enp-parts (enp)
+  (nth-value 1 (split-plist-list enp)))
 
 (defun part-initial-clefs (part)
   (multiple-value-bind (list plist)
@@ -1054,6 +1055,18 @@ grid point. This is always the case, because we never leave the grid."
                       (length list))))
     (values (subseq list 0 position)
             (subseq list position))))
+
+(defun split-plist-list (list)
+  (cond
+    ((null list) (values nil nil))
+    ((and (keywordp (first list))
+          (not (null (cdr list))))
+     (multiple-value-bind (plist tail)
+         (split-plist-list (cddr list))
+       (values (list* (first list) (second list)
+                      plist)
+               tail)))
+    (t (values nil list))))
 
 (defun plist-keys (plist)
   (loop for key in plist by #'cddr

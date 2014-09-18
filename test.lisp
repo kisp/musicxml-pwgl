@@ -48,10 +48,12 @@
                 #:measure-infos
                 #:register-accidental
                 #:split-list-plist
+                #:split-plist-list
                 #:tuplet-ratio
                 #:tuplet-tuplet-ratio
                 #:tuplet-key
                 #:tuplet-eql
+                #:enp-parts
                 )
   (:import-from #:musicxml-pwgl.mapcar-state
                 #:make-mapcar-state))
@@ -525,6 +527,35 @@
                        (progn (enp2musicxml score) t)
                      (error (c) (setq e c))))
               "failed score ID ~A~%~A" id e))))))
+
+(deftest score-can-have-keyword/value-pairs-in-the-beginning-of-the-form.1
+  (is (equalp (enp2musicxml
+               '(                       ;without keyword/value pairs
+                 #1=((((1 ((1 :notes (65))))
+                       :time-signature (1 4) :metronome (4 110)))
+                     :instrument nil :staff :treble-staff)))
+              (enp2musicxml
+               '(:spacing 0.88485d0     ;<- there can be keyword/value
+                                        ;pairs here
+                 #1#)))))
+
+(deftest enp-parts.1
+  (is (equal '((1) (2)) (enp-parts '((1) (2)))))
+  (is (equal '((1) (2)) (enp-parts '(:foo 1 (1) (2)))))
+  (is (equal '((1) (2)) (enp-parts '(:foo 1 :bar 4 (1) (2))))))
+
+(deftest split-plist-list.1
+  ;; FIXME: make this one test with MULTIPLE-VALUE-LIST
+  (is (equal '(:foo 1) (split-plist-list '(:foo 1))))
+  (is (equal '() (split-plist-list '())))
+  (is (equal '(:foo 1) (split-plist-list '(:foo 1 7))))
+  (is (equal '() (split-plist-list '(:foo)))))
+
+(deftest split-plist-list.2
+  (is (equal '() (nth-value 1 (split-plist-list '(:foo 1)))))
+  (is (equal '() (nth-value 1 (split-plist-list '()))))
+  (is (equal '(7) (nth-value 1 (split-plist-list '(:foo 1 7)))))
+  (is (equal '(:foo) (nth-value 1 (split-plist-list '(:foo))))))
 
 (defsuite :musicxml-pwgl.tuplet :in :musicxml-pwgl)
 
