@@ -539,6 +539,29 @@
                                         ;pairs here
                  #1#)))))
 
+(deftest score-can-have-keyword/value-pairs-in-the-beginning-of-the-form.2
+  (is (equalp (enp2musicxml
+               '(#1=((((1 ((1
+                            ((1 :notes (55))
+                             (1 :start-time 0.091 :notes (55))
+                             (1 :start-time 0.182 :notes (55))
+                             (1 :start-time 0.272 :notes (55))
+                             (1 :start-time 0.363 :notes (55))
+                             (1 :start-time 0.454 :notes (55))))))
+                    :time-signature (1 4) :metronome (4 110)))
+                  :instrument nil :staff :treble-staff)
+                 #2=((((1 ((1
+                            ((1 :notes (55))
+                             (1 :start-time 0.136 :notes (55))
+                             (1 :start-time 0.272 :notes (55))
+                             (1 :start-time 0.409 :notes (55))))))
+                    :time-signature (1 4) :metronome (4 110)))
+                  :instrument nil :staff :treble-staff)))
+              (enp2musicxml
+               '(:spacing 0.8389395449778877d0
+                 #1#
+                 #2#)))))
+
 (deftest enp-parts.1
   (is (equal '((1) (2)) (enp-parts '((1) (2)))))
   (is (equal '((1) (2)) (enp-parts '(:foo 1 (1) (2)))))
