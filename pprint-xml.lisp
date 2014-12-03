@@ -26,7 +26,7 @@
 
 (defun group-in-pairs (list)
   (loop for tail on list by #'cddr
-     collect (list (first tail) (second tail))))
+        collect (list (first tail) (second tail))))
 
 (set-pprint-dispatch
  '(cons (cons symbol t) t)

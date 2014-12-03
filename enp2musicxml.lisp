@@ -170,37 +170,37 @@
           (beam-begin-continue-end info)
         (let ((duration (/ abs-dur unit-dur))
               (time-modification*
-               (unless (= 1 time-modification)
-                 (time-modification (numerator time-modification)
-                                    (denominator time-modification)
-                                    nil)))
+                (unless (= 1 time-modification)
+                  (time-modification (numerator time-modification)
+                                     (denominator time-modification)
+                                     nil)))
               (notations
-               `(,@(mapcar (lambda (tuplet)
-                             (tuplet 'stop
-                                     (tuplet-number *tuplet-store*
-                                                    (tuplet-key tuplet))))
-                           (info-ending-tuplets info))
-                   ,@(mapcar (lambda (tuplet)
-                               (register-tuplet *tuplet-store*
-                                                (tuplet-key tuplet))
-                               (let* ((tuplet-ratio
+                `(,@(mapcar (lambda (tuplet)
+                              (tuplet 'stop
+                                      (tuplet-number *tuplet-store*
+                                                     (tuplet-key tuplet))))
+                            (info-ending-tuplets info))
+                  ,@(mapcar (lambda (tuplet)
+                              (register-tuplet *tuplet-store*
+                                               (tuplet-key tuplet))
+                              (let* ((tuplet-ratio
                                        (tuplet-tuplet-ratio tuplet))
-                                      (tuplet-type (tuplet-type tuplet))
-                                      (tuplet-type-if-different
+                                     (tuplet-type (tuplet-type tuplet))
+                                     (tuplet-type-if-different
                                        (if (eql tuplet-type type)
                                            nil
                                            tuplet-type)))
-                                 (tuplet 'start
-                                         (tuplet-number *tuplet-store*
-                                                        (tuplet-key tuplet))
-                                         (first tuplet-ratio)
-                                         tuplet-type-if-different
-                                         (second tuplet-ratio)
-                                         tuplet-type-if-different
-                                         (if *tuplet-show-bracket*
-                                             'yes 'no))))
-                             (info-starting-tuplets info))
-                   ,@(convert-expressions chord next-chord))))
+                                (tuplet 'start
+                                        (tuplet-number *tuplet-store*
+                                                       (tuplet-key tuplet))
+                                        (first tuplet-ratio)
+                                        tuplet-type-if-different
+                                        (second tuplet-ratio)
+                                        tuplet-type-if-different
+                                        (if *tuplet-show-bracket*
+                                            'yes 'no))))
+                            (info-starting-tuplets info))
+                  ,@(convert-expressions chord next-chord))))
           (note (if not-rest
                     (convert-note2pitch note)
                     (rest*))
@@ -289,28 +289,28 @@
     (let* ((dynamics (chord-dynamics chord))
            (wedges (chord-wedges chord))
            (direction-content
-            (append
-             (mapcan (lambda (wedge)
-                       (if (and next-chord
-                                (member wedge (chord-wedges next-chord)))
-                           ;; we know that is starts or continues
-                           (let ((number (register-wedge *wedge-store* wedge)))
-                             (and number
-                                  (list
-                                   (make-wedge
-                                    number
-                                    (string-downcase
-                                     (symbol-name
-                                      (keyword-without-id wedge)))))))
-                           ;; we know that we have to stop it
-                           (list
-                            (make-wedge
-                             (unregister-wedge *wedge-store* wedge) "stop"))))
-                     wedges)
-             (mapcar (lambda (dynamic)
-                       (direction-type
-                        (list (dynamic (keyword-without-id dynamic)))))
-                     (register-dynamics *dynamic-store* dynamics)))))
+             (append
+              (mapcan (lambda (wedge)
+                        (if (and next-chord
+                                 (member wedge (chord-wedges next-chord)))
+                            ;; we know that is starts or continues
+                            (let ((number (register-wedge *wedge-store* wedge)))
+                              (and number
+                                   (list
+                                    (make-wedge
+                                     number
+                                     (string-downcase
+                                      (symbol-name
+                                       (keyword-without-id wedge)))))))
+                            ;; we know that we have to stop it
+                            (list
+                             (make-wedge
+                              (unregister-wedge *wedge-store* wedge) "stop"))))
+                      wedges)
+              (mapcar (lambda (dynamic)
+                        (direction-type
+                         (list (dynamic (keyword-without-id dynamic)))))
+                      (register-dynamics *dynamic-store* dynamics)))))
       (when direction-content
         (list (direction direction-content))))))
 
@@ -359,7 +359,7 @@
                          'whole)
                        0 nil)
                 ,@(when (mapcar-state-lastp state)
-                        '((:|barline| (:|bar-style| "light-heavy")))))))
+                    '((:|barline| (:|bar-style| "light-heavy")))))))
           ;; normal measure
           (let* ((*accidental-store* (make-accidental-store))
                  (*tuplet-store* (make-tuplet-store))
@@ -380,7 +380,7 @@
                                   (list (measure-first-info next-measure))))
                                :repeat (length infos)))
               ,@(when (mapcar-state-lastp state)
-                      '((:|barline| (:|bar-style| "light-heavy"))))))))))
+                  '((:|barline| (:|bar-style| "light-heavy"))))))))))
 
 (defun convert-part (state part)
   (labels ((preprocess (measures)
@@ -401,9 +401,9 @@
   `((:|score-part| :|id| ,(format nil "P~A" (mapcar-state-index state)))
     (:|part-name|
       ,(let ((name (part-instrument part)))
-            (if name
-                (string-capitalize (string name))
-                "")))))
+         (if name
+             (string-capitalize (string name))
+             "")))))
 
 (defun encoding-date ()
   (multiple-value-bind (second minute hour date month year)
@@ -512,8 +512,8 @@ grid point. This is always the case, because we never leave the grid."
           (measure-time-signature measure)
         (/ denom 4))
       (reduce #'lcm
-          (remove nil (measure-abs-durs measure))
-          :key #'minimal-quarter-division)))
+              (remove nil (measure-abs-durs measure))
+              :key #'minimal-quarter-division)))
 
 (defun %chordp (enp)
   (and (second enp)
@@ -577,7 +577,7 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun div-items-sum (enp)
   (the (integer 1)
-    (reduce #'+ (div-items-no-grace enp) :key #'enp-dur)))
+       (reduce #'+ (div-items-no-grace enp) :key #'enp-dur)))
 
 (defun tuplet-ratio (enp)
   (declare (div enp))
@@ -585,12 +585,12 @@ grid point. This is always the case, because we never leave the grid."
         (sum (div-items-sum enp)))
     (list (the (integer 1) sum)
           (the (integer 1)
-            (cond ((= sum 1)
-                   sum)
-                  ((<= sum dur)
-                   dur)
-                  (t
-                   (* dur (expt 2 (truncate (log (/ sum dur) 2))))))))))
+               (cond ((= sum 1)
+                      sum)
+                     ((<= sum dur)
+                      dur)
+                     (t
+                      (* dur (expt 2 (truncate (log (/ sum dur) 2))))))))))
 
 (defun chord-dur (enp)
   (declare (chord enp))
@@ -653,7 +653,7 @@ grid point. This is always the case, because we never leave the grid."
             (float dur))
            (t
             dur))
-     ,@(rest chord)))
+    ,@(rest chord)))
 
 (defun note-pitch (note)
   (declare (type note* note))
@@ -762,24 +762,24 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun info-starting-tuplets (info)
   (loop for div in (rest (info-pointers info))
-     for pos in (info-path info)
-     for tuplet-ratio in (info-tuplet-ratios info)
-     for notated-dur in (rest (info-notated-durs info))
-     while (or (zerop pos)
-               (every #'grace-div-p (subseq (div-items div) 0 pos)))
-     when (/= 1 (list2ratio tuplet-ratio))
-     collect (list div
-                   tuplet-ratio
-                   ;; tuplet-type
-                   (abs-dur-name (/ notated-dur (second tuplet-ratio))))))
+        for pos in (info-path info)
+        for tuplet-ratio in (info-tuplet-ratios info)
+        for notated-dur in (rest (info-notated-durs info))
+        while (or (zerop pos)
+                  (every #'grace-div-p (subseq (div-items div) 0 pos)))
+        when (/= 1 (list2ratio tuplet-ratio))
+          collect (list div
+                        tuplet-ratio
+                        ;; tuplet-type
+                        (abs-dur-name (/ notated-dur (second tuplet-ratio))))))
 
 (defun info-ending-tuplets (info)
   (loop for div in (rest (info-pointers info))
-     for pos in (info-path info)
-     for tuplet-ratio in (info-tuplet-ratios info)
-     while (= (1+ pos) (length (div-items div)))
-     when (/= 1 (list2ratio tuplet-ratio))
-     collect (list div tuplet-ratio)))
+        for pos in (info-path info)
+        for tuplet-ratio in (info-tuplet-ratios info)
+        while (= (1+ pos) (length (div-items div)))
+        when (/= 1 (list2ratio tuplet-ratio))
+          collect (list div tuplet-ratio)))
 
 (defun measure-infos (measure)
   (declare (type measure measure))
@@ -837,28 +837,28 @@ grid point. This is always the case, because we never leave the grid."
     (let* ((notated-durs (mapcar #'info-notated-dur infos))
            (beam-numbers (mapcar #'notated-dur2beam-number notated-durs))
            (dur-constraints
-            (map-neighbours #'list
-                            (append (list 0)
-                                    (map-neighbours #'min beam-numbers)
-                                    (list 0))))
+             (map-neighbours #'list
+                             (append (list 0)
+                                     (map-neighbours #'min beam-numbers)
+                                     (list 0))))
            (grouping-constraints
-            (mapcar (lambda (info)
-                      (list (if (info-beat-start-p info)
-                                0
-                                most-positive-fixnum)
-                            (if (info-beat-end-p info)
-                                0
-                                most-positive-fixnum)))
-                    infos))
+             (mapcar (lambda (info)
+                       (list (if (info-beat-start-p info)
+                                 0
+                                 most-positive-fixnum)
+                             (if (info-beat-end-p info)
+                                 0
+                                 most-positive-fixnum)))
+                     infos))
            (beaming
-            (mapcar (lambda (a b)
-                      (list (min (first a) (first b))
-                            (min (second a) (second b))))
-                    dur-constraints
-                    grouping-constraints)))
+             (mapcar (lambda (a b)
+                       (list (min (first a) (first b))
+                             (min (second a) (second b))))
+                     dur-constraints
+                     grouping-constraints)))
       (loop for info in infos
-         for b in beaming
-         do (setf (info-beaming info) b))))
+            for b in beaming
+            do (setf (info-beaming info) b))))
   all-infos)
 
 (defun validate-beaming (measure-content)
@@ -916,11 +916,11 @@ grid point. This is always the case, because we never leave the grid."
                              (= 1 (chord-dur (first (div-items enp)))))
                         (let ((chord (first (div-items enp))))
                           `(,(div-dur enp)
-                             (,(chord-change-dur chord (div-dur enp)))))
+                            (,(chord-change-dur chord (div-dur enp)))))
                         `(,(div-dur enp)
-                           ,(mapcar #'rec (div-items enp))))))))
+                          ,(mapcar #'rec (div-items enp))))))))
     `(,@(mapcar #'rec (measure-beats measure))
-        :time-signature ,(measure-time-signature measure))))
+      :time-signature ,(measure-time-signature measure))))
 
 (defun measure-split-not-notable-durs (measure)
   (declare (type measure measure))
@@ -936,9 +936,9 @@ grid point. This is always the case, because we never leave the grid."
                (grace-div (list enp))
                ;; div
                (t (list `(,(div-dur enp)
-                           ,(mapcan #'rec (div-items enp))))))))
+                          ,(mapcan #'rec (div-items enp))))))))
     `(,@(mapcan #'rec (measure-beats measure))
-        :time-signature ,(measure-time-signature measure))))
+      :time-signature ,(measure-time-signature measure))))
 
 ;;;# accidental-store
 (defun make-accidental-store ()
@@ -1074,7 +1074,7 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun plist-keys (plist)
   (loop for key in plist by #'cddr
-     collect key))
+        collect key))
 
 (defun power-of-two-p (x)
   (cond
@@ -1103,8 +1103,8 @@ grid point. This is always the case, because we never leave the grid."
 
 (defun map-neighbours (fn list)
   (loop for a in list
-     for b in (cdr list)
-     collect (funcall fn a b)))
+        for b in (cdr list)
+        collect (funcall fn a b)))
 
 (defun 1-to-n (n)
   (declare (type (integer 0)))

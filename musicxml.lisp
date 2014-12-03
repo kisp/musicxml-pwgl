@@ -44,8 +44,8 @@
            ,(if boa
                 `(defun ,name (,@slot-names)
                    (,(symb "MAKE-" name)
-                     ,@(mapcan (lambda (name) (list (kw name) name))
-                               slot-names)))
+                    ,@(mapcan (lambda (name) (list (kw name) name))
+                              slot-names)))
                 `(defun ,name (&rest args &key ,@slot-names)
                    (declare (ignore ,@slot-names))
                    (apply #',(symb "MAKE-" name) args)))
@@ -54,13 +54,13 @@
                    (cons ',name
                          (list
                           ,@(loop for a in slot-names
-                               collect (accessor-form a name)))))
+                                  collect (accessor-form a name)))))
                 `(defmethod make-constructor-form ((,name ,name))
                    (cons ',name
                          (list
                           ,@(loop for a in slot-names
-                               collect (kw a)
-                               collect (accessor-form a name))))))
+                                  collect (kw a)
+                                  collect (accessor-form a name))))))
            (set-pprint-dispatch
             ',name 'generic-pretty-printer 0 *pprint-xml-table*))))))
 
@@ -178,8 +178,8 @@
   `(:|pitch|
      (:|step| ,(string (pitch-step pitch)))
      ,@(unless
-        (eql 0 (pitch-alter pitch))
-        `((:|alter| ,(princ-to-string (pitch-alter pitch)))))
+           (eql 0 (pitch-alter pitch))
+         `((:|alter| ,(princ-to-string (pitch-alter pitch)))))
      (:|octave| ,(princ-to-string (pitch-octave pitch)))))
 
 ;;; rest*
@@ -271,22 +271,22 @@
      ,@(when (note-chordp note) '(:|chord|))
      ,(translate-to-lxml (note-pitch-or-rest note))
      ,@(when (note-duration note)
-             `((:|duration|
-                 ,(princ-to-string (note-duration note)))))
+         `((:|duration|
+             ,(princ-to-string (note-duration note)))))
      ,@(when (note-tie-stop note) '(((:|tie| :|type| "stop"))))
      ,@(when (note-tie-start note) '(((:|tie| :|type| "start"))))
      ,@(when (note-type note)
-             `((:|type| ,(string-downcase (symbol-name (note-type note))))))
+         `((:|type| ,(string-downcase (symbol-name (note-type note))))))
      ,@(loop repeat (note-dots note) collect '(:|dot|))
      ,@(when (note-accidental note)
-             (case (note-accidental note)
-               (unspecific '((:|accidental|)))
-               (t `((:|accidental|
-                      ,(string-downcase (symbol-name (note-accidental note))))))))
+         (case (note-accidental note)
+           (unspecific '((:|accidental|)))
+           (t `((:|accidental|
+                  ,(string-downcase (symbol-name (note-accidental note))))))))
      ,@(when (note-time-modification note)
-             (list (translate-to-lxml (note-time-modification note))))
+         (list (translate-to-lxml (note-time-modification note))))
      ,@(when (note-staff note)
-             `((:|staff| ,(princ-to-string (note-staff note)))))
+         `((:|staff| ,(princ-to-string (note-staff note)))))
      ,@(sort
         (append
          (mapcar (lambda (n) `((:|beam| :|number| ,(princ-to-string n))
@@ -300,7 +300,7 @@
                  (note-beam-end note)))
         #'< :key (lambda (x) (parse-integer (third (car x)))))
      ,@(when (note-notations* note)
-             `((:|notations| ,@(mapcar #'to-lxml (note-notations* note)))))))
+         `((:|notations| ,@(mapcar #'to-lxml (note-notations* note)))))))
 
 (defmethod make-constructor-form ((note note))
   `(note ,(note-pitch-or-rest note)
@@ -320,8 +320,8 @@
 
 (defun note (pitch-or-rest duration type dots accidental
              &key chordp gracep staff notations tie-start tie-stop
-             time-modification
-             beam-begin beam-continue beam-end)
+               time-modification
+               beam-begin beam-continue beam-end)
   (make-note :pitch-or-rest pitch-or-rest :duration duration :chordp chordp
              :staff staff :accidental accidental :type type
              :time-modification time-modification
@@ -360,9 +360,9 @@
      (:|normal-notes|
        ,(princ-to-string (time-modification-normal-notes time-modification)))
      ,@(when (time-modification-normal-type time-modification)
-             `((:|normal-type|
-                 ,(string-downcase (symbol-name (time-modification-normal-type
-                                                 time-modification))))))))
+         `((:|normal-type|
+             ,(string-downcase (symbol-name (time-modification-normal-type
+                                             time-modification))))))))
 
 ;;; tuplet
 (deftype start-stop ()
@@ -396,30 +396,30 @@
 
 (defmethod translate-to-lxml ((tuplet tuplet))
   `((:|tuplet|
-      :|type|
-      ,(string-downcase (symbol-name (tuplet-type tuplet)))
-      :|number| ,(princ-to-string (tuplet-id tuplet))
-      ,@(when (tuplet-bracket tuplet)
-              `(:|bracket|
-                 ,(string-downcase (symbol-name (tuplet-bracket tuplet))))))
+     :|type|
+     ,(string-downcase (symbol-name (tuplet-type tuplet)))
+     :|number| ,(princ-to-string (tuplet-id tuplet))
+     ,@(when (tuplet-bracket tuplet)
+         `(:|bracket|
+            ,(string-downcase (symbol-name (tuplet-bracket tuplet))))))
     ,@(when (tuplet-actual-number tuplet)
-            `((:|tuplet-actual|
-                (:|tuplet-number|
-                  ,(princ-to-string (tuplet-actual-number tuplet)))
-                ,@(when (tuplet-actual-type tuplet)
-                        `((:|tuplet-type|
-                            ,(string-downcase
-                              (symbol-name (tuplet-actual-type tuplet)))))))))
+        `((:|tuplet-actual|
+            (:|tuplet-number|
+              ,(princ-to-string (tuplet-actual-number tuplet)))
+            ,@(when (tuplet-actual-type tuplet)
+                `((:|tuplet-type|
+                    ,(string-downcase
+                      (symbol-name (tuplet-actual-type tuplet)))))))))
     ,@(when (tuplet-normal-number tuplet)
-            `((:|tuplet-normal|
-                ,@(when (tuplet-normal-number tuplet)
-                        `((:|tuplet-number|
-                            ,(princ-to-string (tuplet-normal-number tuplet)))))
-                ,@(when (tuplet-normal-type tuplet)
-                        `((:|tuplet-type|
-                            ,(string-downcase
-                              (symbol-name
-                               (tuplet-normal-type tuplet)))))))))))
+        `((:|tuplet-normal|
+            ,@(when (tuplet-normal-number tuplet)
+                `((:|tuplet-number|
+                    ,(princ-to-string (tuplet-normal-number tuplet)))))
+            ,@(when (tuplet-normal-type tuplet)
+                `((:|tuplet-type|
+                    ,(string-downcase
+                      (symbol-name
+                       (tuplet-normal-type tuplet)))))))))))
 
 (defmethod make-constructor-form ((tuplet tuplet))
   `(tuplet ',(tuplet-type tuplet)
@@ -431,7 +431,7 @@
            ',(tuplet-bracket tuplet)))
 
 (defun tuplet (type id &optional
-               actual-number actual-type normal-number normal-type bracket)
+                         actual-number actual-type normal-number normal-type bracket)
   (make-tuplet :type type
                :id id
                :actual-number actual-number
@@ -476,38 +476,38 @@
 (defmethod translate-to-lxml ((attributes attributes))
   (let ((dom `(:|attributes|
                 ,@(when (attributes-divisions attributes)
-                        `((:|divisions|
-                            ,(princ-to-string
-                              (attributes-divisions attributes)))))
+                    `((:|divisions|
+                        ,(princ-to-string
+                          (attributes-divisions attributes)))))
                 ,@(when (attributes-key attributes)
-                        `((:|key| (:|fifths|
-                                    ,(princ-to-string
-                                      (attributes-key attributes))))))
+                    `((:|key| (:|fifths|
+                                ,(princ-to-string
+                                  (attributes-key attributes))))))
                 ,@(when (attributes-time attributes)
-                        `((:|time|
-                            (:|beats|
-                              ,(princ-to-string
-                                (first (attributes-time attributes))))
-                            (:|beat-type|
-                              ,(princ-to-string
-                                (second (attributes-time attributes)))))))
+                    `((:|time|
+                        (:|beats|
+                          ,(princ-to-string
+                            (first (attributes-time attributes))))
+                        (:|beat-type|
+                          ,(princ-to-string
+                            (second (attributes-time attributes)))))))
                 ,@(when (and (attributes-staves attributes)
                              (/= 1 (attributes-staves attributes)))
-                        `((:|staves|
-                            ,(princ-to-string
-                              (attributes-staves attributes)))))
+                    `((:|staves|
+                        ,(princ-to-string
+                          (attributes-staves attributes)))))
                 ,@(mapcar-state
                    (lambda (state clef)
                      `(,(if (= 1 (length (attributes-clefs attributes)))
                             :|clef|
                             `(:|clef|
-                               :|number|
-                               ,(princ-to-string
-                                 (mapcar-state-index state))))
-                        (:|sign|
-                          ,(symbol-name (first clef)))
-                        ,@(when
-                           (second clef)
+                              :|number|
+                              ,(princ-to-string
+                                (mapcar-state-index state))))
+                       (:|sign|
+                         ,(symbol-name (first clef)))
+                       ,@(when
+                             (second clef)
                            `((:|line|
                                ,(princ-to-string
                                  (second clef)))))))

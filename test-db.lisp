@@ -82,7 +82,7 @@
 
 (defun make-entry (list)
   (destructuring-bind (name description enp musicxml status enp-screen-shot
-                            score)
+                       score)
       list
     (make-instance 'test-case
                    :score score
@@ -134,9 +134,9 @@
   (labels ((count-lines (string)
              (with-input-from-string (in string)
                (loop for i upfrom 0
-                  for line = (read-line in nil)
-                  while line
-                  finally (return i)))))
+                     for line = (read-line in nil)
+                     while line
+                     finally (return i)))))
     (let (res)
       (dolist (tc (list-test-cases))
         (handler-case

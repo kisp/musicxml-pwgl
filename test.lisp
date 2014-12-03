@@ -148,10 +148,10 @@
          (intern (cxml-xmls:node-name node) "KEYWORD"))
         ((consp node)
          `((,(intern (cxml-xmls:node-name node) "KEYWORD")
-             ,@(mapcan (lambda (pair)
-                         (list (intern (first pair) "KEYWORD")
-                               (second pair)))
-                       (reverse (cxml-xmls:node-attrs node))))
+            ,@(mapcan (lambda (pair)
+                        (list (intern (first pair) "KEYWORD")
+                              (second pair)))
+                      (reverse (cxml-xmls:node-attrs node))))
            ,@(mapcar #'xmls2lxml (cxml-xmls:node-children node))))
         (t
          node)))
@@ -324,12 +324,12 @@
             "KEYWORD")))
 
 (defun gen-plist (&key (length (gen-integer :min 0 :max 10))
-                  (elements (gen-integer :min -10 :max 10)))
+                    (elements (gen-integer :min -10 :max 10)))
   (lambda ()
     (loop with keyword = (gen-keyword)
-       repeat (funcall length)
-       collect (funcall keyword)
-       collect (funcall elements))))
+          repeat (funcall length)
+          collect (funcall keyword)
+          collect (funcall elements))))
 
 (deftest split-list-plist
   (for-all ((list (gen-list))
@@ -509,7 +509,7 @@
         (in
          (drakma:http-request "http://lisp.homelinux.net/musicxml-pwgl/bad-scores"))
       (loop for (id enp) = (read in nil (list nil nil))
-         while enp collect (list id enp)))))
+            while enp collect (list id enp)))))
 
 (deftest bad-scores
   (skip*)
@@ -549,15 +549,15 @@
                              (1 :start-time 0.272 :notes (55))
                              (1 :start-time 0.363 :notes (55))
                              (1 :start-time 0.454 :notes (55))))))
-                    :time-signature (1 4) :metronome (4 110)))
-                  :instrument nil :staff :treble-staff)
+                       :time-signature (1 4) :metronome (4 110)))
+                     :instrument nil :staff :treble-staff)
                  #2=((((1 ((1
                             ((1 :notes (55))
                              (1 :start-time 0.136 :notes (55))
                              (1 :start-time 0.272 :notes (55))
                              (1 :start-time 0.409 :notes (55))))))
-                    :time-signature (1 4) :metronome (4 110)))
-                  :instrument nil :staff :treble-staff)))
+                       :time-signature (1 4) :metronome (4 110)))
+                     :instrument nil :staff :treble-staff)))
               (enp2musicxml
                '(:spacing 0.8389395449778877d0
                  #1#
@@ -671,12 +671,12 @@
     `(progn
        (defun ,fn-name (m) ,@body)
        ,@(let ((n 0))
-              (map-measures
-               (lambda (m d s)
-                 (declare (ignore m))
-                 (let ((name* (symbolicate name "."
-                                           (princ-to-string (incf n)))))
-                   `(deftest ,name* ,d (,fn-name ,s)))))))))
+           (map-measures
+            (lambda (m d s)
+              (declare (ignore m))
+              (let ((name* (symbolicate name "."
+                                        (princ-to-string (incf n)))))
+                `(deftest ,name* ,d (,fn-name ,s)))))))))
 
 (defun number-of-tuples (infos)
   (let ((count 0)
@@ -687,10 +687,10 @@
                  (setf (gethash x hash) t))))
       (dolist (info infos count)
         (loop for pointer in (rest (info-pointers info))
-           for tuplet-ratio in (info-tuplet-ratios info)
-           do (when (/= 1 (list2ratio tuplet-ratio))
-                (when (visit pointer)
-                  (incf count))))))))
+              for tuplet-ratio in (info-tuplet-ratios info)
+              do (when (/= 1 (list2ratio tuplet-ratio))
+                   (when (visit pointer)
+                     (incf count))))))))
 
 (deftest tuplet.1
   (let ((infos (measure-infos *test-measure1*)))
