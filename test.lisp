@@ -28,7 +28,6 @@
                 #:%chordp
                 #:%divp
                 #:*accidental-store*
-                #:list2ratio
                 #:abs-dur-name
                 #:append-list-plist
                 #:chord-dur
@@ -37,23 +36,25 @@
                 #:div-dur
                 #:div-items
                 #:enp-note-accidental
+                #:enp-parts
                 #:info-abs-dur
                 #:info-beaming
                 #:info-chord
-                #:info-pointers
                 #:info-ending-tuplets
+                #:info-pointers
                 #:info-starting-tuplets
                 #:info-tuplet-ratios
+                #:list2ratio
                 #:make-accidental-store
                 #:measure-infos
+                #:measure-quarter-division
                 #:register-accidental
                 #:split-list-plist
                 #:split-plist-list
+                #:tuplet-eql
+                #:tuplet-key
                 #:tuplet-ratio
                 #:tuplet-tuplet-ratio
-                #:tuplet-key
-                #:tuplet-eql
-                #:enp-parts
                 )
   (:import-from #:musicxml-pwgl.mapcar-state
                 #:make-mapcar-state))
@@ -733,6 +734,35 @@
     (is (equal '((5 4))
                (mapcar #'tuplet-tuplet-ratio
                        (mapcan #'info-starting-tuplets infos))))))
+
+(deftest measure-quarter-division.1
+  (is (eql 1 (measure-quarter-division
+              '((1 ((1 :START-TIME 4.0 :NOTES (60))))
+                (1 ((1 :START-TIME 5.0 :NOTES (60))))
+                (1 ((1 :START-TIME 6.0 :NOTES (60))))
+                (1 ((1 :START-TIME 7.0 :NOTES (60))))
+                :TIME-SIGNATURE (4 4)))))
+  (is (eql 1 (measure-quarter-division
+              '((1 ((1 :NOTES (60))))
+                (1 ((1 :NOTES (60))))
+                :TIME-SIGNATURE (2 4)))))
+  (is (eql 2 (measure-quarter-division
+              '((1 ((1 :NOTES (60))
+                    (1 :NOTES (60))))
+                (1 ((1 :NOTES (60))))
+                :TIME-SIGNATURE (2 4)))))
+  (is (eql 3 (measure-quarter-division
+              '((1 ((1 :NOTES (60))
+                    (1 :NOTES (60))
+                    (1 :NOTES (60))))
+                (1 ((1 :NOTES (60))))
+                :TIME-SIGNATURE (2 4))))))
+
+(deftest measure-quarter-division.2
+  (is (eql 4 (measure-quarter-division
+              '((5 ((-1  :NOTES (60)))) :TIME-SIGNATURE (5 16)))))
+  (is (eql 2 (measure-quarter-division
+              '((5 ((-1  :NOTES (60)))) :TIME-SIGNATURE (5 8))))))
 
 (defun run-tests ()
   (run! :musicxml-pwgl))

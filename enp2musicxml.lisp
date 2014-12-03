@@ -347,7 +347,7 @@
           ;; full rest
           (destructuring-bind (numer denom)
               (measure-time-signature measure)
-            (let ((division (/ denom 4)))
+            (let ((division (measure-quarter-division measure)))
               `((:|measure| :|number| ,(ts (mapcar-state-index state)))
                 ,(attributes
                   :divisions (when-changed (lambda (m) m division))
@@ -507,9 +507,13 @@ grid point. This is always the case, because we never leave the grid."
 (defun measure-quarter-division (measure)
   "Minimal division of a quarter note that is needed to represent all
 \(absolute) durations within MEASURE."
-  (reduce #'lcm
+  (if (measure-full-rest-p measure)
+      (destructuring-bind (numer denom)
+          (measure-time-signature measure)
+        (/ denom 4))
+      (reduce #'lcm
           (remove nil (measure-abs-durs measure))
-          :key #'minimal-quarter-division))
+          :key #'minimal-quarter-division)))
 
 (defun %chordp (enp)
   (and (second enp)
