@@ -470,11 +470,14 @@
 
 (defun part-measures (part) (first part))
 
-(defun measure-time-signature (measure)
+(defun measure-time-signature (measure &optional (errorp t))
   (multiple-value-bind (list plist)
       (split-list-plist measure)
     (declare (ignore list))
-    (getf plist :time-signature)))
+    (or (getf plist :time-signature)
+        (when errorp
+          (error "Expected to find a :TIME-SIGNATURE in this measure:~%~S"
+                 measure)))))
 
 (defun measure-beats (measure)
   (multiple-value-bind (list plist)
@@ -537,10 +540,7 @@ grid point. This is always the case, because we never leave the grid."
               (plist-keys (cdr enp)))))
 
 (defun %measurep (enp)
-  (multiple-value-bind (list plist)
-      (split-list-plist enp)
-    (declare (ignore list))
-    (member :time-signature plist)))
+  (measure-time-signature enp nil))
 
 (defun %grace-beat-p (enp)
   (eql :grace-beat (getf (cddr enp) :class)))
@@ -813,7 +813,7 @@ grid point. This is always the case, because we never leave the grid."
                        (div-items tree)))))))
     (multiple-value-bind (beats plist)
         (split-list-plist measure)
-      (let* ((tree (list (list2ratio (getf plist :time-signature)) beats))
+      (let* ((tree (list (list2ratio (measure-time-signature measure)) beats))
              (infos (rec 1 tree nil (list tree) nil)))
         (infos-compute-beaming infos)))))
 
