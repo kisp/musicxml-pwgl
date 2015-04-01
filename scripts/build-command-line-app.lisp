@@ -21,9 +21,8 @@
 
 (load (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname)))
 
-(require 'arnesi)
-
-(asdf:oos 'arnesi:clean-op :musicxml-pwgl)
+;; (require 'arnesi)
+;; (asdf:oos 'arnesi:clean-op :musicxml-pwgl)
 
 (require 'musicxml-pwgl)
 
@@ -34,7 +33,9 @@
                    (read *standard-input* nil))))
     (when input
       (musicxml-pwgl.pprint-xml:pprint-xml
-       (musicxml-pwgl.enp2musicxml:enp2musicxml input)))))
+       (musicxml-pwgl.enp2musicxml:enp2musicxml input)
+       :stream *standard-output*)
+      (terpri *standard-output*))))
 
 (sb-ext:save-lisp-and-die "enp2mxml"
                           :toplevel 'main
