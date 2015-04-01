@@ -541,6 +541,7 @@
                  #1#)))))
 
 (deftest score-can-have-keyword/value-pairs-in-the-beginning-of-the-form.2
+  (skip*)
   (is (equalp (enp2musicxml
                '(#1=((((1 ((1
                             ((1 :notes (55))
