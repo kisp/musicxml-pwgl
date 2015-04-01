@@ -31,4 +31,4 @@ install:
 
 script:
   - cl -e '(ql:quickload "musicxml-pwgl")
-           (uiop:quit (if (myam:run! "musicxml-pwgl") 0 1))'
+           (uiop:quit (if (myam:run! :musicxml-pwgl) 0 1))'
