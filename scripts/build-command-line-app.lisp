@@ -21,8 +21,16 @@
 
 (load (merge-pathnames "quicklisp/setup.lisp" (user-homedir-pathname)))
 
+(ql:quickload "s-xml")
+(ql:quickload "cxml")
+(ql:quickload "myam")
+(ql:quickload "sqlite-orm")
+(ql:quickload "drakma")
+
 ;; (require 'arnesi)
 ;; (asdf:oos 'arnesi:clean-op :musicxml-pwgl)
+
+(pushnew '*default-pathname-defaults* asdf:*central-registry*)
 
 (require 'musicxml-pwgl)
 
