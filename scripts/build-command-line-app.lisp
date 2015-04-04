@@ -40,7 +40,7 @@
                      (read in nil))
                    (read *standard-input* nil))))
     (when input
-      (musicxml-pwgl.pprint-xml:pprint-xml
+      (musicxml-pwgl.musicxml:print-musicxml
        (musicxml-pwgl.enp2musicxml:enp2musicxml input)
        :stream *standard-output*)
       (terpri *standard-output*))))
