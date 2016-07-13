@@ -24,6 +24,8 @@
 (require :alexandria)
 (require :cl-fad)
 
+(push '*default-pathname-defaults* asdf:*central-registry*)
+
 (defpackage #:dist
   (:use #:cl #:alexandria))
 
