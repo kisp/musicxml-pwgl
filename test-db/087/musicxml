@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise
+ ><identification
+   ><encoding
+     ><encoding-date>2010-12-08</encoding-date
+     ><software>MusicXML-PWGL v0.1.112</software></encoding
+   ></identification
+ ><part-list
+   ><score-part id='P1'><part-name></part-name></score-part></part-list
+ ><part id='P1'
+   ><measure number='1'
+     ><attributes
+       ><divisions>1</divisions
+       ><time><beats>4</beats><beat-type>4</beat-type></time
+       ><clef><sign>G</sign><line>2</line></clef></attributes
+     ><direction placement='below'
+       ><direction-type><dynamics><p/></dynamics></direction-type
+       ></direction
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><note
+       ><pitch><step>D</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><direction placement='below'
+       ><direction-type><dynamics><f/></dynamics></direction-type
+       ></direction
+     ><note
+       ><pitch><step>E</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><note
+       ><pitch><step>F</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ></measure
+   ><measure number='2'
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><direction placement='below'
+       ><direction-type><dynamics><ff/></dynamics></direction-type
+       ></direction
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><barline><bar-style>light-heavy</bar-style></barline></measure
+   ></part
+ ></score-partwise
+>

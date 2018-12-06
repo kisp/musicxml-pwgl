@@ -1,0 +1,15 @@
+#<TEST-CASE 94 bug from hans 01 RUN {1001995943}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "bug from hans 01"
+  DESCRIPTION                    = "5 16 measure rest then simple bar"
+  ENP                            = (((((5 ((-1 :NOTES (60)))) :TIME-SIGNATURE (5 16))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #<unbound slot>
+  SCORE                          = #<unbound slot>
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 94
+  DELETED                        = NIL

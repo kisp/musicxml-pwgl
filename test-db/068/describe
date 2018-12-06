@@ -1,0 +1,15 @@
+#<TEST-CASE 68 eighth-tone sharp RUN {10019957C3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "eighth-tone sharp"
+  DESCRIPTION                    = "c c+ c c"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (241/4))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 250 0 0 0 214 8 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = (MUSICXML-PWGL.ENP2MUSICXML:*EIGHTH-TONE-ENCODING* T)
+Slots with :INSTANCE allocation:
+  ID                             = 68
+  DELETED                        = NIL

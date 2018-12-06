@@ -1,0 +1,15 @@
+#<TEST-CASE 1 quarters RUN {1006CB4D73}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "quarters"
+  DESCRIPTION                    = "just four quarters"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 133 0 0 0 148 8 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 1
+  DELETED                        = NIL

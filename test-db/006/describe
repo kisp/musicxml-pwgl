@@ -1,0 +1,15 @@
+#<TEST-CASE 6 44-316 RUN {1001995413}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "44-316"
+  DESCRIPTION                    = "4 quarters then 3 16th, no beams"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 105 0 0 0 51 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 6
+  DELETED                        = NIL

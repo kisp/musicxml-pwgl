@@ -1,0 +1,15 @@
+#<TEST-CASE 41 a single grace note RUN {1001995623}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "a single grace note"
+  DESCRIPTION                    = "c f# grace c c"
+  ENP                            = (((((1 ((1 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 76 0 0 0 95 8 2 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 41
+  DELETED                        = NIL

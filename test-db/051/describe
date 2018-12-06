@@ -1,0 +1,15 @@
+#<TEST-CASE 51 fortissimo RUN {10019956C3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "fortissimo"
+  DESCRIPTION                    = "c with ff then c c c"
+  ENP                            = (((((1 ((1 :NOTES (60) :EXPRESSIONS (:FF/537600244))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 43 0 0 0 103 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 51
+  DELETED                        = NIL

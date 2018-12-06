@@ -1,0 +1,15 @@
+#<TEST-CASE 25 scale white keys RUN {1001995543}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "scale white keys"
+  DESCRIPTION                    = "g violine bis ziemlich hoch"
+  ENP                            = (((((1..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 3 4 0 0 0 129 8 2 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 25
+  DELETED                        = NIL

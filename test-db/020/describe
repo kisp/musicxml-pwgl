@@ -1,0 +1,15 @@
+#<TEST-CASE 20 chord with 3 notes RUN {10019954F3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "chord with 3 notes"
+  DESCRIPTION                    = "q (c g a) q q"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (60 67 69))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 45 0 0 0 73 8 2 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 20
+  DELETED                        = NIL

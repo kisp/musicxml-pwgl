@@ -1,0 +1,15 @@
+#<TEST-CASE 23 sharps RUN {1001995523}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "sharps"
+  DESCRIPTION                    = "c cis d dis"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (61))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 67 0 0 0 84 8 2 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 23
+  DELETED                        = NIL

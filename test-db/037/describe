@@ -1,0 +1,15 @@
+#<TEST-CASE 37 note durations no dot RUN {10019955E3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "note durations no dot"
+  DESCRIPTION                    = "from 1/4 to 1/256"
+  ENP                            = (((((1 ((1 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 148 0 0 0 86 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 37
+  DELETED                        = NIL

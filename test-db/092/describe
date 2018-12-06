@@ -1,0 +1,15 @@
+#<TEST-CASE 92 accent RUN {1001995923}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "accent"
+  DESCRIPTION                    = "simple accent on second beat"
+  ENP                            = (((((1 ((1 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = NIL
+  SCORE                          = NIL
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 92
+  DELETED                        = NIL

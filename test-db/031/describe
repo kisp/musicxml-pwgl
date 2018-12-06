@@ -1,0 +1,15 @@
+#<TEST-CASE 31 quarters with ties RUN {1001995583}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "quarters with ties"
+  DESCRIPTION                    = "tie over more than 2 notes"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1.0 :START-TIME 1.0 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 133 0 0 0 148 8 ..
+  SCORE                          = NIL
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 31
+  DELETED                        = NIL

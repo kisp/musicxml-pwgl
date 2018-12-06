@@ -1,0 +1,15 @@
+#<TEST-CASE 75 quintuplet 5-4 in 3-2 RUN {1001995833}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "quintuplet 5-4 in 3-2"
+  DESCRIPTION                    = "q( s( s s s )s )q h"
+  ENP                            = (((((2..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 250 0 0 0 214 8 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 75
+  DELETED                        = NIL

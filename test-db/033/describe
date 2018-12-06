@@ -1,0 +1,15 @@
+#<TEST-CASE 33 part name Nil RUN {10019955A3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "part name Nil"
+  DESCRIPTION                    = "do not show part name Nil"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 241 0 0 0 92 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 33
+  DELETED                        = NIL

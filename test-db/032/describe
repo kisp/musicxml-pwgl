@@ -1,0 +1,15 @@
+#<TEST-CASE 32 partially tied chord RUN {1001995593}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "partially tied chord"
+  DESCRIPTION                    = "c e g, c f g rest of bar c c"
+  ENP                            = (((((1 ((1 :NOTES (60 64 67))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = NIL
+  SCORE                          = NIL
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 32
+  DELETED                        = NIL

@@ -1,0 +1,15 @@
+#<TEST-CASE 34 sharp-natural RUN {10019955B3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "sharp-natural"
+  DESCRIPTION                    = "c sharp then c natural"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (61))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 182 0 0 0 85 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 34
+  DELETED                        = NIL

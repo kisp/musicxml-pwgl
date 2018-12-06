@@ -1,0 +1,15 @@
+#<TEST-CASE 8 84 RUN {1001995433}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "84"
+  DESCRIPTION                    = "h q q h h"
+  ENP                            = (((((2 ((1 :NOTES (60)))) (1 ((1 :START-TIME 2.0 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 165 0 0 0 78 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 8
+  DELETED                        = NIL

@@ -1,0 +1,15 @@
+#<TEST-CASE 93 repositioned accent RUN {1001995933}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "repositioned accent"
+  DESCRIPTION                    = "repositioned accent on second beat"
+  ENP                            = (((((1 ((1 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = NIL
+  SCORE                          = NIL
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 93
+  DELETED                        = NIL

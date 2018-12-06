@@ -1,0 +1,15 @@
+#<TEST-CASE 13 four compl quintuples, one dot RUN {1001995483}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "four compl quintuples, one dot"
+  DESCRIPTION                    = "44 with different quintuplets"
+  ENP                            = (((((1..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 238 0 0 0 76 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 13
+  DELETED                        = NIL

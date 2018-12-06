@@ -1,0 +1,15 @@
+#<TEST-CASE 57 f p RUN {1001995723}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "f p"
+  DESCRIPTION                    = "c (f) c(p) c c"
+  ENP                            = (((((1 ((1 :NOTES (60) :EXPRESSIONS (:F/537500880))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 43 0 0 0 103 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 57
+  DELETED                        = NIL

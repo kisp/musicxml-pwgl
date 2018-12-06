@@ -1,0 +1,15 @@
+#<TEST-CASE 39 quarter tone sharp RUN {1001995603}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "quarter tone sharp"
+  DESCRIPTION                    = "just a single quarter tone"
+  ENP                            = (((((1 ((1 :NOTES (60)))) (1 ((1 :START-TIME 1.0 :NOTES (121/2))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = NIL
+  SCORE                          = NIL
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 39
+  DELETED                        = NIL

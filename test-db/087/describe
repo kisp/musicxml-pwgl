@@ -1,0 +1,15 @@
+#<TEST-CASE 87 2nd mes surprise ff RUN {10019958D3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "2nd mes surprise ff"
+  DESCRIPTION                    = "the ff in 2nd mes comes without any dyns before"
+  ENP                            = (((((1 ((1 :NOTES (60) :EXPRESSIONS (:P/595400072))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 220 0 0 0 70 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 87
+  DELETED                        = NIL

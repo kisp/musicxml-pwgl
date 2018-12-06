@@ -1,0 +1,15 @@
+#<TEST-CASE 91 mp and f overlapping RUN {1001995913}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "mp and f overlapping"
+  DESCRIPTION                    = "visual res should be mp _ f _"
+  ENP                            = (((((1 ((1 :NOTES (60) :EXPRESSIONS (:MP/580917832))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 220 0 0 0 70 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 91
+  DELETED                        = NIL

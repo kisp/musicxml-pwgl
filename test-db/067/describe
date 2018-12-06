@@ -1,0 +1,15 @@
+#<TEST-CASE 67 triplet with no bracket RUN {10019957B3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "triplet with no bracket"
+  DESCRIPTION                    = "q t t t q q"
+  ENP                            = (((((1 ((1 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 250 0 0 0 214 8 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = (MUSICXML-PWGL.ENP2MUSICXML:*TUPLET-SHOW-BRACKET* NIL)
+Slots with :INSTANCE allocation:
+  ID                             = 67
+  DELETED                        = NIL

@@ -1,0 +1,15 @@
+#<TEST-CASE 48 joh example rest in tuplet RUN {1001995693}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "joh example rest in tuplet"
+  DESCRIPTION                    = "the bracket appeared to be longer than it should"
+  ENP                            = (((((1 ((1 :NOTES (60)) (1 :START-TIME 0.5 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 244 0 0 0 82 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 48
+  DELETED                        = NIL

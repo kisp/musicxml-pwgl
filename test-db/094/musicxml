@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise
+ ><identification
+   ><encoding
+     ><encoding-date>2014-12-03</encoding-date
+     ><software>MusicXML-PWGL v0.1.121</software></encoding
+   ></identification
+ ><part-list
+   ><score-part id='P1'><part-name>Violin</part-name></score-part
+   ></part-list
+ ><part id='P1'
+   ><measure number='1'
+     ><attributes
+       ><divisions>4</divisions
+       ><time><beats>5</beats><beat-type>16</beat-type></time
+       ><clef><sign>G</sign><line>2</line></clef></attributes
+     ><note><rest
+     /><duration>5</duration></note></measure
+   ><measure number='2'
+     ><attributes
+       ><divisions>1</divisions
+       ><time><beats>1</beats><beat-type>4</beat-type></time></attributes
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration><type>quarter</type></note
+     ><barline><bar-style>light-heavy</bar-style></barline></measure
+   ></part
+ ></score-partwise>

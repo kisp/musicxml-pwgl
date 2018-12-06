@@ -1,0 +1,15 @@
+#<TEST-CASE 17 2 ties RUN {10019954C3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "2 ties"
+  DESCRIPTION                    = "3 whole notes with ties"
+  ENP                            = (((((4 ((1 :NOTES (60)))) :TIME-SIGNATURE (4 4))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 2 62 0 0 0 77 8 2 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 17
+  DELETED                        = NIL

@@ -1,0 +1,6 @@
+
+(((((2
+     ((1 :NOTES (60)) (1 :START-TIME 0.667 :NOTES (60))
+      (-1 :START-TIME 1.333 :NOTES (60))))
+    :TIME-SIGNATURE (2 4)))
+  :INSTRUMENT NIL :STAFF :TREBLE-STAFF))

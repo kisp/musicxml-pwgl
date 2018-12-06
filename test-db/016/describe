@@ -1,0 +1,15 @@
+#<TEST-CASE 16 whole RUN {10019954B3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "whole"
+  DESCRIPTION                    = "big 4 quarter c"
+  ENP                            = (((((4 ((1 :NOTES (60)))) :TIME-SIGNATURE (4 4))) :INSTRUMENT :VIOLIN..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 170 0 0 0 58 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 16
+  DELETED                        = NIL

@@ -1,0 +1,15 @@
+#<TEST-CASE 15 tie RUN {10019954A3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "tie"
+  DESCRIPTION                    = "q_ triplet half"
+  ENP                            = (((((1 ((1 :NOTES (60))))..
+  MUSICXML                       = "<?xml version=\"1.0\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 86 0 0 0 91 8 2 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 15
+  DELETED                        = NIL

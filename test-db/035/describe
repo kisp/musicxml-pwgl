@@ -1,0 +1,15 @@
+#<TEST-CASE 35 breve RUN {10019955C3}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "breve"
+  DESCRIPTION                    = "84 duration"
+  ENP                            = (((((8 ((1 :NOTES (60)))) :TIME-SIGNATURE (8 4))) :INSTRUMENT NIL..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 0 148 0 0 0 86 8 2..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = NIL
+Slots with :INSTANCE allocation:
+  ID                             = 35
+  DELETED                        = NIL

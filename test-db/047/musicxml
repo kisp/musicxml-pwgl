@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise
+ ><identification
+   ><encoding
+     ><encoding-date>2010-10-12</encoding-date
+     ><software>FOMUS v0.2.12</software></encoding
+   ></identification
+ ><part-list
+   ><score-part id='P1'><part-name></part-name></score-part></part-list
+ ><part id='P1'
+   ><measure number='1'
+     ><attributes
+       ><divisions>2</divisions
+       ><time><beats>8</beats><beat-type>8</beat-type></time
+       ><clef><sign>G</sign><line>2</line></clef></attributes
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>3</duration><type>quarter</type><dot></dot></note
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>3</duration
+       ><tie type='start'></tie
+       ><type>quarter</type
+       ><dot></dot
+       ><notations><tied type='start'></tied></notations></note
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>2</duration
+       ><tie type='stop'></tie
+       ><type>quarter</type
+       ><notations><tied type='stop'></tied></notations></note
+     ><barline><bar-style>light-heavy</bar-style></barline></measure
+   ></part
+ ></score-partwise
+>

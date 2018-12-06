@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+
+<score-partwise
+ ><identification
+   ><encoding
+     ><encoding-date>2010-10-12</encoding-date
+     ><software>FOMUS v0.2.12</software></encoding
+   ></identification
+ ><part-list
+   ><score-part id='P1'><part-name></part-name></score-part></part-list
+ ><part id='P1'
+   ><measure number='1'
+     ><attributes
+       ><divisions>3</divisions
+       ><time><beats>1</beats><beat-type>4</beat-type></time
+       ><clef><sign>G</sign><line>2</line></clef></attributes
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration
+       ><type>eighth</type
+       ><time-modification
+         ><actual-notes>3</actual-notes
+         ><normal-notes>2</normal-notes></time-modification
+       ><beam number='1'>begin</beam
+       ><notations
+         ><tuplet type='start' number='1' bracket='yes'
+           ><tuplet-actual
+             ><tuplet-number>3</tuplet-number></tuplet-actual
+           ><tuplet-normal
+             ><tuplet-number>2</tuplet-number></tuplet-normal
+           ></tuplet
+         ></notations
+       ></note
+     ><note
+       ><rest/>
+       <duration>1</duration
+       ><type>eighth</type
+       ><time-modification
+         ><actual-notes>3</actual-notes
+         ><normal-notes>2</normal-notes></time-modification
+       ><beam number='1'>continue</beam></note
+     ><note
+       ><pitch><step>C</step><octave>4</octave></pitch
+       ><duration>1</duration
+       ><type>eighth</type
+       ><time-modification
+         ><actual-notes>3</actual-notes
+         ><normal-notes>2</normal-notes></time-modification
+       ><beam number='1'>end</beam
+       ><notations><tuplet type='stop' number='1'></tuplet></notations
+       ></note
+     ><barline><bar-style>light-heavy</bar-style></barline></measure
+   ></part
+ ></score-partwise
+>

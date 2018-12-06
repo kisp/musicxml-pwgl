@@ -1,0 +1,15 @@
+#<TEST-CASE 74 3-8 acc sharp RUN {1001995823}>
+  [standard-object]
+
+Slots with :DATABASE allocation:
+  NAME                           = "3-8 acc sharp"
+  DESCRIPTION                    = "q+"
+  ENP                            = (((((1 ((1 :NOTES (243/4)))) :TIME-SIGNATURE (1 4))) :INSTRUMENT NIL..
+  MUSICXML                       = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>..
+  STATUS                         = :RUN
+  ENP-SCREEN-SHOT                = #(137 80 78 71 13 10 26 10 0 0 0 13 73 72 68 82 0 0 1 250 0 0 0 214 8 ..
+  SCORE                          = "(LET ((SYSTEM::WIN (MAKE-INSTANCE (QUOTE SYSTEM::ENP-APPLICATION-WIND..
+  ENV                            = (MUSICXML-PWGL.ENP2MUSICXML:*EIGHTH-TONE-ENCODING* T)
+Slots with :INSTANCE allocation:
+  ID                             = 74
+  DELETED                        = NIL
