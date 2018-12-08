@@ -28,6 +28,8 @@ install:
   #- git clone --depth=1 git://github.com/trivial-features/trivial-features.git ~/lisp/trivial-features
   #- git clone git://common-lisp.net/projects/alexandria/alexandria.git ~/lisp/alexandria
   #- git clone --depth=1 git://github.com/cl-babel/babel.git ~/lisp/babel
+  - which diffx
+  - diff -v
 
 script:
   - cl -e '(ql:quickload "musicxml-pwgl")
