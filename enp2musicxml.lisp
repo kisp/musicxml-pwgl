@@ -278,7 +278,9 @@
                              (unregister-slur *slur-store* slur) "stop"))))
                      (slur-expressions chord))))
     (append (convert-slurs chord)
-            (convert-articulations chord))))
+            (convert-articulations chord)
+            (when (member :tremolo32 (chord-expressions chord))
+              '((:|ornaments| ((:|tremolo| :|type| "single") 3)))))))
 
 (defun convert-dynamics (chord next-chord)
   (declare (type chord chord))
