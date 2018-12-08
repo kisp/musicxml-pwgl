@@ -85,7 +85,7 @@
   (sb-ext:run-program
    "/bin/bash"
    (list "-c"
-         (format nil "xmllint --format <(xmllint --c14n11 '~A') >'~A'"
+         (format nil "xmllint --format <(xmllint --exc-c14n '~A') >'~A'"
                  (namestring path) (namestring new-path)))))
 
 (defun string-remove-first-n-lines (n string)
