@@ -17,6 +17,9 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;; Run with
+;; $ sbcl --script scripts/dist.lisp
+
 (require :asdf)
 (require :sb-posix)
 
@@ -77,16 +80,20 @@
        (progn
          (sb-posix:chdir *tmp-dir*)
          (sb-ext:run-program
-          "/bin/tar"
+          "tar"
           (list "cfz" (format nil "~A.tgz" *name-version*)
-                (enough-namestring *dir* *tmp-dir*)))
+                (enough-namestring *dir* *tmp-dir*))
+          :search t)
          (sb-ext:run-program
-          "/usr/bin/zip"
+          "zip"
           (list "-r" (format nil "~A.zip" *name-version*)
-                (enough-namestring *dir* *tmp-dir*))))
+                (enough-namestring *dir* *tmp-dir*))
+          :search t))
     (sb-posix:chdir cwd)))
 
 (copy-file (merge-pathnames (format nil "~A.tgz" *name-version*) *tmp-dir*)
            (merge-pathnames (format nil "~A.tgz" *name-version*)))
 (copy-file (merge-pathnames (format nil "~A.zip" *name-version*) *tmp-dir*)
            (merge-pathnames (format nil "~A.zip" *name-version*)))
+
+(sb-ext:run-program "bash" (list "-c" (format nil "ls -l ~A*" *name-version*)) :search t :output t)
