@@ -30,6 +30,8 @@ install:
   #- git clone --depth=1 git://github.com/cl-babel/babel.git ~/lisp/babel
   - which diff
   - diff -v
+  - which xmllint
+  - xmllint --version
 
 script:
   - cl -e '(ql:quickload "musicxml-pwgl")
