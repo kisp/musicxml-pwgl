@@ -305,14 +305,16 @@
 
 (macrolet ((frob ()
              (assert (list-test-cases))
-             (mapcar
-              (lambda (tc)
-                `(frob-tc
-                  ,(sqlite-orm:store-object-id tc)
-                  ,(intern (substitute
-                            #\_ #\space
-                            (string-upcase (format nil "test-db-~A-~A" (sqlite-orm:store-object-id tc) (name tc)))))))
-              (list-test-cases)))
+             (cons 'progn
+                   (mapcar
+                    (lambda (tc)
+                      `(frob-tc
+                        ,(sqlite-orm:store-object-id tc)
+                        ,(intern (substitute
+                                  #\_ #\space
+                                  (string-upcase (format nil "test-db-~A-~A"
+                                                         (sqlite-orm:store-object-id tc) (name tc)))))))
+                    (list-test-cases))))
            (frob-tc (id name)
              `(deftest ,name
                 (let* ((id ,id)
