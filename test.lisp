@@ -303,16 +303,28 @@
   (canonicalise "/tmp/exp.xml" "/tmp/expc.xml")
   (files-eql-p "/tmp/resc.xml" "/tmp/expc.xml"))
 
-(deftest test-db
-  (assert (list-test-cases))
-  (dolist (test-case (list-test-cases))
-    (ecase (status test-case)
-      (:skip (skip "~A -- ~A" (name test-case) (description test-case)))
-      (:run
-       (is-true (check-test-db-test-case test-case '(:|identification|))
-                "\"~A\" failed~%~A"
-                (name test-case)
-                (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))
+(macrolet ((frob ()
+             (assert (list-test-cases))
+             (mapcar
+              (lambda (tc)
+                `(frob-tc
+                  ,(sqlite-orm:store-object-id tc)
+                  ,(intern (substitute
+                            #\_ #\space
+                            (string-upcase (format nil "test-db-~A-~A" (sqlite-orm:store-object-id tc) (name tc)))))))
+              (list-test-cases)))
+           (frob-tc (id name)
+             `(deftest ,name
+                (let* ((id ,id)
+                       (test-case (find id (list-test-cases) :key #'sqlite-orm:store-object-id)))
+                  (ecase (status test-case)
+                    (:skip (skip "~A -- ~A" (name test-case) (description test-case)))
+                    (:run
+                     (is-true (check-test-db-test-case test-case '(:|identification|))
+                              "\"~A\" failed~%~A"
+                              (name test-case)
+                              (diff "/tmp/resc.xml" "/tmp/expc.xml"))))))))
+  (frob))
 
 (deftest pprint-xml-nil
   (is
