@@ -88,6 +88,7 @@
          (format nil "Canonicalise <~A >~A"
                  (namestring path) (namestring new-path)))))
 
+
 (defun string-remove-first-n-lines (n string)
   (if (zerop n)
       string
@@ -317,7 +318,6 @@
                     (list-test-cases))))
            (frob-tc (id name)
              `(deftest ,name
-                (warn "running ~A" ',name)
                 (let* ((id ,id)
                        (test-case (find id (list-test-cases) :key #'sqlite-orm:store-object-id)))
                   (ecase (status test-case)
