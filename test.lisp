@@ -88,7 +88,6 @@
          (format nil "Canonicalise <~A >~A"
                  (namestring path) (namestring new-path)))))
 
-
 (defun string-remove-first-n-lines (n string)
   (if (zerop n)
       string
