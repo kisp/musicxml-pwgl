@@ -67,18 +67,21 @@
 (in-suite :musicxml-pwgl.base)
 
 (defun files-eql-p (a b)
+  ;; @todo #3:30m needs better exit code checking of diff
   (let ((process (sb-ext:run-program
                   "/usr/bin/diff"
                   (list "-q" (namestring a) (namestring b)))))
     (zerop (sb-ext:process-exit-code process))))
 
 (defun diff (a b)
+  ;; @todo #3:30m needs better exit code checking of diff 2
   (with-output-to-string (out)
     (sb-ext:run-program
      "/usr/bin/diff"
      (list "-u" (namestring a) (namestring b)) :output out)))
 
 (defun canonicalise (path new-path)
+  ;; @todo #3:30m needs better exit code checking of Canonicalise
   (sb-ext:run-program
    "/bin/bash"
    (list "-c"
