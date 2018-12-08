@@ -303,7 +303,6 @@
   (canonicalise "/tmp/exp.xml" "/tmp/expc.xml")
   (files-eql-p "/tmp/resc.xml" "/tmp/expc.xml"))
 
-
 (macrolet ((frob ()
              (assert (list-test-cases))
              (cons 'progn
@@ -318,6 +317,7 @@
                     (list-test-cases))))
            (frob-tc (id name)
              `(deftest ,name
+                (warn "running ~A" ',name)
                 (let* ((id ,id)
                        (test-case (find id (list-test-cases) :key #'sqlite-orm:store-object-id)))
                   (ecase (status test-case)
