@@ -17,6 +17,10 @@ env:
 #   allow_failures:
 #     - env: LISP=ccl32
 
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y libxml2-utils
+
 install:
   - curl -L https://github.com/luismbo/cl-travis/raw/master/install.sh | sh
   - if [ "${LISP:(-2)}" = "32" ]; then
