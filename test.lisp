@@ -303,6 +303,7 @@
   (canonicalise "/tmp/exp.xml" "/tmp/expc.xml")
   (files-eql-p "/tmp/resc.xml" "/tmp/expc.xml"))
 
+
 (macrolet ((frob ()
              (assert (list-test-cases))
              (cons 'progn
