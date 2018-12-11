@@ -81,21 +81,11 @@
             (list-test-cases)))
 
 (defun make-entry (list)
-  (destructuring-bind (name description enp musicxml status enp-screen-shot
-                       score)
+  (destructuring-bind (name description enp musicxml status enp-screen-shot score)
       list
-    (make-instance 'test-case
-                   :score score
-                   :enp-screen-shot enp-screen-shot
-                   :status status
-                   :musicxml musicxml
-                   :enp enp
-                   :description description
-                   :name name)
-    t))
+    (make-entry* name description enp musicxml status enp-screen-shot score)))
 
-(defun make-entry* (name description enp musicxml status enp-screen-shot
-                    score)
+(defun make-entry* (name description enp musicxml status enp-screen-shot score)
   (make-instance 'test-case
                  :score score
                  :enp-screen-shot enp-screen-shot
