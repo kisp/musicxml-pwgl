@@ -40,7 +40,8 @@
    #:set-to-skip
    #:set-to-run
    #:make-entry*
-   #:env))
+   #:env
+   #:duplicate))
 
 (in-package #:musicxml-pwgl.test-db)
 
@@ -95,6 +96,12 @@
                  :description description
                  :name name)
   t)
+
+(defun duplicate (test-case)
+  (with-accessors ((name name) (description description) (enp enp) (musicxml musicxml)
+                   (status status) (enp-screen-shot enp-screen-shot) (score score))
+      test-case
+    (make-entry* name description enp musicxml status enp-screen-shot score)))
 
 (defun show-foto (test-case)
   (write-byte-vector-into-file
