@@ -279,7 +279,7 @@
                      (slur-expressions chord))))
     (append (convert-slurs chord)
             (convert-articulations chord)
-            (when (member :tremolo32 (chord-expressions chord))
+            (when (member :tremolo32 (chord-expressions chord) :key #'atom-or-first)
               '((:|ornaments| ((:|tremolo| :|type| "single") 3)))))))
 
 (defun convert-dynamics (chord next-chord)
