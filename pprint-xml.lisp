@@ -85,7 +85,7 @@
 
 (defun remove-whitespace (dom)
   "Remove any text elements that contain only whitespace."
-  ;; TODO really remove them
+  ;; should really remove them -- this is an old comment
   (flet ((whitespace-p (char)
            (member char '(#\space #\page #\newline #\return #\tab))))
     (subst-if "" (lambda (obj) (and (stringp obj) (every #'whitespace-p obj)))
